@@ -16,11 +16,17 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-const db = getFirestore(app);
+const firestore = getFirestore(app);
 const googleProvider = new GoogleAuthProvider();
 
-const signInWithGoogle = () => {
-  return signInWithPopup(auth, googleProvider);
+const signInWithGoogle = async () => {
+  try {
+    const result = await signInWithPopup(auth, googleProvider);
+    return result.user;
+  } catch (error) {
+    console.error("Error signing in with Google:", error.message);
+    throw error;
+  }
 };
 
 const signUp = async (email, password) => {
@@ -48,7 +54,8 @@ const logOut = async () => {
     await signOut(auth);
   } catch (error) {
     console.error("Error signing out:", error.message);
+    throw error;
   }
 };
 
-export { auth, db as firestore, googleProvider, signInWithGoogle, signUp, signIn, logOut };
+export { auth, firestore, googleProvider, signInWithGoogle, signUp, signIn, logOut };
