@@ -7,35 +7,20 @@ import {
   addDoc,
   deleteDoc,
   doc,
-  updateDoc
 } from "firebase/firestore";
 import { auth, firestore } from "./lib/firebase";
 import Link from "next/link";
 
-const lawCategories = [
-  "Criminal Law",
-  "Family Law",
-  "Personal Injury",
-  "Real Estate Law",
-  "Business Law",
-  "Intellectual Property Law",
-  "Employment Law",
-  "Immigration Law",
-  "Other"
-];
-
 const Home = () => {
   const [user, setUser] = useState(null);
   const [inquiries, setInquiries] = useState([]);
-  const [title, setTitle] = useState("");
-  const [location, setLocation] = useState("");
   const [problem, setProblem] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
-  const [category, setCategory] = useState("");
+  const [title, setTitle] = useState("");
+  const [location, setLocation] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
-  const [filterCategory, setFilterCategory] = useState("");
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(setUser);
@@ -58,7 +43,7 @@ const Home = () => {
     };
 
     fetchInquiries();
-    return () => unsubscribe();
+    return () => unsubscribe(); // Cleanup subscription on unmount
   }, []);
 
   const handleSignInWithGoogle = async () => {
@@ -94,19 +79,16 @@ const Home = () => {
         problem,
         email,
         phone,
-        category,
         userId: user.uid,
         userName: user.displayName,
         createdAt: new Date(),
-        found: false // New field to manage inquiry status
       });
       setTitle("");
       setLocation("");
       setProblem("");
       setEmail("");
       setPhone("");
-      setCategory("");
-      setFilterCategory(""); // Reset filter
+      // Refresh the inquiries list
       const snapshot = await getDocs(inquiriesCollection);
       const inquiriesList = snapshot.docs.map((doc) => ({
         id: doc.id,
@@ -122,167 +104,157 @@ const Home = () => {
     try {
       const inquiryDoc = doc(firestore, "inquiries", inquiryId);
       await deleteDoc(inquiryDoc);
-      setInquiries((prevInquiries) =>
-        prevInquiries.filter((inquiry) => inquiry.id !== inquiryId)
-      );
+      // Refresh the inquiries list
+      setInquiries(inquiries.filter((inquiry) => inquiry.id !== inquiryId));
     } catch (error) {
       console.error("Error deleting inquiry:", error.message);
     }
   };
 
-  const handleToggleFound = async (inquiryId, currentStatus) => {
-    try {
-      const inquiryDoc = doc(firestore, "inquiries", inquiryId);
-      await updateDoc(inquiryDoc, { found: !currentStatus });
-      setInquiries((prevInquiries) =>
-        prevInquiries.map((inquiry) =>
-          inquiry.id === inquiryId ? { ...inquiry, found: !currentStatus } : inquiry
-        )
-      );
-    } catch (error) {
-      console.error("Error updating inquiry:", error.message);
-    }
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text).then(
+      () => alert("Copied to clipboard!"),
+      (err) => console.error("Failed to copy: ", err)
+    );
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
-      <div className="container mx-auto">
-        {user ? (
-          <div>
-            <button
-              onClick={handleLogout}
-              className="bg-red-500 text-white p-2 rounded-md mb-4"
-            >
-              Sign Out
-            </button>
-            <h1 className="text-2xl font-semibold mb-4">Welcome, {user.displayName}</h1>
-            <div className="bg-white p-6 rounded-lg shadow-lg mb-4">
-              <h2 className="text-xl font-semibold mb-2">Submit Inquiry</h2>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <input
-                  type="text"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  placeholder="Title"
-                  required
-                  className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                <input
-                  type="text"
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                  placeholder="Location (Ex: Colombo)"
-                  required
-                  className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                <textarea
-                  value={problem}
-                  onChange={(e) => setProblem(e.target.value)}
-                  placeholder="Describe your problem"
-                  required
-                  className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 h-32"
-                />
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Your Email (Optional)"
-                  className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                <input
-                  type="number"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  placeholder="Your Phone"
-                  required
-                  className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                <select
-                  value={category}
-                  onChange={(e) => setCategory(e.target.value)}
-                  required
-                  className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="" disabled>Select Law Category</option>
-                  {lawCategories.map((cat) => (
-                    <option key={cat} value={cat}>{cat}</option>
-                  ))}
-                </select>
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className={`w-full p-2 rounded-md text-white ${
-                    loading ? "bg-gray-500 cursor-not-allowed" : "bg-blue-500 hover:bg-blue-600"
-                  }`}
-                >
-                  {loading ? "Submitting..." : "Submit Inquiry"}
-                </button>
-              </form>
-            </div>
-          </div>
-        ) : (
-          <div>
-            <button
-              onClick={handleSignInWithGoogle}
-              className="bg-blue-500 text-white p-2 rounded-md"
-            >
-              Sign In with Google
-            </button>
-          </div>
-        )}
-        <div className="mt-8">
-          <h2 className="text-xl font-semibold mb-2">Inquiries</h2>
-          <div className="bg-white p-6 rounded-lg shadow-lg mb-4">
-            <div className="mb-4">
-              <label className="block text-sm font-medium mb-2">Filter by Category:</label>
-              <select
-                value={filterCategory}
-                onChange={(e) => setFilterCategory(e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="">All Categories</option>
-                {lawCategories.map((cat) => (
-                  <option key={cat} value={cat}>{cat}</option>
-                ))}
-              </select>
-            </div>
-            {loading ? (
-              <p>Loading...</p>
-            ) : (
-              <ul className="space-y-4">
-                {inquiries
-                  .filter(inquiry => !filterCategory || inquiry.category === filterCategory)
-                  .map((inquiry) => (
-                    <li key={inquiry.id} className="border-b border-gray-300 pb-4">
-                      <h3 className="text-lg font-semibold">{inquiry.title}</h3>
-                      <p><strong>Location:</strong> {inquiry.location}</p>
-                      <p><strong>Problem:</strong> {inquiry.problem}</p>
-                      <p><strong>Email:</strong> {inquiry.email || "N/A"}</p>
-                      <p><strong>Phone:</strong> {inquiry.phone}</p>
-                      <p><strong>Category:</strong> {inquiry.category}</p>
-                      <p><strong>Status:</strong> {inquiry.found ? "Found" : "Not Found"}</p>
-                      <div className="mt-2">
-                        <button
-                          onClick={() => handleToggleFound(inquiry.id, inquiry.found)}
-                          className={`mr-2 px-4 py-2 rounded-md text-white ${
-                            inquiry.found ? "bg-red-500 hover:bg-red-600" : "bg-green-500 hover:bg-green-600"
-                          }`}
-                        >
-                          {inquiry.found ? "Mark as Not Found" : "Mark as Found"}
-                        </button>
-                        <button
-                          onClick={() => handleDelete(inquiry.id)}
-                          className="bg-red-500 text-white px-4 py-2 rounded-md"
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    </li>
-                  ))}
-              </ul>
-            )}
-          </div>
+    <div className="p-6 max-w-4xl mx-auto">
+      <h1 className="text-3xl font-bold mb-4 text-center">Law Inquiries ⚖️</h1>
+
+      {!user ? (
+        <div className="text-center">
+          <h2 className="text-xl mb-4">Login to Add Your Listings 👇</h2>
+          <button
+            onClick={handleSignInWithGoogle}
+            className="bg-blue-500 text-white py-2 px-4 rounded shadow hover:bg-blue-600 transition"
+          >
+            Sign in with Google
+          </button>
         </div>
+      ) : (
+        <div className="text-center mt-8">
+          <img
+            src={user?.photoURL || "/default-avatar.png"}
+            alt="User Profile"
+            className="w-32 h-32 rounded-full mx-auto mb-4 object-cover"
+          />
+          <h1 className="text-2xl font-semibold mb-4">
+            Welcome back {user?.displayName} 👋
+          </h1>
+          <button
+            onClick={handleLogout}
+            className="bg-red-500 text-white py-2 px-4 rounded shadow hover:bg-red-600 transition mb-4"
+          >
+            Logout
+          </button>
+          <div className="mb-4">
+            <Link
+              href={"/add"}
+              className="bg-green-500 text-white py-2 px-4 rounded shadow hover:bg-green-600 transition"
+            >
+              Add Inquiry
+            </Link>
+          </div>
+          <button
+            onClick={() => setShowPopup(!showPopup)}
+            className="bg-gray-500 text-white py-2 px-4 rounded shadow hover:bg-gray-600 transition"
+          >
+            Manage Your Inquiries
+          </button>
+          {showPopup && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+              <div className="bg-white p-6 rounded-lg shadow-lg max-w-md mx-4 relative">
+                <button
+                  onClick={() => setShowPopup(false)}
+                  className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 transition"
+                >
+                  ✖
+                </button>
+                <h3 className="text-xl font-semibold mb-4">Your Inquiries</h3>
+                <ul className="space-y-4">
+                  {user && inquiries && inquiries.length ? (
+                    inquiries
+                      .filter((inquiry) => inquiry.userId === user.uid)
+                      .map((inquiry) => (
+                        <li key={inquiry.id} className="border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition">
+                          <p><strong>Title:</strong> {inquiry.title}</p>
+                          <p><strong>Location:</strong> {inquiry.location}</p>
+                          <p><strong>Problem:</strong> {inquiry.problem}</p>
+                          <p>
+                            <strong>Email:</strong>{" "}
+                            <span
+                              className="text-blue-500 cursor-pointer hover:underline"
+                              onClick={() => copyToClipboard(inquiry.email)}
+                            >
+                              {inquiry.email}
+                            </span>
+                          </p>
+                          <p>
+                            <strong>Phone:</strong>{" "}
+                            <span
+                              className="text-blue-500 cursor-pointer hover:underline"
+                              onClick={() => copyToClipboard(inquiry.phone)}
+                            >
+                              {inquiry.phone}
+                            </span>
+                          </p>
+                          <button
+                            onClick={() => handleDelete(inquiry.id)}
+                            className="bg-red-500 text-white py-1 px-3 rounded mt-2 hover:bg-red-600 transition"
+                          >
+                            Delete
+                          </button>
+                        </li>
+                      ))
+                  ) : (
+                    <h1>{user ? "No Inquiries Added" : "Please log in to see inquiries"}</h1>
+                  )}
+                </ul>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      <div className="mt-8">
+        <h2 className="text-2xl font-semibold mb-4">Existing Inquiries</h2>
+        {loading ? (
+          <p>Loading...</p>
+        ) : (
+          <ul className="space-y-4">
+            {inquiries.length ? (
+              inquiries.map((inquiry) => (
+                <li key={inquiry.id} className="border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition">
+                  <h3 className="text-lg font-semibold mb-2">Name: {inquiry.userName}</h3>
+                  <p><strong>Title:</strong> {inquiry.title}</p>
+                  <p><strong>Location:</strong> {inquiry.location}</p>
+                  <p><strong>Problem:</strong> {inquiry.problem}</p>
+                  <p>
+                    <strong>Email:</strong>{" "}
+                    <span
+                      className="text-blue-500 cursor-pointer hover:underline"
+                      onClick={() => copyToClipboard(inquiry.email)}
+                    >
+                      {inquiry.email}
+                    </span>
+                  </p>
+                  <p>
+                    <strong>Phone:</strong>{" "}
+                    <span
+                      className="text-blue-500 cursor-pointer hover:underline"
+                      onClick={() => copyToClipboard(inquiry.phone)}
+                    >
+                      {inquiry.phone}
+                    </span>
+                  </p>
+                </li>
+              ))
+            ) : (
+              <h1>No Inquiries Posted Yet</h1>
+            )}
+          </ul>
+        )}
       </div>
     </div>
   );
