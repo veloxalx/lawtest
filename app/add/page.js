@@ -130,7 +130,24 @@ const AddInquiry = () => {
       </div>
 
       <form onSubmit={handleAddInquiry} className="space-y-4">
+        
+
         <div>
+          <label>Select Category</label>
+          <select
+            id="category"
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            required
+            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50" style={{marginBottom:"40px",marginTop:"20px"}}
+          >
+            <option value="">Select a Category</option>
+            {lawCategories.map((cat) => (
+              <option key={cat} value={cat}>
+                {cat}
+              </option>
+            ))}
+          </select>
           <label htmlFor="title" className="block text-sm font-medium text-gray-700">
             Title
           </label>
@@ -204,20 +221,6 @@ const AddInquiry = () => {
           <label htmlFor="category" className="block text-sm font-medium text-gray-700">
             Category
           </label>
-          <select
-            id="category"
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            required
-            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
-          >
-            <option value="">Select a Category</option>
-            {lawCategories.map((cat) => (
-              <option key={cat} value={cat}>
-                {cat}
-              </option>
-            ))}
-          </select>
         </div>
 
         <button
