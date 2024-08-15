@@ -181,6 +181,7 @@ const Home = () => {
               <p><strong>Email:</strong> {listing.email || "Not provided"}</p>
               <p><strong>Phone:</strong> {listing.phone || "Not provided"}</p>
               <p><strong>Category:</strong> {listing.category}</p>
+              <p><strong></strong> <b>{listing.found && "Occupied"}</b></p>
               {user && user.uid === listing.userId && !listing.found && (
                 <button
                   onClick={() => handleMarkAsOccupied(listing.id)}
@@ -198,7 +199,7 @@ const Home = () => {
 
       {showPopup && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-          <div className="bg-white p-6 rounded-lg shadow-lg max-w-lg mx-4 relative w-full sm:w-96">
+          <div className="bg-white p-6 rounded-lg shadow-lg max-w-lg mx-4 relative w-full sm:w-11/12 md:w-8/12 lg:w-6/12 xl:w-5/12">
             <button
               onClick={() => setShowPopup(false)}
               className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 transition"
@@ -207,11 +208,11 @@ const Home = () => {
             </button>
             <h3 className="text-xl font-semibold mb-4">Your Listings</h3>
             <div className="mb-4">
-              <label htmlFor="category-filter" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="popup-category-filter" className="block text-sm font-medium text-gray-700">
                 Filter by Category
               </label>
               <select
-                id="category-filter"
+                id="popup-category-filter"
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
                 className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
@@ -238,6 +239,7 @@ const Home = () => {
                   <p><strong>Email:</strong> {listing.email || "Not provided"}</p>
                   <p><strong>Phone:</strong> {listing.phone || "Not provided"}</p>
                   <p><strong>Category:</strong> {listing.category}</p>
+                  <p><strong></strong> <b>{listing.found && "Occupied"}</b></p>
                   {user && user.uid === listing.userId && !listing.found && (
                     <button
                       onClick={() => handleMarkAsOccupied(listing.id)}
