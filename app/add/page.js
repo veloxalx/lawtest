@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
-import { collection, addDoc } from "firebase/firestore";
+import { collection, addDoc, updateDoc, doc } from "firebase/firestore";
 import { auth, firestore } from "../lib/firebase";
 import Link from "next/link";
 
@@ -95,9 +95,7 @@ const AddInquiry = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 p-10">
-    
       <div className="container mx-auto">
-
         {user ? (
           <div>
             <button

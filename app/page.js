@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
-import { collection, getDocs, deleteDoc, doc } from "firebase/firestore";
+import { collection, getDocs, deleteDoc, updateDoc, doc } from "firebase/firestore";
 import { auth, firestore } from "./lib/firebase";
 import Link from "next/link";
 
@@ -47,18 +47,8 @@ const Home = () => {
     };
 
     fetchListings();
-    return () => unsubscribe(); // Cleanup subscription on unmount
+    return () => unsubscribe();
   }, []);
-
-  useEffect(() => {
-    if (selectedCategory) {
-      setFilteredListings(
-        listings.filter((listing) => listing.category === selectedCategory)
-      );
-    } else {
-      setFilteredListings(listings);
-    }
-  }, [selectedCategory, listings]);
 
   const handleSignInWithGoogle = async () => {
     try {
@@ -66,7 +56,6 @@ const Home = () => {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
       setUser(user);
-      localStorage.setItem('user', JSON.stringify(user)); // Store user in localStorage
     } catch (error) {
       console.error("Error signing in with Google:", error.message);
     }
@@ -76,179 +65,125 @@ const Home = () => {
     try {
       await signOut(auth);
       setUser(null);
-      localStorage.removeItem('user'); // Remove user from localStorage
     } catch (error) {
       console.error("Error signing out:", error.message);
     }
   };
 
-  const handleDelete = async (listingId) => {
+  const handleFilterChange = (event) => {
+    const category = event.target.value;
+    setSelectedCategory(category);
+    if (category) {
+      setFilteredListings(
+        listings.filter((listing) => listing.category === category)
+      );
+    } else {
+      setFilteredListings(listings);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (confirm("Are you sure you want to delete this inquiry?")) {
+      try {
+        await deleteDoc(doc(firestore, "inquiries", id));
+        setFilteredListings(filteredListings.filter((item) => item.id !== id));
+      } catch (error) {
+        console.error("Error deleting inquiry:", error.message);
+      }
+    }
+  };
+
+  const toggleStatus = async (id, currentStatus) => {
     try {
-      const listingDoc = doc(firestore, "inquiries", listingId);
-      await deleteDoc(listingDoc);
-      // Refresh the listings list
-      setListings(listings.filter((listing) => listing.id !== listingId));
-      setFilteredListings(filteredListings.filter((listing) => listing.id !== listingId));
+      await updateDoc(doc(firestore, "inquiries", id), {
+        found: !currentStatus
+      });
+      setFilteredListings(
+        filteredListings.map((item) =>
+          item.id === id ? { ...item, found: !currentStatus } : item
+        )
+      );
     } catch (error) {
-      console.error("Error deleting listing:", error.message);
+      console.error("Error updating status:", error.message);
     }
   };
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
-      <h1 className="text-3xl font-bold mb-4 text-center">Law Listings ⚖️</h1>
-
-      <div className="text-center mb-4">
-        <label htmlFor="category-filter" className="block text-sm font-medium text-gray-700">
-          Filter by Category
-        </label>
-        <select
-          id="category-filter"
-          value={selectedCategory}
-          onChange={(e) => setSelectedCategory(e.target.value)}
-          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
-        >
-          <option value="">All Categories</option>
-          {lawCategories.map((cat) => (
-            <option key={cat} value={cat}>
-              {cat}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <div className="text-center mb-4">
-        {!user ? (
+    <div className="min-h-screen bg-gray-100 p-10">
+      <div className="container mx-auto">
+        {user ? (
           <div>
-            <h2 className="text-xl mb-4">Login to Add Your Listings 👇</h2>
-            <button
-              onClick={handleSignInWithGoogle}
-              className="bg-blue-500 text-white py-2 px-4 rounded shadow hover:bg-blue-600 transition"
-            >
-              Sign in with Google
-            </button>
-          </div>
-        ) : (
-          <div>
-            <img
-              src={user?.photoURL || "/default-avatar.png"}
-              alt="User Profile"
-              className="w-32 h-32 rounded-full mx-auto mb-4 object-cover"
-            />
-            <h1 className="text-2xl font-semibold mb-4">
-              Welcome back {user?.displayName} 👋
-            </h1>
             <button
               onClick={handleLogout}
-              className="bg-red-500 text-white py-2 px-4 rounded shadow hover:bg-red-600 transition mb-4"
+              className="bg-red-500 text-white p-2 rounded-md mb-4"
             >
-              Logout
+              Sign Out
             </button>
-            <div className="mb-4">
-              <Link
-                href={"/add"}
-                className="bg-green-500 text-white py-2 px-4 rounded shadow hover:bg-green-600 transition"
-              >
-                Add Listing
-              </Link>
-            </div>
-            <button
-              onClick={() => setShowPopup(!showPopup)}
-              className="bg-gray-500 text-white py-2 px-4 rounded shadow hover:bg-gray-600 transition"
+            <h1 className="text-2xl font-semibold mb-4">Inquiries</h1>
+            <Link href={"/add"}>Submit New Inquiry</Link>
+            <br/><br/>
+            <select
+              value={selectedCategory}
+              onChange={handleFilterChange}
+              className="mb-4 p-2 border border-gray-300 rounded-md"
             >
-              Manage Your Listings
+              <option value="">All Categories</option>
+              {lawCategories.map((cat) => (
+                <option key={cat} value={cat}>
+                  {cat}
+                </option>
+              ))}
+            </select>
+            {loading ? (
+              <p>Loading...</p>
+            ) : (
+              <div className="bg-white p-6 rounded-lg shadow-lg">
+                {filteredListings.length > 0 ? (
+                  filteredListings.map((listing) => (
+                    <div
+                      key={listing.id}
+                      className="border-b border-gray-300 p-4 mb-4"
+                    >
+                      <h2 className="text-xl font-semibold">{listing.title}</h2>
+                      <p className="text-gray-700">{listing.location}</p>
+                      <p className="text-gray-600">{listing.problem}</p>
+                      <p className="text-gray-500">Email: {listing.email}</p>
+                      <p className="text-gray-500">Phone: {listing.phone}</p>
+                      <p className="text-gray-500">Category: {listing.category}</p>
+                      <p className={`text-sm font-semibold ${listing.found ? "text-green-600" : "text-red-600"}`}>
+                        Status: {listing.found ? "Occupied" : "Not Occupied"}
+                      </p>
+                      <button
+                        onClick={() => toggleStatus(listing.id, listing.found)}
+                        className="bg-yellow-500 text-white p-2 rounded-md mr-2"
+                      >
+                        Toggle Status
+                      </button>
+                      <button
+                        onClick={() => handleDelete(listing.id)}
+                        className="bg-red-500 text-white p-2 rounded-md"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  ))
+                ) : (
+                  <p>No inquiries found.</p>
+                )}
+              </div>
+            )}
+          </div>
+        ) : (
+          <div>
+            <button
+              onClick={handleSignInWithGoogle}
+              className="bg-blue-500 text-white p-2 rounded-md"
+            >
+              Sign In with Google
             </button>
           </div>
         )}
       </div>
-
-      <div className="space-y-4">
-        {loading ? <h1>Loading...</h1> : filteredListings.length > 0 ? (
-          filteredListings.map((listing) => (
-            <div
-              key={listing.id}
-              className={`border border-gray-200 rounded-lg p-4 shadow-sm ${
-                lawCategories.includes(listing.category) ? "bg-yellow-100" : "bg-white"
-              }`}
-            >
-              <h4 className="text-xl font-semibold">{listing.title}</h4>
-              <p><strong>Location:</strong> {listing.location}</p>
-              <p><strong>Description:</strong> {listing.problem}</p>
-              <p><strong>Email:</strong> {listing.email || "Not provided"}</p>
-              <p><strong>Phone:</strong> {listing.phone || "Not provided"}</p>
-              <p><strong>Category:</strong> {listing.category}</p>
-              {user && user.uid === listing.userId && (
-                <button
-                  onClick={() => handleDelete(listing.id)}
-                  className="bg-red-500 text-white py-1 px-3 rounded mt-2 hover:bg-red-600 transition"
-                >
-                  Delete
-                </button>
-              )}
-            </div>
-          ))
-        ) : (
-          <h2>No Listings Found</h2>
-        )}
-      </div>
-
-      {showPopup && (
-  <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-    <div className="bg-white p-6 rounded-lg shadow-lg max-w-lg mx-4 relative w-full sm:w-96">
-      <button
-        onClick={() => setShowPopup(false)}
-        className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 transition"
-      >
-        ✖
-      </button>
-      <h3 className="text-xl font-semibold mb-4">Your Listings</h3>
-      <div className="mb-4">
-        <label htmlFor="category-filter" className="block text-sm font-medium text-gray-700">
-          Filter by Category
-        </label>
-        <select
-          id="category-filter"
-          value={selectedCategory}
-          onChange={(e) => setSelectedCategory(e.target.value)}
-          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
-        >
-          <option value="">All Categories</option>
-          {lawCategories.map((cat) => (
-            <option key={cat} value={cat}>
-              {cat}
-            </option>
-          ))}
-        </select>
-      </div>
-      <ul className="space-y-4">
-        {user && filteredListings.length > 0 ? (
-          filteredListings
-            .filter((listing) => listing.userId === user.uid)
-            .map((listing) => (
-              <li key={listing.id} className="border border-gray-200 rounded-lg p-4 shadow-sm bg-white">
-                <h4 className="text-xl font-semibold">{listing.title}</h4>
-                <p><strong>Location:</strong> {listing.location}</p>
-                <p><strong>Description:</strong> {listing.problem}</p>
-                <p><strong>Email:</strong> {listing.email || "Not provided"}</p>
-                <p><strong>Phone:</strong> {listing.phone || "Not provided"}</p>
-                <p><strong>Category:</strong> {listing.category}</p>
-                <button
-                  onClick={() => handleDelete(listing.id)}
-                  className="bg-red-500 text-white py-1 px-3 rounded mt-2 hover:bg-red-600 transition"
-                >
-                  Delete
-                </button>
-              </li>
-            ))
-        ) : (
-          <p>You have no listings</p>
-        )}
-      </ul>
-    </div>
-  </div>
-)}
-
-
     </div>
   );
 };
