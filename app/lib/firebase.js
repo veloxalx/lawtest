@@ -1,6 +1,6 @@
-import { initializeApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
+import { initializeApp } from "firebase/app";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
 
 // Replace these with your Firebase project config
 const firebaseConfig = {
@@ -16,7 +16,39 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-const firestore = getFirestore(app);
+const db = getFirestore(app);
 const googleProvider = new GoogleAuthProvider();
 
-export { auth, firestore, googleProvider, signInWithPopup, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword };
+const signInWithGoogle = () => {
+  return signInWithPopup(auth, googleProvider);
+};
+
+const signUp = async (email, password) => {
+  try {
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    return userCredential.user;
+  } catch (error) {
+    console.error("Error signing up:", error.message);
+    throw error;
+  }
+};
+
+const signIn = async (email, password) => {
+  try {
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    return userCredential.user;
+  } catch (error) {
+    console.error("Error signing in:", error.message);
+    throw error;
+  }
+};
+
+const logOut = async () => {
+  try {
+    await signOut(auth);
+  } catch (error) {
+    console.error("Error signing out:", error.message);
+  }
+};
+
+export { auth, db as firestore, googleProvider, signInWithGoogle, signUp, signIn, logOut };
