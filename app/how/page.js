@@ -10,20 +10,20 @@ const HowToSection = () => {
   return (
     <div className="p-6 max-w-3xl mx-auto bg-gray-100 rounded-lg shadow-md">
       <Link href={"/"}>Back to Homepage!</Link>
-      <br/>  <br/>
+      <br /> <br />
       <h1 className="text-2xl font-bold mb-4 text-center">How to Use This Application</h1>
 
       <div className="space-y-4">
         <div className="bg-white p-4 rounded-lg shadow-sm">
           <h2 className="text-xl font-semibold mb-2">Sign Up and Manage Listings</h2>
           <p className="text-gray-700 mb-2">
-            <span className="font-bold text-blue-600">Sign Up:</span> Click on the <span className="font-bold">"Sign in with Google"</span> button to log in or sign up using your Google account.
+            <span className="font-bold text-blue-600">Sign Up:</span> Click on the <span className="font-bold">&quot;Sign in with Google&quot;</span> button to log in or sign up using your Google account.
           </p>
           <p className="text-gray-700 mb-2">
-            <span className="font-bold text-blue-600">Add Listings:</span> After logging in, you can add your legal listings by clicking on the <span className="font-bold">"Add Listing"</span> button.
+            <span className="font-bold text-blue-600">Add Listings:</span> After logging in, you can add your legal listings by clicking on the <span className="font-bold">&quot;Add Listing&quot;</span> button.
           </p>
           <p className="text-gray-700 mb-2">
-            <span className="font-bold text-blue-600">Change Status:</span> You can update the status of your listings to indicate whether they are resolved. Use the <span className="font-bold">"Mark as Occupied"</span> button to change the status.
+            <span className="font-bold text-blue-600">Change Status:</span> You can update the status of your listings to indicate whether they are resolved. Use the <span className="font-bold">&quot;Mark as Occupied&quot;</span> button to change the status.
           </p>
         </div>
 

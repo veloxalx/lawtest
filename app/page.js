@@ -4,6 +4,7 @@ import { GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
 import { collection, getDocs, updateDoc, doc } from "firebase/firestore";
 import { auth, firestore } from "./lib/firebase";
 import Link from "next/link";
+import Image from 'next/image';
 
 const lawCategories = [
   "Criminal Law",
@@ -111,7 +112,7 @@ const Home = () => {
       >
         How it works
       </Link>
-      <br/>  <br/>
+      <br /> <br />
       <div className="text-center mb-4">
         <label
           htmlFor="category-filter"
@@ -147,161 +148,54 @@ const Home = () => {
           </div>
         ) : (
           <div>
-            <img
+            <Image
               src={user?.photoURL || "/default-avatar.png"}
               alt="User Profile"
-              className="w-32 h-32 rounded-full mx-auto mb-4 object-cover"
+              width={128}
+              height={128}
+              className="rounded-full mx-auto mb-4"
             />
-            <h1 className="text-2xl font-semibold mb-4">
-              Welcome back {user?.displayName} 👋
-            </h1>
+            <h2 className="text-xl mb-4">Welcome, {user.displayName}!</h2>
             <button
               onClick={handleLogout}
-              className="bg-red-500 text-white py-2 px-4 rounded shadow hover:bg-red-600 transition mb-4"
+              className="bg-red-500 text-white py-2 px-4 rounded shadow hover:bg-red-600 transition"
             >
-              Logout
-            </button>
-            <div className="mb-4">
-              <Link
-                href={"/add"}
-                className="bg-green-500 text-white py-2 px-4 rounded shadow hover:bg-green-600 transition"
-              >
-                Add Listing
-              </Link>
-            </div>
-            <button
-              onClick={() => setShowPopup(!showPopup)}
-              className="bg-gray-500 text-white py-2 px-4 rounded shadow hover:bg-gray-600 transition"
-            >
-              Manage Your Listings
+              Sign Out
             </button>
           </div>
         )}
       </div>
 
-      <div className="space-y-4">
-        {loading ? (
-          <h1>Loading...</h1>
-        ) : filteredListings.length > 0 ? (
-          filteredListings.map((listing) => (
+      {loading ? (
+        <div className="text-center">Loading...</div>
+      ) : (
+        <div className="space-y-4">
+          {filteredListings.map((listing) => (
             <div
               key={listing.id}
-              className={`border border-gray-200 rounded-lg p-4 shadow-sm ${
-                listing.found
-                  ? "bg-green-100"
-                  : lawCategories.includes(listing.category)
-                  ? "bg-yellow-100"
-                  : "bg-white"
-              }`}
+              className="bg-white p-4 rounded-lg shadow-sm"
             >
-              <h4 className="text-xl font-semibold">{listing.title}</h4>
-              <p>
-                <strong>Location:</strong> {listing.location}
+              <h2 className="text-xl font-semibold mb-2">{listing.title}</h2>
+              <p className="text-gray-700 mb-2">{listing.description}</p>
+              <p className="text-gray-700 mb-2">Category: {listing.category}</p>
+              <p className="text-gray-700 mb-2">
+                Status:{" "}
+                {listing.found ? (
+                  <span className="text-green-600">Occupied</span>
+                ) : (
+                  <span className="text-yellow-600">Open</span>
+                )}
               </p>
-              <p>
-                <strong>Description:</strong> {listing.problem}
-              </p>
-              <p>
-                <strong>Email:</strong> {listing.email || "Not provided"}
-              </p>
-              <p>
-                <strong>Phone:</strong> {listing.phone || "Not provided"}
-              </p>
-              <p>
-                <strong>Category:</strong> {listing.category}
-              </p>
-              <p>
-                <strong></strong> <b>{listing.found && "Occupied"}</b>
-              </p>
-              {user && user.uid === listing.userId && !listing.found && (
+              {!listing.found && user && (
                 <button
                   onClick={() => handleMarkAsOccupied(listing.id)}
-                  className="bg-blue-500 text-white py-1 px-3 rounded mt-2 hover:bg-blue-600 transition"
+                  className="bg-blue-500 text-white py-2 px-4 rounded shadow hover:bg-blue-600 transition"
                 >
                   Mark as Occupied
                 </button>
               )}
             </div>
-          ))
-        ) : (
-          <h2>No Listings Found</h2>
-        )}
-      </div>
-
-      {showPopup && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-          <div className="bg-white p-6 rounded-lg shadow-lg max-w-lg mx-4 relative w-full sm:w-11/12 md:w-8/12 lg:w-6/12 xl:w-5/12">
-            <button
-              onClick={() => setShowPopup(false)}
-              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 transition"
-            >
-              ✖
-            </button>
-            <h3 className="text-xl font-semibold mb-4">Your Listings</h3>
-            <div className="mb-4">
-              <label
-                htmlFor="popup-category-filter"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Filter by Category
-              </label>
-              <select
-                id="popup-category-filter"
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
-              >
-                <option value="">All Categories</option>
-                {lawCategories.map((cat) => (
-                  <option key={cat} value={cat}>
-                    {cat}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <ul className="space-y-4">
-              {filteredListings.map((listing) => (
-                <li
-                  key={listing.id}
-                  className={`border border-gray-200 rounded-lg p-4 shadow-sm ${
-                    listing.found
-                      ? "bg-green-100"
-                      : lawCategories.includes(listing.category)
-                      ? "bg-yellow-100"
-                      : "bg-white"
-                  }`}
-                >
-                  <h4 className="text-xl font-semibold">{listing.title}</h4>
-                  <p>
-                    <strong>Location:</strong> {listing.location}
-                  </p>
-                  <p>
-                    <strong>Description:</strong> {listing.problem}
-                  </p>
-                  <p>
-                    <strong>Email:</strong> {listing.email || "Not provided"}
-                  </p>
-                  <p>
-                    <strong>Phone:</strong> {listing.phone || "Not provided"}
-                  </p>
-                  <p>
-                    <strong>Category:</strong> {listing.category}
-                  </p>
-                  <p>
-                    <strong></strong> <b>{listing.found && "Occupied"}</b>
-                  </p>
-                  {user && user.uid === listing.userId && !listing.found && (
-                    <button
-                      onClick={() => handleMarkAsOccupied(listing.id)}
-                      className="bg-blue-500 text-white py-1 px-3 rounded mt-2 hover:bg-blue-600 transition"
-                    >
-                      Mark as Occupied
-                    </button>
-                  )}
-                </li>
-              ))}
-            </ul>
-          </div>
+          ))}
         </div>
       )}
     </div>
