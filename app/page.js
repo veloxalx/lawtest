@@ -14,7 +14,7 @@ const lawCategories = [
   "Intellectual Property Law",
   "Employment Law",
   "Immigration Law",
-  "Other"
+  "Other",
 ];
 
 const Home = () => {
@@ -66,7 +66,7 @@ const Home = () => {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
       setUser(user);
-      localStorage.setItem('user', JSON.stringify(user)); // Store user in localStorage
+      localStorage.setItem("user", JSON.stringify(user)); // Store user in localStorage
     } catch (error) {
       console.error("Error signing in with Google:", error.message);
     }
@@ -76,7 +76,7 @@ const Home = () => {
     try {
       await signOut(auth);
       setUser(null);
-      localStorage.removeItem('user'); // Remove user from localStorage
+      localStorage.removeItem("user"); // Remove user from localStorage
     } catch (error) {
       console.error("Error signing out:", error.message);
     }
@@ -87,12 +87,16 @@ const Home = () => {
       const listingDoc = doc(firestore, "inquiries", listingId);
       await updateDoc(listingDoc, { found: true });
       // Refresh the listings list
-      setListings(listings.map((listing) =>
-        listing.id === listingId ? { ...listing, found: true } : listing
-      ));
-      setFilteredListings(filteredListings.map((listing) =>
-        listing.id === listingId ? { ...listing, found: true } : listing
-      ));
+      setListings(
+        listings.map((listing) =>
+          listing.id === listingId ? { ...listing, found: true } : listing
+        )
+      );
+      setFilteredListings(
+        filteredListings.map((listing) =>
+          listing.id === listingId ? { ...listing, found: true } : listing
+        )
+      );
     } catch (error) {
       console.error("Error marking listing as occupied:", error.message);
     }
@@ -101,9 +105,17 @@ const Home = () => {
   return (
     <div className="p-6 max-w-4xl mx-auto">
       <h1 className="text-3xl font-bold mb-4 text-center">Law Listings ⚖️</h1>
-
+      <Link
+        href={"/how"}
+        className="bg-green-500 text-white py-2 px-4 rounded shadow hover:bg-green-600 transition"
+      >
+        How it works
+      </Link>
       <div className="text-center mb-4">
-        <label htmlFor="category-filter" className="block text-sm font-medium text-gray-700">
+        <label
+          htmlFor="category-filter"
+          className="block text-sm font-medium text-gray-700"
+        >
           Filter by Category
         </label>
         <select
@@ -167,21 +179,39 @@ const Home = () => {
       </div>
 
       <div className="space-y-4">
-        {loading ? <h1>Loading...</h1> : filteredListings.length > 0 ? (
+        {loading ? (
+          <h1>Loading...</h1>
+        ) : filteredListings.length > 0 ? (
           filteredListings.map((listing) => (
             <div
               key={listing.id}
               className={`border border-gray-200 rounded-lg p-4 shadow-sm ${
-                listing.found ? "bg-green-100" : lawCategories.includes(listing.category) ? "bg-yellow-100" : "bg-white"
+                listing.found
+                  ? "bg-green-100"
+                  : lawCategories.includes(listing.category)
+                  ? "bg-yellow-100"
+                  : "bg-white"
               }`}
             >
               <h4 className="text-xl font-semibold">{listing.title}</h4>
-              <p><strong>Location:</strong> {listing.location}</p>
-              <p><strong>Description:</strong> {listing.problem}</p>
-              <p><strong>Email:</strong> {listing.email || "Not provided"}</p>
-              <p><strong>Phone:</strong> {listing.phone || "Not provided"}</p>
-              <p><strong>Category:</strong> {listing.category}</p>
-              <p><strong></strong> <b>{listing.found && "Occupied"}</b></p>
+              <p>
+                <strong>Location:</strong> {listing.location}
+              </p>
+              <p>
+                <strong>Description:</strong> {listing.problem}
+              </p>
+              <p>
+                <strong>Email:</strong> {listing.email || "Not provided"}
+              </p>
+              <p>
+                <strong>Phone:</strong> {listing.phone || "Not provided"}
+              </p>
+              <p>
+                <strong>Category:</strong> {listing.category}
+              </p>
+              <p>
+                <strong></strong> <b>{listing.found && "Occupied"}</b>
+              </p>
               {user && user.uid === listing.userId && !listing.found && (
                 <button
                   onClick={() => handleMarkAsOccupied(listing.id)}
@@ -208,7 +238,10 @@ const Home = () => {
             </button>
             <h3 className="text-xl font-semibold mb-4">Your Listings</h3>
             <div className="mb-4">
-              <label htmlFor="popup-category-filter" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="popup-category-filter"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Filter by Category
               </label>
               <select
@@ -230,16 +263,32 @@ const Home = () => {
                 <li
                   key={listing.id}
                   className={`border border-gray-200 rounded-lg p-4 shadow-sm ${
-                    listing.found ? "bg-green-100" : lawCategories.includes(listing.category) ? "bg-yellow-100" : "bg-white"
+                    listing.found
+                      ? "bg-green-100"
+                      : lawCategories.includes(listing.category)
+                      ? "bg-yellow-100"
+                      : "bg-white"
                   }`}
                 >
                   <h4 className="text-xl font-semibold">{listing.title}</h4>
-                  <p><strong>Location:</strong> {listing.location}</p>
-                  <p><strong>Description:</strong> {listing.problem}</p>
-                  <p><strong>Email:</strong> {listing.email || "Not provided"}</p>
-                  <p><strong>Phone:</strong> {listing.phone || "Not provided"}</p>
-                  <p><strong>Category:</strong> {listing.category}</p>
-                  <p><strong></strong> <b>{listing.found && "Occupied"}</b></p>
+                  <p>
+                    <strong>Location:</strong> {listing.location}
+                  </p>
+                  <p>
+                    <strong>Description:</strong> {listing.problem}
+                  </p>
+                  <p>
+                    <strong>Email:</strong> {listing.email || "Not provided"}
+                  </p>
+                  <p>
+                    <strong>Phone:</strong> {listing.phone || "Not provided"}
+                  </p>
+                  <p>
+                    <strong>Category:</strong> {listing.category}
+                  </p>
+                  <p>
+                    <strong></strong> <b>{listing.found && "Occupied"}</b>
+                  </p>
                   {user && user.uid === listing.userId && !listing.found && (
                     <button
                       onClick={() => handleMarkAsOccupied(listing.id)}
