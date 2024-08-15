@@ -133,7 +133,9 @@ const AddInquiry = () => {
         
 
         <div>
-          <label>Select Category</label>
+        <label htmlFor="category" className="block text-sm font-medium text-gray-700">
+            Category
+          </label>
           <select
             id="category"
             value={category}
@@ -218,9 +220,7 @@ const AddInquiry = () => {
         </div>
 
         <div>
-          <label htmlFor="category" className="block text-sm font-medium text-gray-700">
-            Category
-          </label>
+
         </div>
 
         <button
