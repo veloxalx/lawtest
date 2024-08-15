@@ -1,7 +1,13 @@
 "use client";
 import { useState, useEffect } from "react";
 import { GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
-import { collection, getDocs, addDoc, deleteDoc, doc } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  addDoc,
+  deleteDoc,
+  doc,
+} from "firebase/firestore";
 import { auth, firestore } from "./lib/firebase";
 import Link from "next/link";
 
@@ -105,12 +111,16 @@ const Home = () => {
     }
   };
 
+  console.log("User:", user);
+  console.log("Inquiries:", inquiries);
+
   return (
     <div>
       <h1>Law Inquiries</h1>
 
       {!user ? (
-        <div>
+        <div style={{textAlign:"left"}}>
+          <h1>Login to Add Your Listings 👇</h1>
           <button onClick={handleSignInWithGoogle}>Sign in with Google</button>
         </div>
       ) : (
@@ -133,7 +143,7 @@ const Home = () => {
               <button onClick={() => setShowPopup(false)}>Close</button>
               <h3>Your Inquiries</h3>
               <ul>
-                {inquiries.length ? (
+                {user && inquiries && inquiries.length ? (
                   inquiries
                     .filter((inquiry) => inquiry.userId === user.uid)
                     .map((inquiry) => (
@@ -159,7 +169,11 @@ const Home = () => {
                       </li>
                     ))
                 ) : (
-                  <h1>No Inquiries Added</h1>
+                  <h1>
+                    {user
+                      ? "No Inquiries Added"
+                      : "Please log in to see inquiries"}
+                  </h1>
                 )}
               </ul>
             </div>
