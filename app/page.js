@@ -122,7 +122,7 @@ const Home = () => {
   };
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
+    <div className="p-3 max-w-8xl max-h-12xl mx-auto">
       <h1 className="text-3xl font-bold mb-4 text-center">Law Listings ⚖️</h1>
       {user && (
         <button
@@ -262,8 +262,8 @@ const Home = () => {
       </div>
 
       {showPopup && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4">
-          <div className="bg-white rounded-lg shadow-lg w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4 p-12">
+          <div className="bg-white rounded-lg shadow-lg w-full  max-w-7xl max-h-18xl overflow-y-auto">
             <div className="sticky top-0 bg-white p-4 border-b">
               <button
                 onClick={() => setShowPopup(false)}
