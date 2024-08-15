@@ -1,7 +1,9 @@
-import React, { useState } from "react";
+"use client";
+import React, { useState, useEffect } from "react";
 import { GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
 import { collection, addDoc } from "firebase/firestore";
-import { auth, firestore } from "./lib/firebase";
+import { auth, firestore } from "../lib/firebase";
+import Link from "next/link";
 
 const lawCategories = [
   "Criminal Law",
@@ -24,12 +26,22 @@ const AddInquiry = () => {
   const [phone, setPhone] = useState("");
   const [category, setCategory] = useState("");
   const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState(""); // New state for status messages
+
+  useEffect(() => {
+    const storedUser = JSON.parse(localStorage.getItem('user'));
+    if (storedUser) {
+      setUser(storedUser);
+    }
+  }, []);
 
   const handleSignInWithGoogle = async () => {
     try {
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
-      setUser(result.user);
+      const user = result.user;
+      setUser(user);
+      localStorage.setItem('user', JSON.stringify(user)); // Store user in localStorage
     } catch (error) {
       console.error("Error signing in with Google:", error.message);
     }
@@ -39,6 +51,7 @@ const AddInquiry = () => {
     try {
       await signOut(auth);
       setUser(null);
+      localStorage.removeItem('user'); // Remove user from localStorage
     } catch (error) {
       console.error("Error signing out:", error.message);
     }
@@ -50,6 +63,7 @@ const AddInquiry = () => {
       alert("You must be logged in to submit an inquiry.");
       return;
     }
+    setLoading(true); // Start loading
     try {
       const inquiriesCollection = collection(firestore, "inquiries");
       await addDoc(inquiriesCollection, {
@@ -70,13 +84,18 @@ const AddInquiry = () => {
       setEmail("");
       setPhone("");
       setCategory("");
+      setStatus("Inquiry submitted successfully!"); // Set success message
     } catch (error) {
       console.error("Error adding inquiry:", error.message);
+      setStatus("Failed to submit inquiry. Please try again."); // Set error message
+    } finally {
+      setLoading(false); // End loading
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
+    <div className="min-h-screen bg-gray-100 p-10">
+      <Link href={"/"}>Back to homepage!</Link>
       <div className="container mx-auto">
         {user ? (
           <div>
@@ -87,6 +106,15 @@ const AddInquiry = () => {
               Sign Out
             </button>
             <h1 className="text-2xl font-semibold mb-4">Submit Inquiry</h1>
+            {status && (
+              <div
+                className={`p-4 mb-4 text-white rounded-md ${
+                  status.includes("success") ? "bg-green-500" : "bg-red-500"
+                }`}
+              >
+                {status}
+              </div>
+            )}
             <div className="bg-white p-6 rounded-lg shadow-lg">
               <form onSubmit={handleSubmit} className="space-y-4">
                 <input
