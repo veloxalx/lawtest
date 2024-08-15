@@ -111,6 +111,7 @@ const Home = () => {
       >
         How it works
       </Link>
+      <br/>  <br/>
       <div className="text-center mb-4">
         <label
           htmlFor="category-filter"
