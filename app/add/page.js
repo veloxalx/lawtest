@@ -118,6 +118,17 @@ const AddInquiry = () => {
             )}
             <div className="bg-white p-6 rounded-lg shadow-lg">
               <form onSubmit={handleSubmit} className="space-y-4">
+              <select
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                  required
+                  className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="" disabled>Select Law Category</option>
+                  {lawCategories.map((cat) => (
+                    <option key={cat} value={cat}>{cat}</option>
+                  ))}
+                </select>
                 <input
                   type="text"
                   value={title}
@@ -156,17 +167,6 @@ const AddInquiry = () => {
                   required
                   className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
-                <select
-                  value={category}
-                  onChange={(e) => setCategory(e.target.value)}
-                  required
-                  className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="" disabled>Select Law Category</option>
-                  {lawCategories.map((cat) => (
-                    <option key={cat} value={cat}>{cat}</option>
-                  ))}
-                </select>
                 <button
                   type="submit"
                   disabled={loading}
