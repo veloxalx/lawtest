@@ -131,7 +131,7 @@ const Home = () => {
   };
 
   return (
-    <div className="p-3 max-w-8xl max-h-12xl mx-auto">
+    <div className="p-3 max-w-8xl  mx-auto">
       <h1 className="text-3xl font-bold mb-4 text-center">Law Listings ⚖️</h1>
       {user && (
         <button
@@ -234,7 +234,7 @@ const Home = () => {
           filteredListings.map((listing) => (
             <div
               key={listing.id}
-              className={`border border-gray-200 rounded-lg p-6 shadow-lg ${
+              className={`border border-gray-200 rounded-lg p-6 h-400 shadow-lg ${
                 listing.found
                   ? "bg-green-100"
                   : lawCategories.includes(listing.category)
