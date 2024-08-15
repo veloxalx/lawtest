@@ -34,7 +34,7 @@ const AddInquiry = () => {
         email,
         phone,
         userId: user.uid,
-        userName: user.displayName, // Add userName to the inquiry
+        userName: user.displayName,
         createdAt: new Date(),
       });
       setTitle("");
@@ -42,7 +42,7 @@ const AddInquiry = () => {
       setProblem("");
       setEmail("");
       setPhone("");
-      router.push("/"); // Redirect to the home page or any other page after submission
+      router.push("/"); // Redirect to the home page after submission
     } catch (error) {
       console.error("Error adding inquiry:", error.message);
       setError("Error adding inquiry. Please try again.");
@@ -81,13 +81,13 @@ const AddInquiry = () => {
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          placeholder="Email (Optional), Ideally recommended"
+          placeholder="Your Email (Optional , but ideally required)"
         />
         <input
           type="number"
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
-          placeholder="Phone Number"
+          placeholder="Your Phone"
           required
         />
         <button type="submit" disabled={loading}>

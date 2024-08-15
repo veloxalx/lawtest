@@ -1,13 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
-import {
-  collection,
-  getDocs,
-  addDoc,
-  deleteDoc,
-  doc,
-} from "firebase/firestore";
+import { collection, getDocs, addDoc, deleteDoc, doc } from "firebase/firestore";
 import { auth, firestore } from "./lib/firebase";
 import Link from "next/link";
 
@@ -80,6 +74,7 @@ const Home = () => {
         email,
         phone,
         userId: user.uid,
+        userName: user.displayName,
         createdAt: new Date(),
       });
       setTitle("");
@@ -138,7 +133,7 @@ const Home = () => {
               <button onClick={() => setShowPopup(false)}>Close</button>
               <h3>Your Inquiries</h3>
               <ul>
-                {inquiries && inquiries?.length ? (
+                {inquiries.length ? (
                   inquiries
                     .filter((inquiry) => inquiry.userId === user.uid)
                     .map((inquiry) => (
@@ -180,6 +175,7 @@ const Home = () => {
           {inquiries.length ? (
             inquiries.map((inquiry) => (
               <li key={inquiry.id} style={{ margin: "100px" }}>
+                <h1> Name : {inquiry.userName}</h1>
                 <p>
                   <strong>Title:</strong> {inquiry.title}
                 </p>
