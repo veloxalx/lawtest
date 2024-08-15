@@ -29,6 +29,13 @@ const AddInquiry = () => {
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState(""); // New state for status messages
 
+
+  useEffect(()=>{
+    setTimeout(()=>{
+      setStatus("")
+    },6000)
+  },[status])
+
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('user'));
     if (storedUser) {
@@ -91,6 +98,7 @@ const AddInquiry = () => {
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
+    
       <h1 className="text-3xl font-bold mb-4 text-center">Add a New Inquiry</h1>
       <Link
         href={"/"}
@@ -129,7 +137,13 @@ const AddInquiry = () => {
           </div>
         )}
       </div>
-
+      {status && (
+          <div className="text-center mt-4">
+            <p className={`font-semibold ${status.startsWith("Failed") ? "text-red-500" : "text-green-500"}`}>
+              {status}
+            </p>
+          </div>
+        )}
       <form onSubmit={handleAddInquiry} className="space-y-4">
         
 
@@ -237,13 +251,7 @@ const AddInquiry = () => {
           {loading ? "Adding..." : "Add Inquiry"}
         </button>
 
-        {status && (
-          <div className="text-center mt-4">
-            <p className={`font-semibold ${status.startsWith("Failed") ? "text-red-500" : "text-green-500"}`}>
-              {status}
-            </p>
-          </div>
-        )}
+        
       </form>
     </div>
   );
