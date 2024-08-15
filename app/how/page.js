@@ -2,42 +2,49 @@
 import React from 'react';
 
 const HowToSection = () => {
+  const handleEmailClick = () => {
+    window.location.href = "mailto:imveloxal@gmail.com";
+  };
+
   return (
     <div className="p-6 max-w-3xl mx-auto bg-gray-100 rounded-lg shadow-md">
       <h1 className="text-2xl font-bold mb-4 text-center">How to Use This Application</h1>
 
       <div className="space-y-4">
         <div className="bg-white p-4 rounded-lg shadow-sm">
-          <h2 className="text-xl font-semibold mb-2">1. Sign Up with Google</h2>
-          <p className="text-gray-700">
-            To get started, you need to sign up by clicking the "Sign up with Google" button on the homepage!. This will allow you to access all features of the application.
+          <h2 className="text-xl font-semibold mb-2">Sign Up and Manage Listings</h2>
+          <p className="text-gray-700 mb-2">
+            <span className="font-bold text-blue-600">Sign Up:</span> Click on the <span className="font-bold">"Sign in with Google"</span> button to log in or sign up using your Google account.
+          </p>
+          <p className="text-gray-700 mb-2">
+            <span className="font-bold text-blue-600">Add Listings:</span> After logging in, you can add your legal listings by clicking on the <span className="font-bold">"Add Listing"</span> button.
+          </p>
+          <p className="text-gray-700 mb-2">
+            <span className="font-bold text-blue-600">Change Status:</span> You can update the status of your listings to indicate whether they are resolved. Use the <span className="font-bold">"Mark as Occupied"</span> button to change the status.
           </p>
         </div>
 
         <div className="bg-white p-4 rounded-lg shadow-sm">
-          <h2 className="text-xl font-semibold mb-2">2. Add Your Legal Listings</h2>
-          <p className="text-gray-700">
-            After logging in, you can add your legal listings by navigating to the "Add Listing" section. Here, you can provide details about legal issues for which you're seeking assistance.
-          </p>
-        </div>
-
-        <div className="bg-white p-4 rounded-lg shadow-sm">
-          <h2 className="text-xl font-semibold mb-2">3. Update Listing Status</h2>
-          <p className="text-gray-700">
-            Once you've found a lawyer for your problem, you can update the status of your listing. 
-            Click the "Mark as Occupied" button to indicate that the issue has been resolved. 
-            If you have not found a lawyer yet, the listing will remain in its initial color.
-          </p>
-        </div>
-
-        <div className="bg-white p-4 rounded-lg shadow-sm">
-          <h2 className="text-xl font-semibold mb-2">4. Understanding Listing Colors</h2>
+          <h2 className="text-xl font-semibold mb-2">Color Codes</h2>
           <p className="text-gray-700">
             <span className="font-bold text-green-600">Green:</span> Indicates that the case is <span className="font-bold">OCCUPIED</span>. This means that a lawyer has been found and the issue has been resolved.
           </p>
           <p className="text-gray-700">
-            <span className="font-bold text-yellow-600">Other Colors:</span> Represent listings that are <span className="font-bold">NOT YET OCCUPIED</span>. These cases are still open and require a lawyer.
+            <span className="font-bold text-yellow-600">Yellow:</span> Indicates that the case is <span className="font-bold">OPEN</span>. This means that the case is still available for legal assistance.
           </p>
+          <p className="text-gray-700">
+            <span className="font-bold text-red-600">Red:</span> Indicates that the case is <span className="font-bold">CLOSED</span>. This means that the case has been resolved and is no longer available.
+          </p>
+        </div>
+
+        <div className="bg-white p-4 rounded-lg shadow-sm">
+          <h2 className="text-xl font-semibold mb-2">Any Other Questions?</h2>
+          <button
+            onClick={handleEmailClick}
+            className="bg-blue-500 text-white py-2 px-4 rounded-lg shadow hover:bg-blue-600 transition"
+          >
+            Contact Us
+          </button>
         </div>
       </div>
     </div>
