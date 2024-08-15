@@ -163,7 +163,7 @@ const Home = () => {
       </div>
 
       <div className="space-y-4">
-        {filteredListings.length > 0 ? (
+        {loading ? <h1>Loading...</h1> : filteredListings.length > 0 ? (
           filteredListings.map((listing) => (
             <div
               key={listing.id}
@@ -247,6 +247,7 @@ const Home = () => {
     </div>
   </div>
 )}
+
 
     </div>
   );

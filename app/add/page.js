@@ -95,8 +95,9 @@ const AddInquiry = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 p-10">
-      <Link href={"/"}>Back to homepage!</Link>
+    
       <div className="container mx-auto">
+
         {user ? (
           <div>
             <button
@@ -106,6 +107,8 @@ const AddInquiry = () => {
               Sign Out
             </button>
             <h1 className="text-2xl font-semibold mb-4">Submit Inquiry</h1>
+            <Link href={"/"}>Back to homepage!</Link>
+            <br/><br/>
             {status && (
               <div
                 className={`p-4 mb-4 text-white rounded-md ${
