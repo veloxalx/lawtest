@@ -15,8 +15,9 @@ const AddInquiry = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const user = auth.currentUser;
+  const [status,setStatus] = useState("")
 
-  const router = useRouter();
+  // const router = useRouter();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -44,7 +45,8 @@ const AddInquiry = () => {
       setProblem("");
       setEmail("");
       setPhone("");
-      router.push("/"); // Redirect to the home page after submission
+      setError("Added Your Inquiry, check the homepage!")
+      // router.push("/"); // Redirect to the home page after submission
     } catch (error) {
       console.error("Error adding inquiry:", error.message);
       setError("Error adding inquiry. Please try again.");
@@ -55,7 +57,6 @@ const AddInquiry = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-6">
-      <b>If it says "Error , couldn't add" , don't panick it's a temporary bug! (Check the homepage , your inquiry will be there!)</b>
       <Link href={"/"} className="text-blue-500 hover:underline mb-4">
         &larr; Go back home
       </Link>
