@@ -153,7 +153,8 @@ const Home = () => {
           id="category-filter"
           value={selectedCategory}
           onChange={(e) => setSelectedCategory(e.target.value)}
-          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
+          className="mt-4 block w-full border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 "
+          style={{height:"40px",margin:"20px",width:"80vw",boxShadow:"inherit"}}
         >
           <option value="">All Categories</option>
           {lawCategories.map((cat) => (
