@@ -3,6 +3,7 @@ import { useState } from "react";
 import { collection, addDoc } from "firebase/firestore";
 import { auth, firestore } from "../lib/firebase";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 const AddInquiry = () => {
   const [title, setTitle] = useState("");
@@ -33,6 +34,7 @@ const AddInquiry = () => {
         email,
         phone,
         userId: user.uid,
+        userName: user.displayName, // Add userName to the inquiry
         createdAt: new Date(),
       });
       setTitle("");
@@ -51,6 +53,7 @@ const AddInquiry = () => {
 
   return (
     <div>
+      <Link href={"/"}>Go back home!</Link>
       <h1>Add Inquiry</h1>
       {error && <p style={{ color: "red" }}>{error}</p>}
       <form onSubmit={handleSubmit}>
@@ -65,7 +68,7 @@ const AddInquiry = () => {
           type="text"
           value={location}
           onChange={(e) => setLocation(e.target.value)}
-          placeholder="Location (Ex:Colombo)"
+          placeholder="Location (Ex: Colombo)"
           required
         />
         <textarea
@@ -78,10 +81,10 @@ const AddInquiry = () => {
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          placeholder="Email (Optional) , Ideally recommended"
+          placeholder="Email (Optional), Ideally recommended"
         />
         <input
-          type="text"
+          type="number"
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
           placeholder="Phone Number"

@@ -1,7 +1,14 @@
 "use client";
 import { useState, useEffect } from "react";
-import { collection, getDocs, addDoc, deleteDoc, doc } from "firebase/firestore";
-import { auth, signInWithPopup, signOut, GoogleAuthProvider, firestore } from "./lib/firebase";
+import { GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
+import {
+  collection,
+  getDocs,
+  addDoc,
+  deleteDoc,
+  doc,
+} from "firebase/firestore";
+import { auth, firestore } from "./lib/firebase";
 import Link from "next/link";
 
 const Home = () => {
@@ -80,7 +87,13 @@ const Home = () => {
       setProblem("");
       setEmail("");
       setPhone("");
-      setInquiries([...inquiries, { title, location, problem, email, phone, userId: user.uid }]);
+      // Refresh the inquiries list
+      const snapshot = await getDocs(inquiriesCollection);
+      const inquiriesList = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setInquiries(inquiriesList);
     } catch (error) {
       console.error("Error adding inquiry:", error.message);
     }
@@ -90,6 +103,7 @@ const Home = () => {
     try {
       const inquiryDoc = doc(firestore, "inquiries", inquiryId);
       await deleteDoc(inquiryDoc);
+      // Refresh the inquiries list
       setInquiries(inquiries.filter((inquiry) => inquiry.id !== inquiryId));
     } catch (error) {
       console.error("Error deleting inquiry:", error.message);
@@ -97,7 +111,7 @@ const Home = () => {
   };
 
   return (
-    <div >
+    <div>
       <h1>Law Inquiries</h1>
 
       {!user ? (
@@ -105,47 +119,87 @@ const Home = () => {
           <button onClick={handleSignInWithGoogle}>Sign in with Google</button>
         </div>
       ) : (
-        <div style={{margin:"40px"}}>
+        <div style={{ margin: "40px" }}>
+          <img
+            src={user?.photoURL || "/default-avatar.png"}
+            alt="User Profile"
+            className="w-full h-full rounded-full object-cover"
+          />
+          <h1 style={{ textAlign: "left", margin: "40px" }}>
+            Welcome back {user?.displayName} 👋
+          </h1>
           <button onClick={handleLogout}>Logout</button>
           <Link href={"/add"}>Add Inquiry</Link>
           <button onClick={() => setShowPopup(!showPopup)}>
             Manage Your Inquiries
           </button>
           {showPopup && (
-            <div className="popup">
+            <div className="popup" style={{ margin: "40px" }}>
               <button onClick={() => setShowPopup(false)}>Close</button>
               <h3>Your Inquiries</h3>
               <ul>
-                {inquiries.filter(inquiry => inquiry.userId === user.uid).map((inquiry) => (
-                  <li key={inquiry.id}>
-                    <p><strong>Title:</strong> {inquiry.title}</p>
-                    <p><strong>Location:</strong> {inquiry.location}</p>
-                    <p><strong>Problem:</strong> {inquiry.problem}</p>
-                    <p><strong>Email:</strong> {inquiry.email}</p>
-                    <p><strong>Phone:</strong> {inquiry.phone}</p>
-                    <button onClick={() => handleDelete(inquiry.id)}>Delete</button>
-                  </li>
-                ))}
+                {inquiries && inquiries?.length ? (
+                  inquiries
+                    .filter((inquiry) => inquiry.userId === user.uid)
+                    .map((inquiry) => (
+                      <li key={inquiry.id}>
+                        <p>
+                          <strong>Title:</strong> {inquiry.title}
+                        </p>
+                        <p>
+                          <strong>Location:</strong> {inquiry.location}
+                        </p>
+                        <p>
+                          <strong>Problem:</strong> {inquiry.problem}
+                        </p>
+                        <p>
+                          <strong>Email:</strong> {inquiry.email}
+                        </p>
+                        <p>
+                          <strong>Phone:</strong> {inquiry.phone}
+                        </p>
+                        <button onClick={() => handleDelete(inquiry.id)}>
+                          Delete
+                        </button>
+                      </li>
+                    ))
+                ) : (
+                  <h1>No Inquiries Added</h1>
+                )}
               </ul>
             </div>
           )}
         </div>
       )}
-    
+
       <h2>Existing Inquiries</h2>
       {loading ? (
         <p>Loading...</p>
       ) : (
         <ul>
-          {inquiries.length ? inquiries.map((inquiry,index) => (
-            <li key={inquiry.id || index}>
-              <p><strong>Title:</strong> {inquiry.title}</p>
-              <p><strong>Location:</strong> {inquiry.location}</p>
-              <p><strong>Problem:</strong> {inquiry.problem}</p>
-              <p><strong>Email:</strong> {inquiry.email}</p>
-              <p><strong>Phone:</strong> {inquiry.phone}</p>
-            </li>
-          )) : <h1>No Inquiries Posted Yet</h1>}
+          {inquiries.length ? (
+            inquiries.map((inquiry) => (
+              <li key={inquiry.id} style={{ margin: "100px" }}>
+                <p>
+                  <strong>Title:</strong> {inquiry.title}
+                </p>
+                <p>
+                  <strong>Location:</strong> {inquiry.location}
+                </p>
+                <p>
+                  <strong>Problem:</strong> {inquiry.problem}
+                </p>
+                <p>
+                  <strong>Email:</strong> {inquiry.email}
+                </p>
+                <p>
+                  <strong>Phone:</strong> {inquiry.phone}
+                </p>
+              </li>
+            ))
+          ) : (
+            <h1>No Inquiries Posted Yet</h1>
+          )}
         </ul>
       )}
     </div>
