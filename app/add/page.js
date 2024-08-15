@@ -156,6 +156,7 @@ const AddInquiry = () => {
           <input
             id="title"
             type="text"
+                placeholder="Enter Title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             required
@@ -170,6 +171,7 @@ const AddInquiry = () => {
           <input
             id="location"
             type="text"
+                placeholder="Enter Location"
             value={location}
             onChange={(e) => setLocation(e.target.value)}
             required
@@ -185,6 +187,7 @@ const AddInquiry = () => {
             id="problem"
             rows="4"
             value={problem}
+                placeholder="Enter Problem Description"
             onChange={(e) => setProblem(e.target.value)}
             required
             className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
@@ -199,8 +202,8 @@ const AddInquiry = () => {
             id="email"
             type="email"
             value={email}
+                placeholder="Enter Email Address (Optional)"
             onChange={(e) => setEmail(e.target.value)}
-            required
             className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
           />
         </div>
@@ -215,6 +218,8 @@ const AddInquiry = () => {
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
             required
+            placeholder="Enter Phone Number"
+            minLength={10}
             className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
           />
         </div>
