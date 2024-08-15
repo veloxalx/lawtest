@@ -1,4 +1,5 @@
 "use client";
+import Link from 'next/link';
 import React from 'react';
 
 const HowToSection = () => {
@@ -8,6 +9,7 @@ const HowToSection = () => {
 
   return (
     <div className="p-6 max-w-3xl mx-auto bg-gray-100 rounded-lg shadow-md">
+      <Link href={"/"}>Back to Homepage!</Link>
       <h1 className="text-2xl font-bold mb-4 text-center">How to Use This Application</h1>
 
       <div className="space-y-4">
