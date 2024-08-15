@@ -130,12 +130,12 @@ const Home = () => {
           ))}
         </select>
       </div>
-      <button
+     {user  &&  <button
               onClick={handleLogout}
               className="bg-red-500 text-white py-2 px-4 rounded shadow hover:bg-red-600 transition mb-4"
             >
               Logout
-            </button>
+            </button>}
       <div className="text-center mb-4">
         {!user ? (
           <div>
