@@ -1,10 +1,12 @@
 "use client";
 import { useState } from "react";
 import { collection, addDoc } from "firebase/firestore";
-import { auth,firestore } from "../lib/firebase";
+import { auth, firestore } from "../lib/firebase";
 import { useRouter } from "next/navigation";
 
 const AddInquiry = () => {
+  const [title, setTitle] = useState("");
+  const [location, setLocation] = useState("");
   const [problem, setProblem] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -25,12 +27,16 @@ const AddInquiry = () => {
     try {
       const inquiriesCollection = collection(firestore, "inquiries");
       await addDoc(inquiriesCollection, {
+        title,
+        location,
         problem,
         email,
         phone,
         userId: user.uid,
         createdAt: new Date(),
       });
+      setTitle("");
+      setLocation("");
       setProblem("");
       setEmail("");
       setPhone("");
@@ -48,6 +54,20 @@ const AddInquiry = () => {
       <h1>Add Inquiry</h1>
       {error && <p style={{ color: "red" }}>{error}</p>}
       <form onSubmit={handleSubmit}>
+        <input
+          type="text"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="Title"
+          required
+        />
+        <input
+          type="text"
+          value={location}
+          onChange={(e) => setLocation(e.target.value)}
+          placeholder="Location (Ex:Colombo)"
+          required
+        />
         <textarea
           value={problem}
           onChange={(e) => setProblem(e.target.value)}
@@ -62,7 +82,7 @@ const AddInquiry = () => {
           required
         />
         <input
-          type="number"
+          type="text"
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
           placeholder="Phone Number"

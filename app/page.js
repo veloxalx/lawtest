@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { collection, getDocs, addDoc, deleteDoc, doc } from "firebase/firestore";
-import { auth, signInWithPopup, signOut, GoogleAuthProvider } from "./lib/firebase";
+import { auth, signInWithPopup, signOut, GoogleAuthProvider, firestore } from "./lib/firebase";
 import Link from "next/link";
 
 const Home = () => {
@@ -10,6 +10,8 @@ const Home = () => {
   const [problem, setProblem] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+  const [title, setTitle] = useState("");
+  const [location, setLocation] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
 
@@ -65,16 +67,20 @@ const Home = () => {
     try {
       const inquiriesCollection = collection(firestore, "inquiries");
       await addDoc(inquiriesCollection, {
+        title,
+        location,
         problem,
         email,
         phone,
         userId: user.uid,
         createdAt: new Date(),
       });
+      setTitle("");
+      setLocation("");
       setProblem("");
       setEmail("");
       setPhone("");
-      setInquiries([...inquiries, { problem, email, phone, userId: user.uid }]);
+      setInquiries([...inquiries, { title, location, problem, email, phone, userId: user.uid }]);
     } catch (error) {
       console.error("Error adding inquiry:", error.message);
     }
@@ -102,6 +108,20 @@ const Home = () => {
         <div>
           <button onClick={handleLogout}>Logout</button>
           <form onSubmit={handleSubmit}>
+            <input
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Title"
+              required
+            />
+            <input
+              type="text"
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              placeholder="Location"
+              required
+            />
             <textarea
               value={problem}
               onChange={(e) => setProblem(e.target.value)}
@@ -134,9 +154,11 @@ const Home = () => {
               <ul>
                 {inquiries.filter(inquiry => inquiry.userId === user.uid).map((inquiry) => (
                   <li key={inquiry.id}>
-                    <p>{inquiry.problem}</p>
-                    <p>Email: {inquiry.email}</p>
-                    <p>Phone: {inquiry.phone}</p>
+                    <p><strong>Title:</strong> {inquiry.title}</p>
+                    <p><strong>Location:</strong> {inquiry.location}</p>
+                    <p><strong>Problem:</strong> {inquiry.problem}</p>
+                    <p><strong>Email:</strong> {inquiry.email}</p>
+                    <p><strong>Phone:</strong> {inquiry.phone}</p>
                     <button onClick={() => handleDelete(inquiry.id)}>Delete</button>
                   </li>
                 ))}
@@ -153,9 +175,11 @@ const Home = () => {
         <ul>
           {inquiries.length ? inquiries.map((inquiry) => (
             <li key={inquiry.id}>
-              <p>{inquiry.problem}</p>
-              <p>Email: {inquiry.email}</p>
-              <p>Phone: {inquiry.phone}</p>
+              <p><strong>Title:</strong> {inquiry.title}</p>
+              <p><strong>Location:</strong> {inquiry.location}</p>
+              <p><strong>Problem:</strong> {inquiry.problem}</p>
+              <p><strong>Email:</strong> {inquiry.email}</p>
+              <p><strong>Phone:</strong> {inquiry.phone}</p>
             </li>
           )) : <h1>No Inquiries Posted Yet</h1>}
         </ul>
