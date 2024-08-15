@@ -221,6 +221,7 @@ const AddInquiry = () => {
             required
             placeholder="Enter Phone Number"
             minLength={10}
+            maxLength={10}
             className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
           />
         </div>
