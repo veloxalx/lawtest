@@ -1,9 +1,10 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
-import { collection, addDoc, updateDoc, doc } from "firebase/firestore";
+import { collection, addDoc } from "firebase/firestore";
 import { auth, firestore } from "../lib/firebase";
 import Link from "next/link";
+import Image from "next/image";
 
 const lawCategories = [
   "Criminal Law",
@@ -57,26 +58,20 @@ const AddInquiry = () => {
     }
   };
 
-  const handleSubmit = async (e) => {
+  const handleAddInquiry = async (e) => {
     e.preventDefault();
-    if (!user) {
-      alert("You must be logged in to submit an inquiry.");
-      return;
-    }
-    setLoading(true); // Start loading
+    setLoading(true);
+    setStatus(""); // Clear status message
+
     try {
-      const inquiriesCollection = collection(firestore, "inquiries");
-      await addDoc(inquiriesCollection, {
+      await addDoc(collection(firestore, "inquiries"), {
         title,
         location,
         problem,
         email,
         phone,
         category,
-        userId: user.uid,
-        userName: user.displayName,
-        createdAt: new Date(),
-        found: false // Initialize status
+        found: false,
       });
       setTitle("");
       setLocation("");
@@ -84,112 +79,162 @@ const AddInquiry = () => {
       setEmail("");
       setPhone("");
       setCategory("");
-      setStatus("Inquiry submitted successfully!"); // Set success message
+      setStatus("Inquiry added successfully!"); // Success message
     } catch (error) {
       console.error("Error adding inquiry:", error.message);
-      setStatus("Failed to submit inquiry. Please try again."); // Set error message
+      setStatus("Failed to add inquiry. Please try again."); // Error message
     } finally {
-      setLoading(false); // End loading
+      setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-10">
-      <div className="container mx-auto">
-        {user ? (
+    <div className="p-6 max-w-4xl mx-auto">
+      <h1 className="text-3xl font-bold mb-4 text-center">Add a New Inquiry</h1>
+      <Link
+        href={"/"}
+        className="bg-gray-500 text-white py-2 px-4 rounded shadow hover:bg-gray-600 transition"
+      >
+        Back to Home
+      </Link>
+      <br /> <br />
+      <div className="text-center mb-4">
+        {!user ? (
           <div>
+            <h2 className="text-xl mb-4">Login to Add Your Inquiry 👇</h2>
             <button
-              onClick={handleLogout}
-              className="bg-red-500 text-white p-2 rounded-md mb-4"
+              onClick={handleSignInWithGoogle}
+              className="bg-blue-500 text-white py-2 px-4 rounded shadow hover:bg-blue-600 transition"
             >
-              Sign Out
+              Sign in with Google
             </button>
-            <h1 className="text-2xl font-semibold mb-4">Submit Inquiry</h1>
-            <Link href={"/"}>Back to homepage!</Link>
-            <br/><br/>
-            {status && (
-              <div
-                className={`p-4 mb-4 text-white rounded-md ${
-                  status.includes("success") ? "bg-green-500" : "bg-red-500"
-                }`}
-              >
-                {status}
-              </div>
-            )}
-            <div className="bg-white p-6 rounded-lg shadow-lg">
-              <form onSubmit={handleSubmit} className="space-y-4">
-              <select
-                  value={category}
-                  onChange={(e) => setCategory(e.target.value)}
-                  required
-                  className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="" disabled>Select Law Category</option>
-                  {lawCategories.map((cat) => (
-                    <option key={cat} value={cat}>{cat}</option>
-                  ))}
-                </select>
-                <input
-                  type="text"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  placeholder="Title"
-                  required
-                  className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                <input
-                  type="text"
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                  placeholder="Location (Ex: Colombo)"
-                  required
-                  className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                <textarea
-                  value={problem}
-                  onChange={(e) => setProblem(e.target.value)}
-                  placeholder="Describe your problem"
-                  required
-                  className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 h-32"
-                />
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Your Email (Optional)"
-                  className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                <input
-                  type="number"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  placeholder="Your Phone"
-                  required
-                  className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className={`w-full p-2 rounded-md text-white ${
-                    loading ? "bg-gray-500 cursor-not-allowed" : "bg-blue-500 hover:bg-blue-600"
-                  }`}
-                >
-                  {loading ? "Submitting..." : "Submit Inquiry"}
-                </button>
-              </form>
-            </div>
           </div>
         ) : (
           <div>
+            <Image
+              src={user?.photoURL || "/default-avatar.png"}
+              alt="User Profile"
+              width={128}
+              height={128}
+              className="rounded-full mx-auto mb-4"
+            />
+            <h2 className="text-xl mb-4">Welcome, {user.displayName}!</h2>
             <button
-              onClick={handleSignInWithGoogle}
-              className="bg-blue-500 text-white p-2 rounded-md"
+              onClick={handleLogout}
+              className="bg-red-500 text-white py-2 px-4 rounded shadow hover:bg-red-600 transition"
             >
-              Sign In with Google
+              Sign Out
             </button>
           </div>
         )}
       </div>
+
+      <form onSubmit={handleAddInquiry} className="space-y-4">
+        <div>
+          <label htmlFor="title" className="block text-sm font-medium text-gray-700">
+            Title
+          </label>
+          <input
+            id="title"
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            required
+            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="location" className="block text-sm font-medium text-gray-700">
+            Location
+          </label>
+          <input
+            id="location"
+            type="text"
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+            required
+            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="problem" className="block text-sm font-medium text-gray-700">
+            Problem Description
+          </label>
+          <textarea
+            id="problem"
+            rows="4"
+            value={problem}
+            onChange={(e) => setProblem(e.target.value)}
+            required
+            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+            Email
+          </label>
+          <input
+            id="email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
+            Phone
+          </label>
+          <input
+            id="phone"
+            type="tel"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            required
+            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="category" className="block text-sm font-medium text-gray-700">
+            Category
+          </label>
+          <select
+            id="category"
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            required
+            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
+          >
+            <option value="">Select a Category</option>
+            {lawCategories.map((cat) => (
+              <option key={cat} value={cat}>
+                {cat}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <button
+          type="submit"
+          className="bg-blue-500 text-white py-2 px-4 rounded shadow hover:bg-blue-600 transition"
+        >
+          {loading ? "Adding..." : "Add Inquiry"}
+        </button>
+
+        {status && (
+          <div className="text-center mt-4">
+            <p className={`font-semibold ${status.startsWith("Failed") ? "text-red-500" : "text-green-500"}`}>
+              {status}
+            </p>
+          </div>
+        )}
+      </form>
     </div>
   );
 };

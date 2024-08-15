@@ -4,7 +4,6 @@ import { GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
 import { collection, getDocs, updateDoc, doc } from "firebase/firestore";
 import { auth, firestore } from "./lib/firebase";
 import Link from "next/link";
-import Image from 'next/image';
 
 const lawCategories = [
   "Criminal Law",
@@ -15,7 +14,7 @@ const lawCategories = [
   "Intellectual Property Law",
   "Employment Law",
   "Immigration Law",
-  "Other",
+  "Other"
 ];
 
 const Home = () => {
@@ -67,7 +66,7 @@ const Home = () => {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
       setUser(user);
-      localStorage.setItem("user", JSON.stringify(user)); // Store user in localStorage
+      localStorage.setItem('user', JSON.stringify(user)); // Store user in localStorage
     } catch (error) {
       console.error("Error signing in with Google:", error.message);
     }
@@ -77,7 +76,7 @@ const Home = () => {
     try {
       await signOut(auth);
       setUser(null);
-      localStorage.removeItem("user"); // Remove user from localStorage
+      localStorage.removeItem('user'); // Remove user from localStorage
     } catch (error) {
       console.error("Error signing out:", error.message);
     }
@@ -88,16 +87,12 @@ const Home = () => {
       const listingDoc = doc(firestore, "inquiries", listingId);
       await updateDoc(listingDoc, { found: true });
       // Refresh the listings list
-      setListings(
-        listings.map((listing) =>
-          listing.id === listingId ? { ...listing, found: true } : listing
-        )
-      );
-      setFilteredListings(
-        filteredListings.map((listing) =>
-          listing.id === listingId ? { ...listing, found: true } : listing
-        )
-      );
+      setListings(listings.map((listing) =>
+        listing.id === listingId ? { ...listing, found: true } : listing
+      ));
+      setFilteredListings(filteredListings.map((listing) =>
+        listing.id === listingId ? { ...listing, found: true } : listing
+      ));
     } catch (error) {
       console.error("Error marking listing as occupied:", error.message);
     }
@@ -108,16 +103,13 @@ const Home = () => {
       <h1 className="text-3xl font-bold mb-4 text-center">Law Listings ⚖️</h1>
       <Link
         href={"/how"}
-        className="bg-green-500 text-white py-2 px-4 rounded shadow hover:bg-green-600 transition"
+        className="bg-gray-500 text-white py-2 px-4 rounded shadow hover:bg-gray-600 transition"
+        color="green"
       >
-        How it works
+        How to (Guide)
       </Link>
-      <br /> <br />
       <div className="text-center mb-4">
-        <label
-          htmlFor="category-filter"
-          className="block text-sm font-medium text-gray-700"
-        >
+        <label htmlFor="category-filter" className="block text-sm font-medium text-gray-700">
           Filter by Category
         </label>
         <select
@@ -148,56 +140,134 @@ const Home = () => {
           </div>
         ) : (
           <div>
-            <Image
+            <img
               src={user?.photoURL || "/default-avatar.png"}
               alt="User Profile"
-              width={128}
-              height={128}
-              className="rounded-full mx-auto mb-4"
+              className="w-32 h-32 rounded-full mx-auto mb-4 object-cover"
             />
-            <h2 className="text-xl mb-4">Welcome, {user.displayName}!</h2>
+            <h1 className="text-2xl font-semibold mb-4">
+              Welcome back {user?.displayName} 👋
+            </h1>
             <button
               onClick={handleLogout}
-              className="bg-red-500 text-white py-2 px-4 rounded shadow hover:bg-red-600 transition"
+              className="bg-red-500 text-white py-2 px-4 rounded shadow hover:bg-red-600 transition mb-4"
             >
-              Sign Out
+              Logout
+            </button>
+            <div className="mb-4">
+              <Link
+                href={"/add"}
+                className="bg-green-500 text-white py-2 px-4 rounded shadow hover:bg-green-600 transition"
+              >
+                Add Listing
+              </Link>
+            </div>
+            <button
+              onClick={() => setShowPopup(!showPopup)}
+              className="bg-gray-500 text-white py-2 px-4 rounded shadow hover:bg-gray-600 transition"
+            >
+              Manage Your Listings
             </button>
           </div>
         )}
       </div>
 
-      {loading ? (
-        <div className="text-center">Loading...</div>
-      ) : (
-        <div className="space-y-4">
-          {filteredListings.map((listing) => (
+      <div className="space-y-4">
+        {loading ? <h1>Loading...</h1> : filteredListings.length > 0 ? (
+          filteredListings.map((listing) => (
             <div
               key={listing.id}
-              className="bg-white p-4 rounded-lg shadow-sm"
+              className={`border border-gray-200 rounded-lg p-4 shadow-sm ${
+                listing.found ? "bg-green-100" : lawCategories.includes(listing.category) ? "bg-yellow-100" : "bg-white"
+              }`}
             >
-              <h2 className="text-xl font-semibold mb-2">{listing.title}</h2>
-              <p className="text-gray-700 mb-2">{listing.description}</p>
-              <p className="text-gray-700 mb-2">Category: {listing.category}</p>
-              <p className="text-gray-700 mb-2">
-                Status:{" "}
-                {listing.found ? (
-                  <span className="text-green-600">Occupied</span>
-                ) : (
-                  <span className="text-yellow-600">Open</span>
-                )}
-              </p>
-              {!listing.found && user && (
+              <h4 className="text-xl font-semibold">{listing.title}</h4>
+              <p><strong>Location:</strong> {listing.location}</p>
+              <p><strong>Description:</strong> {listing.problem}</p>
+              <p><strong>Email:</strong> {listing.email || "Not provided"}</p>
+              <p><strong>Phone:</strong> {listing.phone || "Not provided"}</p>
+              <p><strong>Category:</strong> {listing.category}</p>
+              <p><strong></strong> <b>{listing.found && "Occupied"}</b></p>
+              {user && user.uid === listing.userId && !listing.found && (
                 <button
                   onClick={() => handleMarkAsOccupied(listing.id)}
-                  className="bg-blue-500 text-white py-2 px-4 rounded shadow hover:bg-blue-600 transition"
+                  className="bg-blue-500 text-white py-1 px-3 rounded mt-2 hover:bg-blue-600 transition"
                 >
                   Mark as Occupied
                 </button>
               )}
             </div>
-          ))}
+          ))
+        ) : (
+          <h2>No Listings Found</h2>
+        )}
+      </div>
+
+      {showPopup && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4">
+    <div className="bg-white rounded-lg shadow-lg w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+      <div className="sticky top-0 bg-white p-4 border-b">
+        <button
+          onClick={() => setShowPopup(false)}
+          className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 transition"
+        >
+          ✖
+        </button>
+        <h3 className="text-xl font-semibold">Your Listings</h3>
+      </div>
+      <div className="p-4">
+        <div className="mb-4">
+          <label htmlFor="popup-category-filter" className="block text-sm font-medium text-gray-700">
+            Filter by Category
+          </label>
+          <select
+            id="popup-category-filter"
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
+          >
+            <option value="">All Categories</option>
+            {lawCategories.map((cat) => (
+              <option key={cat} value={cat}>
+                {cat}
+              </option>
+            ))}
+          </select>
         </div>
-      )}
+        <div className="space-y-4">
+          {filteredListings.length > 0 ? (
+            filteredListings.map((listing) => (
+              <div
+                key={listing.id}
+                className={`border border-gray-200 rounded-lg p-4 shadow-sm ${
+                  listing.found ? "bg-green-100" : "bg-white"
+                }`}
+              >
+                <h4 className="text-xl font-semibold">{listing.title}</h4>
+                <p><strong>Location:</strong> {listing.location}</p>
+                <p><strong>Description:</strong> {listing.problem}</p>
+                <p><strong>Email:</strong> {listing.email || "Not provided"}</p>
+                <p><strong>Phone:</strong> {listing.phone || "Not provided"}</p>
+                <p><strong>Category:</strong> {listing.category}</p>
+                <p><strong></strong> <b>{listing.found && "Occupied"}</b></p>
+                {user && user.uid === listing.userId && !listing.found && (
+                  <button
+                    onClick={() => handleMarkAsOccupied(listing.id)}
+                    className="bg-blue-500 text-white py-1 px-3 rounded mt-2 hover:bg-blue-600 transition"
+                  >
+                    Mark as Occupied
+                  </button>
+                )}
+              </div>
+            ))
+          ) : (
+            <h2>No Listings Found</h2>
+          )}
+        </div>
+      </div>
+    </div>
+  </div>
+)}
     </div>
   );
 };
