@@ -115,103 +115,111 @@ const Home = () => {
   console.log("Inquiries:", inquiries);
 
   return (
-    <div>
-      <h1>Law Inquiries</h1>
+    <div className="p-6 max-w-4xl mx-auto">
+      <h1 className="text-3xl font-bold mb-4 text-center">Law Inquiries</h1>
 
       {!user ? (
-        <div style={{textAlign:"left"}}>
-          <h1>Login to Add Your Listings 👇</h1>
-          <button onClick={handleSignInWithGoogle}>Sign in with Google</button>
+        <div className="text-center">
+          <h2 className="text-xl mb-4">Login to Add Your Listings 👇</h2>
+          <button
+            onClick={handleSignInWithGoogle}
+            className="bg-blue-500 text-white py-2 px-4 rounded shadow hover:bg-blue-600 transition"
+          >
+            Sign in with Google
+          </button>
         </div>
       ) : (
-        <div style={{ margin: "40px" }}>
+        <div className="text-center mt-8">
           <img
             src={user?.photoURL || "/default-avatar.png"}
             alt="User Profile"
-            className="w-full h-full rounded-full object-cover"
+            className="w-32 h-32 rounded-full mx-auto mb-4 object-cover"
           />
-          <h1 style={{ textAlign: "left", margin: "40px" }}>
+          <h1 className="text-2xl font-semibold mb-4">
             Welcome back {user?.displayName} 👋
           </h1>
-          <button onClick={handleLogout}>Logout</button>
-          <Link href={"/add"}>Add Inquiry</Link>
-          <button onClick={() => setShowPopup(!showPopup)}>
+          <button
+            onClick={handleLogout}
+            className="bg-red-500 text-white py-2 px-4 rounded shadow hover:bg-red-600 transition mb-4"
+          >
+            Logout
+          </button>
+          <div className="mb-4">
+            <Link
+              href={"/add"}
+              className="bg-green-500 text-white py-2 px-4 rounded shadow hover:bg-green-600 transition"
+            >
+              Add Inquiry
+            </Link>
+          </div>
+          <button
+            onClick={() => setShowPopup(!showPopup)}
+            className="bg-gray-500 text-white py-2 px-4 rounded shadow hover:bg-gray-600 transition"
+          >
             Manage Your Inquiries
           </button>
           {showPopup && (
-            <div className="popup" style={{ margin: "40px" }}>
-              <button onClick={() => setShowPopup(false)}>Close</button>
-              <h3>Your Inquiries</h3>
-              <ul>
-                {user && inquiries && inquiries.length ? (
-                  inquiries
-                    .filter((inquiry) => inquiry.userId === user.uid)
-                    .map((inquiry) => (
-                      <li key={inquiry.id}>
-                        <p>
-                          <strong>Title:</strong> {inquiry.title}
-                        </p>
-                        <p>
-                          <strong>Location:</strong> {inquiry.location}
-                        </p>
-                        <p>
-                          <strong>Problem:</strong> {inquiry.problem}
-                        </p>
-                        <p>
-                          <strong>Email:</strong> {inquiry.email}
-                        </p>
-                        <p>
-                          <strong>Phone:</strong> {inquiry.phone}
-                        </p>
-                        <button onClick={() => handleDelete(inquiry.id)}>
-                          Delete
-                        </button>
-                      </li>
-                    ))
-                ) : (
-                  <h1>
-                    {user
-                      ? "No Inquiries Added"
-                      : "Please log in to see inquiries"}
-                  </h1>
-                )}
-              </ul>
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+              <div className="bg-white p-6 rounded-lg shadow-lg max-w-md mx-4 relative">
+                <button
+                  onClick={() => setShowPopup(false)}
+                  className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 transition"
+                >
+                  ✖
+                </button>
+                <h3 className="text-xl font-semibold mb-4">Your Inquiries</h3>
+                <ul className="space-y-4">
+                  {user && inquiries && inquiries.length ? (
+                    inquiries
+                      .filter((inquiry) => inquiry.userId === user.uid)
+                      .map((inquiry) => (
+                        <li key={inquiry.id} className="border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition">
+                          <p><strong>Title:</strong> {inquiry.title}</p>
+                          <p><strong>Location:</strong> {inquiry.location}</p>
+                          <p><strong>Problem:</strong> {inquiry.problem}</p>
+                          <p><strong>Email:</strong> {inquiry.email}</p>
+                          <p><strong>Phone:</strong> {inquiry.phone}</p>
+                          <button
+                            onClick={() => handleDelete(inquiry.id)}
+                            className="bg-red-500 text-white py-1 px-3 rounded mt-2 hover:bg-red-600 transition"
+                          >
+                            Delete
+                          </button>
+                        </li>
+                      ))
+                  ) : (
+                    <h1>{user ? "No Inquiries Added" : "Please log in to see inquiries"}</h1>
+                  )}
+                </ul>
+              </div>
             </div>
           )}
         </div>
       )}
 
-      <h2>Existing Inquiries</h2>
-      {loading ? (
-        <p>Loading...</p>
-      ) : (
-        <ul>
-          {inquiries.length ? (
-            inquiries.map((inquiry) => (
-              <li key={inquiry.id} style={{ margin: "100px" }}>
-                <h1> Name : {inquiry.userName}</h1>
-                <p>
-                  <strong>Title:</strong> {inquiry.title}
-                </p>
-                <p>
-                  <strong>Location:</strong> {inquiry.location}
-                </p>
-                <p>
-                  <strong>Problem:</strong> {inquiry.problem}
-                </p>
-                <p>
-                  <strong>Email:</strong> {inquiry.email}
-                </p>
-                <p>
-                  <strong>Phone:</strong> {inquiry.phone}
-                </p>
-              </li>
-            ))
-          ) : (
-            <h1>No Inquiries Posted Yet</h1>
-          )}
-        </ul>
-      )}
+      <div className="mt-8">
+        <h2 className="text-2xl font-semibold mb-4">Existing Inquiries</h2>
+        {loading ? (
+          <p>Loading...</p>
+        ) : (
+          <ul className="space-y-4">
+            {inquiries.length ? (
+              inquiries.map((inquiry) => (
+                <li key={inquiry.id} className="border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition">
+                  <h3 className="text-lg font-semibold mb-2">Name: {inquiry.userName}</h3>
+                  <p><strong>Title:</strong> {inquiry.title}</p>
+                  <p><strong>Location:</strong> {inquiry.location}</p>
+                  <p><strong>Problem:</strong> {inquiry.problem}</p>
+                  <p><strong>Email:</strong> {inquiry.email}</p>
+                  <p><strong>Phone:</strong> {inquiry.phone}</p>
+                </li>
+              ))
+            ) : (
+              <h1>No Inquiries Posted Yet</h1>
+            )}
+          </ul>
+        )}
+      </div>
     </div>
   );
 };

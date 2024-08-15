@@ -52,48 +52,63 @@ const AddInquiry = () => {
   };
 
   return (
-    <div>
-      <Link href={"/"}>Go back home!</Link>
-      <h1>Add Inquiry</h1>
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="Title"
-          required
-        />
-        <input
-          type="text"
-          value={location}
-          onChange={(e) => setLocation(e.target.value)}
-          placeholder="Location (Ex: Colombo)"
-          required
-        />
-        <textarea
-          value={problem}
-          onChange={(e) => setProblem(e.target.value)}
-          placeholder="Describe your problem"
-          required
-        />
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="Your Email (Optional , but ideally required)"
-        />
-        <input
-          type="number"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-          placeholder="Your Phone"
-          required
-        />
-        <button type="submit" disabled={loading}>
-          {loading ? "Submitting..." : "Submit Inquiry"}
-        </button>
-      </form>
+    <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-6">
+      <Link href={"/"} className="text-blue-500 hover:underline mb-4">
+        &larr; Go back home
+      </Link>
+      <div className="bg-white p-6 rounded-lg shadow-lg max-w-lg w-full">
+        <h1 className="text-2xl font-semibold mb-4">Add Inquiry</h1>
+        {error && <p className="text-red-500 mb-4">{error}</p>}
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <input
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="Title"
+            required
+            className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <input
+            type="text"
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+            placeholder="Location (Ex: Colombo)"
+            required
+            className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <textarea
+            value={problem}
+            onChange={(e) => setProblem(e.target.value)}
+            placeholder="Describe your problem"
+            required
+            className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 h-32"
+          />
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Your Email (Optional)"
+            className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <input
+            type="number"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            placeholder="Your Phone"
+            required
+            className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <button
+            type="submit"
+            disabled={loading}
+            className={`w-full p-2 rounded-md text-white ${
+              loading ? "bg-gray-500 cursor-not-allowed" : "bg-blue-500 hover:bg-blue-600"
+            }`}
+          >
+            {loading ? "Submitting..." : "Submit Inquiry"}
+          </button>
+        </form>
+      </div>
     </div>
   );
 };
