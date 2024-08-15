@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider } from 'firebase/auth';
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
 // Replace these with your Firebase project config
@@ -19,4 +19,4 @@ const auth = getAuth(app);
 const firestore = getFirestore(app);
 const googleProvider = new GoogleAuthProvider();
 
-export { auth, firestore, googleProvider };
+export { auth, firestore, googleProvider, signInWithPopup, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword };

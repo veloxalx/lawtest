@@ -1,27 +1,55 @@
 "use client";
 import { useState, useEffect } from 'react';
-import { firestore,auth } from './lib/firebase';
-import { useAuth } from './context/AuthContext';
+import { collection, getDocs, addDoc } from 'firebase/firestore';
+import { auth, signInWithPopup, signOut, GoogleAuthProvider } from './lib/firebase';
 
 const Home = () => {
+  const [user, setUser] = useState(null);
   const [inquiries, setInquiries] = useState([]);
   const [problem, setProblem] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [loading, setLoading] = useState(false);
-  const { user, signInWithGoogle, logout } = useAuth();
 
   useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged(setUser);
+
     const fetchInquiries = async () => {
       setLoading(true);
-      const snapshot = await firestore.collection('inquiries').get();
-      const inquiriesList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setInquiries(inquiriesList);
-      setLoading(false);
+      try {
+        const inquiriesCollection = collection(firestore, 'inquiries');
+        const snapshot = await getDocs(inquiriesCollection);
+        const inquiriesList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setInquiries(inquiriesList);
+      } catch (error) {
+        console.error('Error fetching inquiries:', error.message);
+      } finally {
+        setLoading(false);
+      }
     };
 
     fetchInquiries();
+    return () => unsubscribe(); // Cleanup subscription on unmount
   }, []);
+
+  const handleSignInWithGoogle = async () => {
+    try {
+      const provider = new GoogleAuthProvider();
+      const result = await signInWithPopup(auth, provider);
+      setUser(result.user);
+    } catch (error) {
+      console.error('Error signing in with Google:', error.message);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      setUser(null);
+    } catch (error) {
+      console.error('Error signing out:', error.message);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -29,17 +57,22 @@ const Home = () => {
       alert('You must be logged in to submit an inquiry.');
       return;
     }
-    await firestore.collection('inquiries').add({
-      problem,
-      email,
-      phone,
-      userId: user.uid,
-      createdAt: new Date()
-    });
-    setProblem('');
-    setEmail('');
-    setPhone('');
-    setInquiries([...inquiries, { problem, email, phone }]);
+    try {
+      const inquiriesCollection = collection(firestore, 'inquiries');
+      await addDoc(inquiriesCollection, {
+        problem,
+        email,
+        phone,
+        userId: user.uid,
+        createdAt: new Date()
+      });
+      setProblem('');
+      setEmail('');
+      setPhone('');
+      setInquiries([...inquiries, { problem, email, phone }]);
+    } catch (error) {
+      console.error('Error adding inquiry:', error.message);
+    }
   };
 
   return (
@@ -47,15 +80,32 @@ const Home = () => {
       <h1>Law Inquiries</h1>
       {!user ? (
         <div>
-          <button onClick={signInWithGoogle}>Sign in with Google</button>
+          <button onClick={handleSignInWithGoogle}>Sign in with Google</button>
         </div>
       ) : (
         <div>
-          <button onClick={logout}>Logout</button>
+          <button onClick={handleLogout}>Logout</button>
           <form onSubmit={handleSubmit}>
-            <textarea value={problem} onChange={(e) => setProblem(e.target.value)} placeholder="Describe your problem" required />
-            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" required />
-            <input type="phone" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="Phone Number" required />
+            <textarea
+              value={problem}
+              onChange={(e) => setProblem(e.target.value)}
+              placeholder="Describe your problem"
+              required
+            />
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Email"
+              required
+            />
+            <input
+              type="text"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="Phone Number"
+              required
+            />
             <button type="submit">Add Inquiry</button>
           </form>
         </div>
