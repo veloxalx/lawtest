@@ -112,7 +112,7 @@ const Home = () => {
   return (
     <div className="p-6 max-w-4xl mx-auto">
       <h1 className="text-3xl font-bold mb-4 text-center">Law Listings ⚖️</h1>
-      {user && (
+           {user && (
         <button
           onClick={handleLogout}
           className="bg-red-500 text-white py-2 px-4 rounded shadow hover:bg-red-600 transition mb-4"
