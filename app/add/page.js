@@ -71,6 +71,7 @@ const AddInquiry = () => {
         email,
         phone,
         category,
+        userId:user.uid,
         found: false,
       });
       setTitle("");
