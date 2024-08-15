@@ -111,12 +111,16 @@ const Home = () => {
     }
   };
 
-  console.log("User:", user);
-  console.log("Inquiries:", inquiries);
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text).then(
+      () => alert("Copied to clipboard!"),
+      (err) => console.error("Failed to copy: ", err)
+    );
+  };
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
-      <h1 className="text-3xl font-bold mb-4 text-center">Law Inquiries</h1>
+      <h1 className="text-3xl font-bold mb-4 text-center">Law Inquiries ⚖️</h1>
 
       {!user ? (
         <div className="text-center">
@@ -177,8 +181,24 @@ const Home = () => {
                           <p><strong>Title:</strong> {inquiry.title}</p>
                           <p><strong>Location:</strong> {inquiry.location}</p>
                           <p><strong>Problem:</strong> {inquiry.problem}</p>
-                          <p><strong>Email:</strong> {inquiry.email}</p>
-                          <p><strong>Phone:</strong> {inquiry.phone}</p>
+                          <p>
+                            <strong>Email:</strong>{" "}
+                            <span
+                              className="text-blue-500 cursor-pointer hover:underline"
+                              onClick={() => copyToClipboard(inquiry.email)}
+                            >
+                              {inquiry.email}
+                            </span>
+                          </p>
+                          <p>
+                            <strong>Phone:</strong>{" "}
+                            <span
+                              className="text-blue-500 cursor-pointer hover:underline"
+                              onClick={() => copyToClipboard(inquiry.phone)}
+                            >
+                              {inquiry.phone}
+                            </span>
+                          </p>
                           <button
                             onClick={() => handleDelete(inquiry.id)}
                             className="bg-red-500 text-white py-1 px-3 rounded mt-2 hover:bg-red-600 transition"
@@ -210,8 +230,24 @@ const Home = () => {
                   <p><strong>Title:</strong> {inquiry.title}</p>
                   <p><strong>Location:</strong> {inquiry.location}</p>
                   <p><strong>Problem:</strong> {inquiry.problem}</p>
-                  <p><strong>Email:</strong> {inquiry.email}</p>
-                  <p><strong>Phone:</strong> {inquiry.phone}</p>
+                  <p>
+                    <strong>Email:</strong>{" "}
+                    <span
+                      className="text-blue-500 cursor-pointer hover:underline"
+                      onClick={() => copyToClipboard(inquiry.email)}
+                    >
+                      {inquiry.email}
+                    </span>
+                  </p>
+                  <p>
+                    <strong>Phone:</strong>{" "}
+                    <span
+                      className="text-blue-500 cursor-pointer hover:underline"
+                      onClick={() => copyToClipboard(inquiry.phone)}
+                    >
+                      {inquiry.phone}
+                    </span>
+                  </p>
                 </li>
               ))
             ) : (
