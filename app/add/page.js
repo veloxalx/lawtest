@@ -55,6 +55,7 @@ const AddInquiry = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-6">
+      <b>If it says "Error , couldn't add" , don't panick it's a temporary bug! (Check the homepage , your inquiry will be there!)</b>
       <Link href={"/"} className="text-blue-500 hover:underline mb-4">
         &larr; Go back home
       </Link>
