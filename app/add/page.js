@@ -78,8 +78,7 @@ const AddInquiry = () => {
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          placeholder="Email"
-          required
+          placeholder="Email (Optional) , Ideally recommended"
         />
         <input
           type="text"

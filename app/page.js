@@ -97,7 +97,7 @@ const Home = () => {
   };
 
   return (
-    <div>
+    <div >
       <h1>Law Inquiries</h1>
 
       {!user ? (
@@ -105,45 +105,9 @@ const Home = () => {
           <button onClick={handleSignInWithGoogle}>Sign in with Google</button>
         </div>
       ) : (
-        <div>
+        <div style={{margin:"40px"}}>
           <button onClick={handleLogout}>Logout</button>
-          <form onSubmit={handleSubmit}>
-            <input
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Title"
-              required
-            />
-            <input
-              type="text"
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              placeholder="Location"
-              required
-            />
-            <textarea
-              value={problem}
-              onChange={(e) => setProblem(e.target.value)}
-              placeholder="Describe your problem"
-              required
-            />
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Email"
-              required
-            />
-            <input
-              type="text"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              placeholder="Phone Number"
-              required
-            />
-            <button type="submit">Add Inquiry</button>
-          </form>
+          <Link href={"/add"}>Add Inquiry</Link>
           <button onClick={() => setShowPopup(!showPopup)}>
             Manage Your Inquiries
           </button>
@@ -167,14 +131,14 @@ const Home = () => {
           )}
         </div>
       )}
-      <Link href="/add">Add New Inquiry</Link>
+    
       <h2>Existing Inquiries</h2>
       {loading ? (
         <p>Loading...</p>
       ) : (
         <ul>
-          {inquiries.length ? inquiries.map((inquiry) => (
-            <li key={inquiry.id}>
+          {inquiries.length ? inquiries.map((inquiry,index) => (
+            <li key={inquiry.id || index}>
               <p><strong>Title:</strong> {inquiry.title}</p>
               <p><strong>Location:</strong> {inquiry.location}</p>
               <p><strong>Problem:</strong> {inquiry.problem}</p>
