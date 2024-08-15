@@ -11,6 +11,7 @@ const Home = () => {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPopup, setShowPopup] = useState(false);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(setUser);
@@ -123,6 +124,25 @@ const Home = () => {
             />
             <button type="submit">Add Inquiry</button>
           </form>
+          <button onClick={() => setShowPopup(!showPopup)}>
+            Manage Your Inquiries
+          </button>
+          {showPopup && (
+            <div className="popup">
+              <button onClick={() => setShowPopup(false)}>Close</button>
+              <h3>Your Inquiries</h3>
+              <ul>
+                {inquiries.filter(inquiry => inquiry.userId === user.uid).map((inquiry) => (
+                  <li key={inquiry.id}>
+                    <p>{inquiry.problem}</p>
+                    <p>Email: {inquiry.email}</p>
+                    <p>Phone: {inquiry.phone}</p>
+                    <button onClick={() => handleDelete(inquiry.id)}>Delete</button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
       )}
       <Link href="/add">Add New Inquiry</Link>
@@ -136,9 +156,6 @@ const Home = () => {
               <p>{inquiry.problem}</p>
               <p>Email: {inquiry.email}</p>
               <p>Phone: {inquiry.phone}</p>
-              {user && user.uid === inquiry.userId && ( // Check if the user is the owner
-                <button onClick={() => handleDelete(inquiry.id)}>Delete</button>
-              )}
             </li>
           )) : <h1>No Inquiries Posted Yet</h1>}
         </ul>
