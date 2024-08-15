@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { collection, addDoc } from "firebase/firestore";
 import { auth, firestore } from "../lib/firebase";
+import { useRouter } from "next/router";
 
 import Link from "next/link";
 
@@ -14,6 +15,8 @@ const AddInquiry = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const user = auth.currentUser;
+
+  const router = useRouter();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
