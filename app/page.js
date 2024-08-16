@@ -132,7 +132,7 @@ const Home = () => {
 
   return (
     <div className="p-3 max-w-8xl  mx-auto">
-      <h1 className="text-3xl font-bold mb-4 text-center">Law Listings ⚖️</h1>
+      <h1 className="text-3xl font-bold mb-4 text-center" style={{margin:"40px"}}>Law Listings ⚖️</h1>
       {user && (
         <button
           onClick={handleLogout}
@@ -163,7 +163,7 @@ const Home = () => {
           value={selectedCategory}
           onChange={(e) => setSelectedCategory(e.target.value)}
           className="mt-4 block w-full border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 "
-          style={{height:"40px",margin:"20px",width:"80vw",boxShadow:"inherit"}}
+          style={{height:"40px",margin:"20px",width:"20rem",boxShadow:"inherit"}}
         >
           <option value="">All Categories</option>
           {lawCategories.map((cat) => (
@@ -172,12 +172,7 @@ const Home = () => {
             </option>
           ))}
         </select>
-        <label
-          htmlFor="search-input"
-          className="block text-sm font-medium text-gray-700 mt-4"
-        >
-          Search
-        </label>
+
         <input
           id="search-input"
           type="text"
@@ -185,7 +180,7 @@ const Home = () => {
           onChange={(e) => setSearchTerm(e.target.value)}
           placeholder="Search by title..."
           className="mt-2 block w-full border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
-          style={{height:"40px",margin:"20px",width:"80vw",boxShadow:"inherit"}}
+          style={{height:"40px",margin:"30px",width:"80vw",boxShadow:"inherit",padding:"10px"}}
         />
       </div>
       <div className="text-center mb-4">
@@ -243,17 +238,17 @@ const Home = () => {
               }`}
             >
               <h4 className="text-xl font-semibold">{listing.title}</h4>
-              <p>
-                <strong>Location:</strong> {listing.location}
-              </p>
-              <p>
-                <strong>Description:</strong> {listing.problem}
+              <p style={{margin:"60px"}}>
+                <label><strong><h1>Description</h1><br/>{listing.problem}</strong> </label>
               </p>
               <p>
                 <strong>Email:</strong> {listing.email || "Not provided"}
               </p>
               <p>
                 <strong>Phone:</strong> {listing.phone || "Not provided"}
+              </p>
+              <p>
+                <strong>Location:</strong> {listing.location}
               </p>
               {user && (
                 <div className="mt-4">

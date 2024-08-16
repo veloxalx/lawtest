@@ -27,17 +27,18 @@ const HowToSection = () => {
           </p>
         </div>
 
-        <div className="bg-white p-4 rounded-lg shadow-sm">
+        <div className="bg-white p-4 rounded-lg shadow-sm" style={{marginTop:"40px"}} >
           <h2 className="text-xl font-semibold mb-2">Color Codes</h2>
-          <p className="text-gray-700">
+          <p className="text-gray-700" >
             <span className="font-bold text-green-600">Green:</span> Indicates that the case is <span className="font-bold">OCCUPIED</span>. This means that a lawyer has been found and the issue has been resolved.
           </p>
+          <br/>
           <p className="text-gray-700">
             <span className="font-bold text-yellow-600">Yellow:</span> Indicates that the case is <span className="font-bold">OPEN</span>. This means that the case is still available for legal assistance.
           </p>
-          <p className="text-gray-700">
+          {/* <p className="text-gray-700">
             <span className="font-bold text-red-600">Red:</span> Indicates that the case is <span className="font-bold">CLOSED</span>. This means that the case has been resolved and is no longer available.
-          </p>
+          </p> */}
         </div>
 
         <div className="bg-white p-4 rounded-lg shadow-sm">
