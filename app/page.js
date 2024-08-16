@@ -126,27 +126,24 @@ const Home = () => {
     }
   };
 
-  const handleMarkAsOccupied = async (listingId) => {
+  const handleToggleOccupied = async (listingId) => {
     try {
       const listingDoc = doc(firestore, "inquiries", listingId);
-      await updateDoc(listingDoc, { found: true });
-      setListings(
-        listings.map((listing) =>
-          listing.id === listingId ? { ...listing, found: true } : listing
-        )
-      );
-      setFilteredListings(
-        filteredListings.map((listing) =>
-          listing.id === listingId ? { ...listing, found: true } : listing
-        )
-      );
-      setUserListings(
-        userListings.map((listing) =>
-          listing.id === listingId ? { ...listing, found: true } : listing
-        )
-      );
+      const listingToUpdate = listings.find((listing) => listing.id === listingId);
+      const newFoundStatus = !listingToUpdate.found;
+      
+      await updateDoc(listingDoc, { found: newFoundStatus });
+      
+      const updateListing = (list) =>
+        list.map((listing) =>
+          listing.id === listingId ? { ...listing, found: newFoundStatus } : listing
+        );
+
+      setListings(updateListing(listings));
+      setFilteredListings(updateListing(filteredListings));
+      setUserListings(updateListing(userListings));
     } catch (error) {
-      console.error("Error marking listing as occupied:", error.message);
+      console.error("Error toggling listing occupied status:", error.message);
     }
   };
 
@@ -317,15 +314,16 @@ const Home = () => {
             </p>
               {user && user.uid === listing.userId && (
                 <div className="mt-4">
-                  {!listing.found && (
-                    <button
-                      onClick={() => handleMarkAsOccupied(listing.id)}
-                      className="bg-blue-500 text-white py-2 px-4 rounded shadow hover:bg-blue-600 transition mr-2"
-                      disabled={listing.found}
-                    >
-                      Mark as Occupied
-                    </button>
-                  )}
+                  <button
+                    onClick={() => handleToggleOccupied(listing.id)}
+                    className={`py-2 px-4 rounded shadow transition mr-2 ${
+                      listing.found
+                        ? "bg-yellow-500 hover:bg-yellow-600 text-white"
+                        : "bg-blue-500 hover:bg-blue-600 text-white"
+                    }`}
+                  >
+                    {listing.found ? "Mark as Unoccupied" : "Mark as Occupied"}
+                  </button>
                   <button
                     onClick={() => handleDeleteListing(listing.id)}
                     className="bg-red-500 text-white py-2 px-4 rounded shadow hover:bg-red-600 transition"
@@ -363,14 +361,16 @@ const Home = () => {
               
             </p>
             <div className="mt-2">
-              {!listing.found && (
-                <button
-                  onClick={() => handleMarkAsOccupied(listing.id)}
-                  className="bg-blue-500 text-white py-1 px-2 rounded mr-2"
-                >
-                  Mark as Occupied
-                </button>
-              )}
+              <button
+                onClick={() => handleToggleOccupied(listing.id)}
+                className={`py-1 px-2 rounded mr-2 ${
+                  listing.found
+                    ? "bg-yellow-500 text-white"
+                    : "bg-blue-500 text-white"
+                }`}
+              >
+                {listing.found ? "Mark as Unoccupied" : "Mark as Occupied"}
+              </button>
               <button
                 onClick={() => handleDeleteListing(listing.id)}
                 className="bg-red-500 text-white py-1 px-2 rounded"
