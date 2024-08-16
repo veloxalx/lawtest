@@ -39,6 +39,10 @@ const HowToSection = () => {
           <p className="text-gray-700">
             <span className="font-bold text-yellow-600">Yellow:</span> Indicates that the case is <span className="font-bold">OPEN</span>. This means that the case is still available for legal assistance.
           </p>
+          <br/>
+          <p className="text-gray-700">
+            <span className="font-bold text-red-600">Red Glow:</span> Indicates that the case is <span className="font-bold">URGENT</span>. This means that the case needs IMMEDIATE attention.
+          </p>
         </div>
 
         <div className="bg-white p-4 rounded-lg shadow-sm">

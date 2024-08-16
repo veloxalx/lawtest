@@ -26,18 +26,18 @@ const AddInquiry = () => {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [category, setCategory] = useState("");
+  const [urgent, setUrgent] = useState(false); // New state for urgent checkbox
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState(""); // New state for status messages
 
-
-  useEffect(()=>{
-    setTimeout(()=>{
-      setStatus("")
-    },6000)
-  },[status])
+  useEffect(() => {
+    setTimeout(() => {
+      setStatus("");
+    }, 6000);
+  }, [status]);
 
   useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem('user'));
+    const storedUser = JSON.parse(localStorage.getItem("user"));
     if (storedUser) {
       setUser(storedUser);
     }
@@ -49,7 +49,7 @@ const AddInquiry = () => {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
       setUser(user);
-      localStorage.setItem('user', JSON.stringify(user)); // Store user in localStorage
+      localStorage.setItem("user", JSON.stringify(user)); // Store user in localStorage
     } catch (error) {
       console.error("Error signing in with Google:", error.message);
     }
@@ -59,7 +59,7 @@ const AddInquiry = () => {
     try {
       await signOut(auth);
       setUser(null);
-      localStorage.removeItem('user'); // Remove user from localStorage
+      localStorage.removeItem("user"); // Remove user from localStorage
     } catch (error) {
       console.error("Error signing out:", error.message);
     }
@@ -78,8 +78,9 @@ const AddInquiry = () => {
         email,
         phone,
         category,
-        userId:user.uid,
+        userId: user.uid,
         found: false,
+        urgent, // Add urgent status to the inquiry
       });
       setTitle("");
       setLocation("");
@@ -87,6 +88,7 @@ const AddInquiry = () => {
       setEmail("");
       setPhone("");
       setCategory("");
+      setUrgent(false); // Reset urgent status
       setStatus("Inquiry added successfully!"); // Success message
     } catch (error) {
       console.error("Error adding inquiry:", error.message);
@@ -98,7 +100,6 @@ const AddInquiry = () => {
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
-    
       <h1 className="text-3xl font-bold mb-4 text-center">Add a New Inquiry</h1>
       <Link
         href={"/"}
@@ -138,17 +139,22 @@ const AddInquiry = () => {
         )}
       </div>
       {status && (
-          <div className="text-center mt-4">
-            <p className={`font-semibold ${status.startsWith("Failed") ? "text-red-500" : "text-green-500"}`}>
-              {status}
-            </p>
-          </div>
-        )}
+        <div className="text-center mt-4">
+          <p
+            className={`font-semibold ${
+              status.startsWith("Failed") ? "text-red-500" : "text-green-500"
+            }`}
+          >
+            {status}
+          </p>
+        </div>
+      )}
       <form onSubmit={handleAddInquiry} className="space-y-4">
-        
-
         <div>
-        <label htmlFor="category" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="category"
+            className="block text-sm font-medium text-gray-700"
+          >
             Category
           </label>
           <select
@@ -156,7 +162,8 @@ const AddInquiry = () => {
             value={category}
             onChange={(e) => setCategory(e.target.value)}
             required
-            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50" style={{marginBottom:"40px",marginTop:"20px"}}
+            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
+            style={{ marginBottom: "40px", marginTop: "20px" }}
           >
             <option value="">Select a Category</option>
             {lawCategories.map((cat) => (
@@ -165,13 +172,16 @@ const AddInquiry = () => {
               </option>
             ))}
           </select>
-          <label htmlFor="title" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="title"
+            className="block text-sm font-medium text-gray-700"
+          >
             Title
           </label>
           <input
             id="title"
             type="text"
-                placeholder="Enter Title"
+            placeholder="Enter Title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             required
@@ -180,13 +190,16 @@ const AddInquiry = () => {
         </div>
 
         <div>
-          <label htmlFor="location" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="location"
+            className="block text-sm font-medium text-gray-700"
+          >
             Location
           </label>
           <input
             id="location"
             type="text"
-                placeholder="Enter Location"
+            placeholder="Enter Location"
             value={location}
             onChange={(e) => setLocation(e.target.value)}
             required
@@ -195,14 +208,17 @@ const AddInquiry = () => {
         </div>
 
         <div>
-          <label htmlFor="problem" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="problem"
+            className="block text-sm font-medium text-gray-700"
+          >
             Problem Description
           </label>
           <textarea
             id="problem"
             rows="4"
+            placeholder="Enter Problem Description"
             value={problem}
-                placeholder="Enter Problem Description"
             onChange={(e) => setProblem(e.target.value)}
             required
             className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
@@ -210,48 +226,65 @@ const AddInquiry = () => {
         </div>
 
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="email"
+            className="block text-sm font-medium text-gray-700"
+          >
             Email
           </label>
           <input
             id="email"
             type="email"
+            placeholder="Enter Email Address (Optional)"
             value={email}
-                placeholder="Enter Email Address (Optional)"
             onChange={(e) => setEmail(e.target.value)}
             className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
           />
         </div>
 
         <div>
-          <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="phone"
+            className="block text-sm font-medium text-gray-700"
+          >
             Phone
           </label>
           <input
             id="phone"
             type="tel"
+            placeholder="Enter Phone Number"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
             required
-            placeholder="Enter Phone Number"
             minLength={10}
             maxLength={10}
             className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
           />
         </div>
 
-        <div>
-
+        <div className="flex items-center">
+          <input
+            id="urgent"
+            type="checkbox"
+            checked={urgent}
+            onChange={(e) => setUrgent(e.target.checked)}
+            className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+          />
+          <label
+            htmlFor="urgent"
+            className="ml-2 block text-sm font-medium text-gray-700"
+          >
+            Mark as urgent?
+          </label>
         </div>
 
         <button
           type="submit"
           className="bg-blue-500 text-white py-2 px-4 rounded shadow hover:bg-blue-600 transition"
+          disabled={loading}
         >
-          {loading ? "Adding..." : "Add Inquiry"}
+          {loading ? "Adding Inquiry..." : "Add Inquiry"}
         </button>
-
-        
       </form>
     </div>
   );

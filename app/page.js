@@ -271,68 +271,130 @@ const Home = () => {
         )}
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mx-18" >
         {loading ? (
           <h1>Loading...</h1>
         ) : filteredListings.length > 0 ? (
           filteredListings.map((listing) => (
-            <div
-              key={listing.id}
-              className={`border border-gray-200 rounded-lg p-6 h-400 shadow-lg ${
-                listing.found
-                  ? "bg-green-100"
-                  : lawCategories.includes(listing.category)
-                  && "bg-yellow-100"
+listing.urgent ?             <div
+key={listing.id}
+style={{
+  borderColor: "red",
+  borderRadius: "12px",
+  borderWidth: "2px",
+  boxShadow: "0 0 15px red",
+}}
+className={`border border-gray-200 rounded-lg p-6 h-400 shadow-lg ${
+  listing.found
+    ? "bg-green-100"
+    : lawCategories.includes(listing.category)
+    && "bg-yellow-100"
 
-              }`}
-            >
-              <h4 className="text-xl font-semibold">{listing.title}</h4>
-              <p style={{ margin: "60px" }}>
-                <label>
-                  <strong>
-                    <h1>Description</h1>
-                    <br />
-                    {listing.problem}
-                  </strong>{" "}
-                </label>
-              </p>
-              <p>
-                <strong>Email:</strong> {listing.email || "Not provided"}
-              </p>
-              <p>
-                <strong>Phone:</strong> {listing.phone || "Not provided"}
-              </p>
-              <p>
-                <strong>Location:</strong> {listing.location}
-              </p>
-              <p>
-                <strong>Category:</strong> {listing.category}
-              </p>
-              <p>
-              <strong>Status: {listing.found ? "Occupied" : "Available"}</strong>{" "}
-              
-            </p>
-              {user && user.uid === listing.userId && (
-                <div className="mt-4">
-                  <button
-                    onClick={() => handleToggleOccupied(listing.id)}
-                    className={`py-2 px-4 rounded shadow transition mr-2 ${
-                      listing.found
-                        ? "bg-yellow-500 hover:bg-yellow-600 text-white"
-                        : "bg-blue-500 hover:bg-blue-600 text-white"
-                    }`}
-                  >
-                    {listing.found ? "Mark as Unoccupied" : "Mark as Occupied"}
-                  </button>
-                  <button
-                    onClick={() => handleDeleteListing(listing.id)}
-                    className="bg-red-500 text-white py-2 px-4 rounded shadow hover:bg-red-600 transition"
-                  >
-                    Delete
-                  </button>
-                </div>
-              )}
-            </div>
+}`}
+>
+<h4 className="text-xl font-semibold">{listing.title}</h4>
+<p style={{ margin: "60px" }}>
+  <label>
+    <strong>
+      <h1>Description</h1>
+      <br />
+      {listing.problem}
+    </strong>{" "}
+  </label>
+</p>
+<p>
+  <strong>Email:</strong> {listing.email || "Not provided"}
+</p>
+<p>
+  <strong>Phone:</strong> {listing.phone || "Not provided"}
+</p>
+<p>
+  <strong>Location:</strong> {listing.location}
+</p>
+<p>
+  <strong>Category:</strong> {listing.category}
+</p>
+<p>
+<strong>Status: {listing.found ? "Occupied" : "Available"}</strong>{" "}
+
+</p>
+{user && user.uid === listing.userId && (
+  <div className="mt-4">
+    <button
+      onClick={() => handleToggleOccupied(listing.id)}
+      className={`py-2 px-4 rounded shadow transition mr-2 ${
+        listing.found
+          ? "bg-yellow-500 hover:bg-yellow-600 text-white"
+          : "bg-blue-500 hover:bg-blue-600 text-white"
+      }`}
+    >
+      {listing.found ? "Mark as Unoccupied" : "Mark as Occupied"}
+    </button>
+    <button
+      onClick={() => handleDeleteListing(listing.id)}
+      className="bg-red-500 text-white py-2 px-4 rounded shadow hover:bg-red-600 transition"
+    >
+      Delete
+    </button>
+  </div>
+)}
+</div>:             <div
+key={listing.id}
+className={`border border-gray-200 rounded-lg p-6 h-400 shadow-lg ${
+  listing.found
+    ? "bg-green-100"
+    : lawCategories.includes(listing.category)
+    && "bg-yellow-100"
+
+}`}
+>
+<h4 className="text-xl font-semibold">{listing.title}</h4>
+<p style={{ margin: "60px" }}>
+  <label>
+    <strong>
+      <h1>Description</h1>
+      <br />
+      {listing.problem}
+    </strong>{" "}
+  </label>
+</p>
+<p>
+  <strong>Email:</strong> {listing.email || "Not provided"}
+</p>
+<p>
+  <strong>Phone:</strong> {listing.phone || "Not provided"}
+</p>
+<p>
+  <strong>Location:</strong> {listing.location}
+</p>
+<p>
+  <strong>Category:</strong> {listing.category}
+</p>
+<p>
+<strong>Status: {listing.found ? "Occupied" : "Available"}</strong>{" "}
+
+</p>
+{user && user.uid === listing.userId && (
+  <div className="mt-4">
+    <button
+      onClick={() => handleToggleOccupied(listing.id)}
+      className={`py-2 px-4 rounded shadow transition mr-2 ${
+        listing.found
+          ? "bg-yellow-500 hover:bg-yellow-600 text-white"
+          : "bg-blue-500 hover:bg-blue-600 text-white"
+      }`}
+    >
+      {listing.found ? "Mark as Unoccupied" : "Mark as Occupied"}
+    </button>
+    <button
+      onClick={() => handleDeleteListing(listing.id)}
+      className="bg-red-500 text-white py-2 px-4 rounded shadow hover:bg-red-600 transition"
+    >
+      Delete
+    </button>
+  </div>
+)}
+</div>
           ))
         ) : (
           <h1 style={{margin:"40px"}}><strong>No listings found</strong></h1>
@@ -381,7 +443,7 @@ const Home = () => {
           </div>
         ))
       ) : (
-        <p>You have no listings yet.</p>
+        <p>You have no listings added yet.</p>
       )}
       <button
         onClick={() => setShowPopup(false)}
