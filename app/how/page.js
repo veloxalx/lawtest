@@ -26,7 +26,7 @@ const HowToSection = () => {
             <span className="font-bold text-blue-600">Change Status:</span> You can update the status of your listings to indicate whether they are resolved. Use the <span className="font-bold">&quot;Mark as Occupied&quot;</span> button to change the status.
           </p>
           <p className="text-gray-700 mb-2">
-            <span className="font-bold text-blue-600">Update Status:</span> If a case that was marked as <strong>OCCUPIED</strong> becomes available again <br/><strong>"(Mark As Occupied)"</strong>, you can revert it to <strong>UN-OCCUPIED</strong> status. Just click the <span className="font-bold">&quot;Mark as Unoccupied&quot;</span> button to make the case open for legal assistance once more.
+            <span className="font-bold text-blue-600">Update Status:</span> If a case that was marked as <strong>OCCUPIED</strong> becomes available again <br/>. Just click the <span className="font-bold">&quot;Mark as Unoccupied&quot;</span> button to make the case open for legal assistance once more.
           </p>
         </div>
 
