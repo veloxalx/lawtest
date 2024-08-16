@@ -285,8 +285,8 @@ const Home = () => {
                 listing.found
                   ? "bg-green-100"
                   : lawCategories.includes(listing.category)
-                  ? "bg-yellow-100"
-                  : "bg-white"
+                  && "bg-yellow-100"
+
               }`}
             >
               <h4 className="text-xl font-semibold">{listing.title}</h4>
@@ -311,6 +311,10 @@ const Home = () => {
               <p>
                 <strong>Category:</strong> {listing.category}
               </p>
+              <p>
+              <strong>Status: {listing.found ? "Occupied" : "Available"}</strong>{" "}
+              
+            </p>
               {user && user.uid === listing.userId && (
                 <div className="mt-4">
                   {!listing.found && (
@@ -344,6 +348,7 @@ const Home = () => {
         userListings.map((listing) => (
           <div 
             key={listing.id} 
+            style={{marginTop:"40px"}}
             className={`mb-4 p-4 border rounded ${
               listing.found ? 'bg-green-100' : 'bg-yellow-100'
             }`}
@@ -354,8 +359,8 @@ const Home = () => {
               <strong>Category:</strong> {listing.category}
             </p>
             <p>
-              <strong>Status:</strong>{" "}
-              {listing.found ? "Occupied" : "Available"}
+              <strong>Status: {listing.found ? "Occupied" : "Available"}</strong>{" "}
+              
             </p>
             <div className="mt-2">
               {!listing.found && (
