@@ -337,7 +337,7 @@ const Home = () => {
             </div>
           ))
         ) : (
-          <h1>No listings found</h1>
+          <h1 style={{margin:"40px"}}><strong>No listings found</strong></h1>
         )}
       </div>
       {showPopup && (
