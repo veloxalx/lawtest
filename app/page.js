@@ -7,6 +7,8 @@ import {
   updateDoc,
   doc,
   deleteDoc,
+  query,
+  where,
 } from "firebase/firestore";
 import { auth, firestore } from "./lib/firebase";
 import Link from "next/link";
@@ -30,8 +32,8 @@ const Home = () => {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
-  const [popupSelectedCategory, setPopupSelectedCategory] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
+  const [userListings, setUserListings] = useState([]);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(setUser);
@@ -76,6 +78,32 @@ const Home = () => {
     setFilteredListings(updatedListings);
   }, [selectedCategory, searchTerm, listings]);
 
+  useEffect(() => {
+    if (user && showPopup) {
+      fetchUserListings();
+    }
+  }, [user, showPopup]);
+
+  const fetchUserListings = async () => {
+    if (user) {
+      setLoading(true);
+      try {
+        const listingsCollection = collection(firestore, "inquiries");
+        const q = query(listingsCollection, where("userId", "==", user.uid));
+        const snapshot = await getDocs(q);
+        const userListingsList = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setUserListings(userListingsList);
+      } catch (error) {
+        console.error("Error fetching user listings:", error.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
   const handleSignInWithGoogle = async () => {
     try {
       const provider = new GoogleAuthProvider();
@@ -112,6 +140,11 @@ const Home = () => {
           listing.id === listingId ? { ...listing, found: true } : listing
         )
       );
+      setUserListings(
+        userListings.map((listing) =>
+          listing.id === listingId ? { ...listing, found: true } : listing
+        )
+      );
     } catch (error) {
       console.error("Error marking listing as occupied:", error.message);
     }
@@ -125,13 +158,16 @@ const Home = () => {
       setFilteredListings(
         filteredListings.filter((listing) => listing.id !== listingId)
       );
+      setUserListings(
+        userListings.filter((listing) => listing.id !== listingId)
+      );
     } catch (error) {
       console.error("Error deleting listing:", error.message);
     }
   };
 
   return (
-    <div className="p-3 max-w-8xl  mx-auto">
+    <div className="p-3 max-w-8xl mx-auto">
       <h1 className="text-3xl font-bold mb-4 text-center" style={{margin:"40px"}}>Law Listings ⚖️</h1>
       {user && (
         <button
@@ -162,7 +198,7 @@ const Home = () => {
           id="category-filter"
           value={selectedCategory}
           onChange={(e) => setSelectedCategory(e.target.value)}
-          className="mt-4 block w-full border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 "
+          className="mt-4 block w-full border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
           style={{height:"40px",margin:"20px",width:"20rem",boxShadow:"inherit"}}
         >
           <option value="">All Categories</option>
@@ -213,7 +249,7 @@ const Home = () => {
               </Link>
             </div>
             <button
-              onClick={() => setShowPopup(!showPopup)}
+              onClick={() => setShowPopup(true)}
               className="bg-gray-500 text-white py-2 px-4 rounded shadow hover:bg-gray-600 transition"
             >
               Manage Your Listings
@@ -250,7 +286,10 @@ const Home = () => {
               <p>
                 <strong>Location:</strong> {listing.location}
               </p>
-              {user && (
+              <p>
+                <strong>Category:</strong> {listing.category}
+              </p>
+              {user && user.uid === listing.userId && (
                 <div className="mt-4">
                   <button
                     onClick={() => handleMarkAsOccupied(listing.id)}
@@ -273,6 +312,47 @@ const Home = () => {
           <h1>No listings found</h1>
         )}
       </div>
+
+      {showPopup && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-6 rounded-lg max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+            <h2 className="text-2xl font-bold mb-4">Your Listings</h2>
+            {userListings.length > 0 ? (
+              userListings.map((listing) => (
+                <div key={listing.id} className="mb-4 p-4 border rounded">
+                  <h3 className="text-xl font-semibold">{listing.title}</h3>
+                  <p>{listing.problem}</p>
+                  <p><strong>Category:</strong> {listing.category}</p>
+                  <p><strong>Status:</strong> {listing.found ? "Occupied" : "Available"}</p>
+                  <div className="mt-2">
+                    <button
+                      onClick={() => handleMarkAsOccupied(listing.id)}
+                      className="bg-blue-500 text-white py-1 px-2 rounded mr-2"
+                      disabled={listing.found}
+                    >
+                      Mark as Occupied
+                    </button>
+                    <button
+                      onClick={() => handleDeleteListing(listing.id)}
+                      className="bg-red-500 text-white py-1 px-2 rounded"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p>You have no listings yet.</p>
+            )}
+            <button
+              onClick={() => setShowPopup(false)}
+              className="mt-4 bg-gray-500 text-white py-2 px-4 rounded"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
