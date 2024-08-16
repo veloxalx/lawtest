@@ -168,7 +168,12 @@ const Home = () => {
 
   return (
     <div className="p-3 max-w-8xl mx-auto">
-      <h1 className="text-3xl font-bold mb-4 text-center" style={{margin:"40px"}}>Law Listings ⚖️</h1>
+      <h1
+        className="text-3xl font-bold mb-4 text-center"
+        style={{ margin: "40px" }}
+      >
+        Law Listings ⚖️
+      </h1>
       {user && (
         <button
           onClick={handleLogout}
@@ -199,7 +204,12 @@ const Home = () => {
           value={selectedCategory}
           onChange={(e) => setSelectedCategory(e.target.value)}
           className="mt-4 block w-full border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
-          style={{height:"40px",margin:"20px",width:"20rem",boxShadow:"inherit"}}
+          style={{
+            height: "40px",
+            margin: "20px",
+            width: "20rem",
+            boxShadow: "inherit",
+          }}
         >
           <option value="">All Categories</option>
           {lawCategories.map((cat) => (
@@ -216,7 +226,13 @@ const Home = () => {
           onChange={(e) => setSearchTerm(e.target.value)}
           placeholder="Search by title..."
           className="mt-2 block w-full border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
-          style={{height:"40px",margin:"30px",width:"80vw",boxShadow:"inherit",padding:"10px"}}
+          style={{
+            height: "40px",
+            margin: "30px",
+            width: "80vw",
+            boxShadow: "inherit",
+            padding: "10px",
+          }}
         />
       </div>
       <div className="text-center mb-4">
@@ -274,8 +290,14 @@ const Home = () => {
               }`}
             >
               <h4 className="text-xl font-semibold">{listing.title}</h4>
-              <p style={{margin:"60px"}}>
-                <label><strong><h1>Description</h1><br/>{listing.problem}</strong> </label>
+              <p style={{ margin: "60px" }}>
+                <label>
+                  <strong>
+                    <h1>Description</h1>
+                    <br />
+                    {listing.problem}
+                  </strong>{" "}
+                </label>
               </p>
               <p>
                 <strong>Email:</strong> {listing.email || "Not provided"}
@@ -291,13 +313,15 @@ const Home = () => {
               </p>
               {user && user.uid === listing.userId && (
                 <div className="mt-4">
-                  <button
-                    onClick={() => handleMarkAsOccupied(listing.id)}
-                    className="bg-blue-500 text-white py-2 px-4 rounded shadow hover:bg-blue-600 transition mr-2"
-                    disabled={listing.found}
-                  >
-                    Mark as Occupied
-                  </button>
+                  {!listing.found && (
+                    <button
+                      onClick={() => handleMarkAsOccupied(listing.id)}
+                      className="bg-blue-500 text-white py-2 px-4 rounded shadow hover:bg-blue-600 transition mr-2"
+                      disabled={listing.found}
+                    >
+                      Mark as Occupied
+                    </button>
+                  )}
                   <button
                     onClick={() => handleDeleteListing(listing.id)}
                     className="bg-red-500 text-white py-2 px-4 rounded shadow hover:bg-red-600 transition"
@@ -312,47 +336,57 @@ const Home = () => {
           <h1>No listings found</h1>
         )}
       </div>
-
       {showPopup && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white p-6 rounded-lg max-w-2xl w-full max-h-[80vh] overflow-y-auto">
-            <h2 className="text-2xl font-bold mb-4">Your Listings</h2>
-            {userListings.length > 0 ? (
-              userListings.map((listing) => (
-                <div key={listing.id} className="mb-4 p-4 border rounded">
-                  <h3 className="text-xl font-semibold">{listing.title}</h3>
-                  <p>{listing.problem}</p>
-                  <p><strong>Category:</strong> {listing.category}</p>
-                  <p><strong>Status:</strong> {listing.found ? "Occupied" : "Available"}</p>
-                  <div className="mt-2">
-                    <button
-                      onClick={() => handleMarkAsOccupied(listing.id)}
-                      className="bg-blue-500 text-white py-1 px-2 rounded mr-2"
-                      disabled={listing.found}
-                    >
-                      Mark as Occupied
-                    </button>
-                    <button
-                      onClick={() => handleDeleteListing(listing.id)}
-                      className="bg-red-500 text-white py-1 px-2 rounded"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <p>You have no listings yet.</p>
-            )}
-            <button
-              onClick={() => setShowPopup(false)}
-              className="mt-4 bg-gray-500 text-white py-2 px-4 rounded"
-            >
-              Close
-            </button>
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+    <div className="bg-white p-6 rounded-lg max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+      <h2 className="text-2xl font-bold mb-4">Your Listings</h2>
+      {userListings.length > 0 ? (
+        userListings.map((listing) => (
+          <div 
+            key={listing.id} 
+            className={`mb-4 p-4 border rounded ${
+              listing.found ? 'bg-green-100' : 'bg-yellow-100'
+            }`}
+          >
+            <h3 className="text-xl font-semibold">{listing.title}</h3>
+            <p>{listing.problem}</p>
+            <p>
+              <strong>Category:</strong> {listing.category}
+            </p>
+            <p>
+              <strong>Status:</strong>{" "}
+              {listing.found ? "Occupied" : "Available"}
+            </p>
+            <div className="mt-2">
+              {!listing.found && (
+                <button
+                  onClick={() => handleMarkAsOccupied(listing.id)}
+                  className="bg-blue-500 text-white py-1 px-2 rounded mr-2"
+                >
+                  Mark as Occupied
+                </button>
+              )}
+              <button
+                onClick={() => handleDeleteListing(listing.id)}
+                className="bg-red-500 text-white py-1 px-2 rounded"
+              >
+                Delete
+              </button>
+            </div>
           </div>
-        </div>
+        ))
+      ) : (
+        <p>You have no listings yet.</p>
       )}
+      <button
+        onClick={() => setShowPopup(false)}
+        className="mt-4 bg-gray-500 text-white py-2 px-4 rounded"
+      >
+        Close
+      </button>
+    </div>
+  </div>
+)}
     </div>
   );
 };
