@@ -4,15 +4,14 @@ import { getFirestore } from "firebase/firestore";
 
 // Replace these with your Firebase project config
 const firebaseConfig = {
-  apiKey: "AIzaSyDGcWqWxz338bvN7euLEYbxEmUi7RQUQIk",
-  authDomain: "lawfr-9004a.firebaseapp.com",
-  projectId: "lawfr-9004a",
-  storageBucket: "lawfr-9004a.appspot.com",
-  messagingSenderId: "598850029757",
-  appId: "1:598850029757:web:9e351bb38fce6fcf944fd4",
-  measurementId: "G-3GTKM6EFWC"
+  apiKey: "AIzaSyCfj-o4h1Jp49iqREEHSdZZOE4DQRLCNjU",
+  authDomain: "problems-33746.firebaseapp.com",
+  projectId: "problems-33746",
+  storageBucket: "problems-33746.appspot.com",
+  messagingSenderId: "4637713392",
+  appId: "1:4637713392:web:cb8de88019d96a132bf335",
+  measurementId: "G-LCBEGTE3B2"
 };
-
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
