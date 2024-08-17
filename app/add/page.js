@@ -6,19 +6,19 @@ import { auth, firestore } from "../lib/firebase";
 import Link from "next/link";
 import Image from "next/image";
 
-const lawCategories = [
-  "Criminal Law",
-  "Family Law",
-  "Personal Injury",
-  "Real Estate Law",
-  "Business Law",
-  "Intellectual Property Law",
-  "Employment Law",
-  "Immigration Law",
+const problemCategories = [
+  "Medical",
+  "Technical",
+  "Financial",
+  "Educational",
+  "Home & Repair",
+  "Legal",
+  "Career",
+  "Relationship",
   "Other"
 ];
 
-const AddInquiry = () => {
+const AddProblem = () => {
   const [user, setUser] = useState(null);
   const [title, setTitle] = useState("");
   const [location, setLocation] = useState("");
@@ -26,9 +26,9 @@ const AddInquiry = () => {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [category, setCategory] = useState("");
-  const [urgent, setUrgent] = useState(false); // New state for urgent checkbox
+  const [urgent, setUrgent] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [status, setStatus] = useState(""); // New state for status messages
+  const [status, setStatus] = useState("");
 
   useEffect(() => {
     setTimeout(() => {
@@ -49,7 +49,7 @@ const AddInquiry = () => {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
       setUser(user);
-      localStorage.setItem("user", JSON.stringify(user)); // Store user in localStorage
+      localStorage.setItem("user", JSON.stringify(user));
     } catch (error) {
       console.error("Error signing in with Google:", error.message);
     }
@@ -59,19 +59,19 @@ const AddInquiry = () => {
     try {
       await signOut(auth);
       setUser(null);
-      localStorage.removeItem("user"); // Remove user from localStorage
+      localStorage.removeItem("user");
     } catch (error) {
       console.error("Error signing out:", error.message);
     }
   };
 
-  const handleAddInquiry = async (e) => {
+  const handleAddProblem = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setStatus(""); // Clear status message
+    setStatus("");
 
     try {
-      await addDoc(collection(firestore, "inquiries"), {
+      await addDoc(collection(firestore, "problems"), {
         title,
         location,
         problem,
@@ -80,7 +80,7 @@ const AddInquiry = () => {
         category,
         userId: user.uid,
         found: false,
-        urgent, // Add urgent status to the inquiry
+        urgent,
       });
       setTitle("");
       setLocation("");
@@ -88,11 +88,11 @@ const AddInquiry = () => {
       setEmail("");
       setPhone("");
       setCategory("");
-      setUrgent(false); // Reset urgent status
-      setStatus("Inquiry added successfully!"); // Success message
+      setUrgent(false);
+      setStatus("Problem added successfully!");
     } catch (error) {
-      console.error("Error adding inquiry:", error.message);
-      setStatus("Failed to add inquiry. Please try again."); // Error message
+      console.error("Error adding problem:", error.message);
+      setStatus("Failed to add problem. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -100,7 +100,7 @@ const AddInquiry = () => {
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
-      <h1 className="text-3xl font-bold mb-4 text-center">Add a New Inquiry</h1>
+      <h1 className="text-3xl font-bold mb-4 text-center">Add a New Problem</h1>
       <Link
         href={"/"}
         className="bg-gray-500 text-white py-2 px-4 rounded shadow hover:bg-gray-600 transition"
@@ -111,7 +111,7 @@ const AddInquiry = () => {
       <div className="text-center mb-4">
         {!user ? (
           <div>
-            <h2 className="text-xl mb-4">Login to Add Your Inquiry 👇</h2>
+            <h2 className="text-xl mb-4">Login to Add Your Problem 👇</h2>
             <button
               onClick={handleSignInWithGoogle}
               className="bg-blue-500 text-white py-2 px-4 rounded shadow hover:bg-blue-600 transition"
@@ -149,7 +149,7 @@ const AddInquiry = () => {
           </p>
         </div>
       )}
-      <form onSubmit={handleAddInquiry} className="space-y-4">
+      <form onSubmit={handleAddProblem} className="space-y-4">
         <div>
           <label
             htmlFor="category"
@@ -166,12 +166,15 @@ const AddInquiry = () => {
             style={{ marginBottom: "40px", marginTop: "20px" }}
           >
             <option value="">Select a Category</option>
-            {lawCategories.map((cat) => (
+            {problemCategories.map((cat) => (
               <option key={cat} value={cat}>
                 {cat}
               </option>
             ))}
           </select>
+        </div>
+
+        <div>
           <label
             htmlFor="title"
             className="block text-sm font-medium text-gray-700"
@@ -217,7 +220,7 @@ const AddInquiry = () => {
           <textarea
             id="problem"
             rows="4"
-            placeholder="Enter Problem Description"
+            placeholder="Describe your problem"
             value={problem}
             onChange={(e) => setProblem(e.target.value)}
             required
@@ -235,9 +238,10 @@ const AddInquiry = () => {
           <input
             id="email"
             type="email"
-            placeholder="Enter Email Address (Optional)"
+            placeholder="Enter Email Address"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            required
             className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
           />
         </div>
@@ -255,9 +259,6 @@ const AddInquiry = () => {
             placeholder="Enter Phone Number"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
-            required
-            minLength={10}
-            maxLength={10}
             className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
           />
         </div>
@@ -283,11 +284,11 @@ const AddInquiry = () => {
           className="bg-blue-500 text-white py-2 px-4 rounded shadow hover:bg-blue-600 transition"
           disabled={loading}
         >
-          {loading ? "Adding Inquiry..." : "Add Inquiry"}
+          {loading ? "Adding Problem..." : "Add Problem"}
         </button>
       </form>
     </div>
   );
 };
 
-export default AddInquiry;
+export default AddProblem;

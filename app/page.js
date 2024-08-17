@@ -13,91 +13,91 @@ import {
 import { auth, firestore } from "./lib/firebase";
 import Link from "next/link";
 
-const lawCategories = [
-  "Criminal Law",
-  "Family Law",
-  "Personal Injury",
-  "Real Estate Law",
-  "Business Law",
-  "Intellectual Property Law",
-  "Employment Law",
-  "Immigration Law",
-  "Other",
+const problemCategories = [
+  "Medical",
+  "Technical",
+  "Financial",
+  "Educational",
+  "Home & Repair",
+  "Legal",
+  "Career",
+  "Relationship",
+  "Other"
 ];
 
 const Home = () => {
   const [user, setUser] = useState(null);
-  const [listings, setListings] = useState([]);
-  const [filteredListings, setFilteredListings] = useState([]);
+  const [problems, setProblems] = useState([]);
+  const [filteredProblems, setFilteredProblems] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [userListings, setUserListings] = useState([]);
+  const [userProblems, setUserProblems] = useState([]);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(setUser);
 
-    const fetchListings = async () => {
+    const fetchProblems = async () => {
       setLoading(true);
       try {
-        const listingsCollection = collection(firestore, "inquiries");
-        const snapshot = await getDocs(listingsCollection);
-        const listingsList = snapshot.docs.map((doc) => ({
+        const problemsCollection = collection(firestore, "problems");
+        const snapshot = await getDocs(problemsCollection);
+        const problemsList = snapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
         }));
-        setListings(listingsList);
-        setFilteredListings(listingsList);
+        setProblems(problemsList);
+        setFilteredProblems(problemsList);
       } catch (error) {
-        console.error("Error fetching listings:", error.message);
+        console.error("Error fetching problems:", error.message);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchListings();
+    fetchProblems();
     return () => unsubscribe();
   }, []);
 
   useEffect(() => {
-    let updatedListings = listings;
+    let updatedProblems = problems;
 
     if (selectedCategory) {
-      updatedListings = updatedListings.filter(
-        (listing) => listing.category === selectedCategory
+      updatedProblems = updatedProblems.filter(
+        (problem) => problem.category === selectedCategory
       );
     }
 
     if (searchTerm) {
-      updatedListings = updatedListings.filter((listing) =>
-        listing.title.toLowerCase().includes(searchTerm.toLowerCase())
+      updatedProblems = updatedProblems.filter((problem) =>
+        problem.title.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
-    setFilteredListings(updatedListings);
-  }, [selectedCategory, searchTerm, listings]);
+    setFilteredProblems(updatedProblems);
+  }, [selectedCategory, searchTerm, problems]);
 
   useEffect(() => {
     if (user && showPopup) {
-      fetchUserListings();
+      fetchUserProblems();
     }
   }, [user, showPopup]);
 
-  const fetchUserListings = async () => {
+  const fetchUserProblems = async () => {
     if (user) {
       setLoading(true);
       try {
-        const listingsCollection = collection(firestore, "inquiries");
-        const q = query(listingsCollection, where("userId", "==", user.uid));
+        const problemsCollection = collection(firestore, "problems");
+        const q = query(problemsCollection, where("userId", "==", user.uid));
         const snapshot = await getDocs(q);
-        const userListingsList = snapshot.docs.map((doc) => ({
+        const userProblemsList = snapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
         }));
-        setUserListings(userListingsList);
+        setUserProblems(userProblemsList);
       } catch (error) {
-        console.error("Error fetching user listings:", error.message);
+        console.error("Error fetching user problems:", error.message);
       } finally {
         setLoading(false);
       }
@@ -126,40 +126,40 @@ const Home = () => {
     }
   };
 
-  const handleToggleOccupied = async (listingId) => {
+  const handleToggleSolved = async (problemId) => {
     try {
-      const listingDoc = doc(firestore, "inquiries", listingId);
-      const listingToUpdate = listings.find((listing) => listing.id === listingId);
-      const newFoundStatus = !listingToUpdate.found;
+      const problemDoc = doc(firestore, "problems", problemId);
+      const problemToUpdate = problems.find((problem) => problem.id === problemId);
+      const newFoundStatus = !problemToUpdate.found;
       
-      await updateDoc(listingDoc, { found: newFoundStatus });
+      await updateDoc(problemDoc, { found: newFoundStatus });
       
-      const updateListing = (list) =>
-        list.map((listing) =>
-          listing.id === listingId ? { ...listing, found: newFoundStatus } : listing
+      const updateProblem = (list) =>
+        list.map((problem) =>
+          problem.id === problemId ? { ...problem, found: newFoundStatus } : problem
         );
 
-      setListings(updateListing(listings));
-      setFilteredListings(updateListing(filteredListings));
-      setUserListings(updateListing(userListings));
+      setProblems(updateProblem(problems));
+      setFilteredProblems(updateProblem(filteredProblems));
+      setUserProblems(updateProblem(userProblems));
     } catch (error) {
-      console.error("Error toggling listing occupied status:", error.message);
+      console.error("Error toggling problem solved status:", error.message);
     }
   };
 
-  const handleDeleteListing = async (listingId) => {
+  const handleDeleteProblem = async (problemId) => {
     try {
-      const listingDoc = doc(firestore, "inquiries", listingId);
-      await deleteDoc(listingDoc);
-      setListings(listings.filter((listing) => listing.id !== listingId));
-      setFilteredListings(
-        filteredListings.filter((listing) => listing.id !== listingId)
+      const problemDoc = doc(firestore, "problems", problemId);
+      await deleteDoc(problemDoc);
+      setProblems(problems.filter((problem) => problem.id !== problemId));
+      setFilteredProblems(
+        filteredProblems.filter((problem) => problem.id !== problemId)
       );
-      setUserListings(
-        userListings.filter((listing) => listing.id !== listingId)
+      setUserProblems(
+        userProblems.filter((problem) => problem.id !== problemId)
       );
     } catch (error) {
-      console.error("Error deleting listing:", error.message);
+      console.error("Error deleting problem:", error.message);
     }
   };
 
@@ -169,7 +169,7 @@ const Home = () => {
         className="text-3xl font-bold mb-4 text-center"
         style={{ margin: "40px" }}
       >
-        Law Listings ⚖️
+        Problem Solver 🆘
       </h1>
       {user && (
         <button
@@ -209,7 +209,7 @@ const Home = () => {
           }}
         >
           <option value="">All Categories</option>
-          {lawCategories.map((cat) => (
+          {problemCategories.map((cat) => (
             <option key={cat} value={cat}>
               {cat}
             </option>
@@ -235,7 +235,7 @@ const Home = () => {
       <div className="text-center mb-4">
         {!user ? (
           <div>
-            <h2 className="text-xl mb-4">Login to Add Your Listings 👇</h2>
+            <h2 className="text-xl mb-4">Login to Add Your Problems 👇</h2>
             <button
               onClick={handleSignInWithGoogle}
               className="bg-blue-500 text-white py-2 px-4 rounded shadow hover:bg-blue-600 transition"
@@ -258,14 +258,14 @@ const Home = () => {
                 href={"/add"}
                 className="bg-green-500 text-white py-2 px-4 rounded shadow hover:bg-green-600 transition"
               >
-                Add Listing
+                Add Problem
               </Link>
             </div>
             <button
               onClick={() => setShowPopup(true)}
               className="bg-gray-500 text-white py-2 px-4 rounded shadow hover:bg-gray-600 transition"
             >
-              Manage Your Listings
+              Manage Your Problems
             </button>
           </div>
         )}
@@ -274,167 +274,98 @@ const Home = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mx-18" >
         {loading ? (
           <h1>Loading...</h1>
-        ) : filteredListings.length > 0 ? (
-          filteredListings.map((listing) => (
-listing.urgent ?             <div
-key={listing.id}
-style={{
-  borderColor: "red",
-  borderRadius: "12px",
-  borderWidth: "2px",
-  boxShadow: "0 0 15px red",
-}}
-className={`border border-gray-200 rounded-lg p-6 h-400 shadow-lg ${
-  listing.found
-    ? "bg-green-100"
-    : lawCategories.includes(listing.category)
-    && "bg-yellow-100"
-
-}`}
->
-<h4 className="text-xl font-semibold">{listing.title}</h4>
-<p style={{ margin: "60px" }}>
-  <label>
-    <strong>
-      <h1>Description</h1>
-      <br />
-      {listing.problem}
-    </strong>{" "}
-  </label>
-</p>
-<p>
-  <strong>Email:</strong> {listing.email || "Not provided"}
-</p>
-<p>
-  <strong>Phone:</strong> {listing.phone || "Not provided"}
-</p>
-<p>
-  <strong>Location:</strong> {listing.location}
-</p>
-<p>
-  <strong>Category:</strong> {listing.category}
-</p>
-<p>
-<strong>Status: {listing.found ? "Occupied" : "Available"}</strong>{" "}
-
-</p>
-{user && user.uid === listing.userId && (
-  <div className="mt-4">
-    <button
-      onClick={() => handleToggleOccupied(listing.id)}
-      className={`py-2 px-4 rounded shadow transition mr-2 ${
-        listing.found
-          ? "bg-yellow-500 hover:bg-yellow-600 text-white"
-          : "bg-blue-500 hover:bg-blue-600 text-white"
-      }`}
-    >
-      {listing.found ? "Mark as Unoccupied" : "Mark as Occupied"}
-    </button>
-    <button
-      onClick={() => handleDeleteListing(listing.id)}
-      className="bg-red-500 text-white py-2 px-4 rounded shadow hover:bg-red-600 transition"
-    >
-      Delete
-    </button>
-  </div>
-)}
-</div>:             <div
-key={listing.id}
-className={`border border-gray-200 rounded-lg p-6 h-400 shadow-lg ${
-  listing.found
-    ? "bg-green-100"
-    : lawCategories.includes(listing.category)
-    && "bg-yellow-100"
-
-}`}
->
-<h4 className="text-xl font-semibold">{listing.title}</h4>
-<p style={{ margin: "60px" }}>
-  <label>
-    <strong>
-      <h1>Description</h1>
-      <br />
-      {listing.problem}
-    </strong>{" "}
-  </label>
-</p>
-<p>
-  <strong>Email:</strong> {listing.email || "Not provided"}
-</p>
-<p>
-  <strong>Phone:</strong> {listing.phone || "Not provided"}
-</p>
-<p>
-  <strong>Location:</strong> {listing.location}
-</p>
-<p>
-  <strong>Category:</strong> {listing.category}
-</p>
-<p>
-<strong>Status: {listing.found ? "Occupied" : "Available"}</strong>{" "}
-
-</p>
-{user && user.uid === listing.userId && (
-  <div className="mt-4">
-    <button
-      onClick={() => handleToggleOccupied(listing.id)}
-      className={`py-2 px-4 rounded shadow transition mr-2 ${
-        listing.found
-          ? "bg-yellow-500 hover:bg-yellow-600 text-white"
-          : "bg-blue-500 hover:bg-blue-600 text-white"
-      }`}
-    >
-      {listing.found ? "Mark as Unoccupied" : "Mark as Occupied"}
-    </button>
-    <button
-      onClick={() => handleDeleteListing(listing.id)}
-      className="bg-red-500 text-white py-2 px-4 rounded shadow hover:bg-red-600 transition"
-    >
-      Delete
-    </button>
-  </div>
-)}
-</div>
+        ) : filteredProblems.length > 0 ? (
+          filteredProblems.map((problem) => (
+            <div
+              key={problem.id}
+              className={`border border-gray-200 rounded-lg p-6 h-400 shadow-lg ${
+                problem.found ? "bg-green-100" : "bg-yellow-100"
+              }`}
+              style={problem.urgent ? {
+                borderColor: "red",
+                borderRadius: "12px",
+                borderWidth: "2px",
+                boxShadow: "0 0 15px red",
+              } : {}}
+            >
+              <h4 className="text-xl font-semibold">{problem.title}</h4>
+              <p style={{ margin: "20px 0" }}>
+                <strong>Description:</strong><br />
+                {problem.problem}
+              </p>
+              <p><strong>Category:</strong> {problem.category}</p>
+              <p><strong>Location:</strong> {problem.location}</p>
+              <p><strong>Status:</strong> {problem.found ? "Solved" : "Unsolved"}</p>
+              {user && user.uid === problem.userId && (
+                <div className="mt-4">
+                  <button
+                    onClick={() => handleToggleSolved(problem.id)}
+                    className={`py-2 px-4 rounded shadow transition mr-2 ${
+                      problem.found
+                        ? "bg-yellow-500 hover:bg-yellow-600 text-white"
+                        : "bg-blue-500 hover:bg-blue-600 text-white"
+                    }`}
+                  >
+                    {problem.found ? "Mark as Unsolved" : "Mark as Solved"}
+                  </button>
+                  <button
+                    onClick={() => handleDeleteProblem(problem.id)}
+                    className="bg-red-500 text-white py-2 px-4 rounded shadow hover:bg-red-600 transition"
+                  >
+                    Delete
+                  </button>
+                </div>
+              )}
+              {!user || user.uid !== problem.userId && (
+                <div className="mt-4">
+                  <button
+                    onClick={() => window.location.href = `mailto:${problem.email}`}
+                    className="bg-green-500 text-white py-2 px-4 rounded shadow hover:bg-green-600 transition"
+                  >
+                    Contact to Help
+                  </button>
+                </div>
+              )}
+            </div>
           ))
         ) : (
-          <h1 style={{margin:"40px"}}><strong>No listings found</strong></h1>
+          <h1 style={{margin:"40px"}}><strong>No problems found</strong></h1>
         )}
       </div>
       {showPopup && (
   <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
     <div className="bg-white p-6 rounded-lg max-w-2xl w-full max-h-[80vh] overflow-y-auto">
-      <h2 className="text-2xl font-bold mb-4">Your Listings</h2>
-      {userListings.length > 0 ? (
-        userListings.map((listing) => (
+      <h2 className="text-2xl font-bold mb-4">Your Problems</h2>
+      {userProblems.length > 0 ? (
+        userProblems.map((problem) => (
           <div 
-            key={listing.id} 
+            key={problem.id} 
             style={{marginTop:"40px"}}
             className={`mb-4 p-4 border rounded ${
-              listing.found ? 'bg-green-100' : 'bg-yellow-100'
+              problem.found ? 'bg-green-100' : 'bg-yellow-100'
             }`}
           >
-            <h3 className="text-xl font-semibold">{listing.title}</h3>
-            <p>{listing.problem}</p>
+            <h3 className="text-xl font-semibold">{problem.title}</h3>
+            <p>{problem.problem}</p>
             <p>
-              <strong>Category:</strong> {listing.category}
+              <strong>Category:</strong> {problem.category}
             </p>
             <p>
-              <strong>Status: {listing.found ? "Occupied" : "Available"}</strong>{" "}
-              
+              <strong>Status: {problem.found ? "Solved" : "Unsolved"}</strong>{" "}
             </p>
             <div className="mt-2">
               <button
-                onClick={() => handleToggleOccupied(listing.id)}
+                onClick={() => handleToggleSolved(problem.id)}
                 className={`py-1 px-2 rounded mr-2 ${
-                  listing.found
+                  problem.found
                     ? "bg-yellow-500 text-white"
                     : "bg-blue-500 text-white"
                 }`}
               >
-                {listing.found ? "Mark as Unoccupied" : "Mark as Occupied"}
+                {problem.found ? "Mark as Unsolved" : "Mark as Solved"}
               </button>
               <button
-                onClick={() => handleDeleteListing(listing.id)}
+                onClick={() => handleDeleteProblem(problem.id)}
                 className="bg-red-500 text-white py-1 px-2 rounded"
               >
                 Delete
@@ -443,7 +374,7 @@ className={`border border-gray-200 rounded-lg p-6 h-400 shadow-lg ${
           </div>
         ))
       ) : (
-        <p>You have no listings added yet.</p>
+        <p>You have no problems added yet.</p>
       )}
       <button
         onClick={() => setShowPopup(false)}

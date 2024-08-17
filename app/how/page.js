@@ -15,33 +15,40 @@ const HowToSection = () => {
 
       <div className="space-y-4">
         <div className="bg-white p-4 rounded-lg shadow-sm">
-          <h2 className="text-xl font-semibold mb-2">Sign Up and Manage Listings</h2>
+          <h2 className="text-xl font-semibold mb-2">Sign Up and Manage Problems</h2>
           <p className="text-gray-700 mb-2">
             <span className="font-bold text-blue-600">Sign Up:</span> Click on the <span className="font-bold">&quot;Sign in with Google&quot;</span> button to log in or sign up using your Google account.
           </p>
           <p className="text-gray-700 mb-2">
-            <span className="font-bold text-blue-600">Add Listings:</span> After logging in, you can add your legal listings by clicking on the <span className="font-bold">&quot;Add Listing&quot;</span> button.
+            <span className="font-bold text-blue-600">Add Problems:</span> After logging in, you can add your problems by clicking on the <span className="font-bold">&quot;Add Problem&quot;</span> button.
           </p>
           <p className="text-gray-700 mb-2">
-            <span className="font-bold text-blue-600">Change Status:</span> You can update the status of your listings to indicate whether they are resolved. Use the <span className="font-bold">&quot;Mark as Occupied&quot;</span> button to change the status.
+            <span className="font-bold text-blue-600">Change Status:</span> You can update the status of your problems to indicate whether they are resolved. Use the <span className="font-bold">&quot;Mark as Solved&quot;</span> button to change the status.
           </p>
           <p className="text-gray-700 mb-2">
-            <span className="font-bold text-blue-600">Update Status:</span> If a case that was marked as <strong>OCCUPIED</strong> becomes available again <br/>. Just click the <span className="font-bold">&quot;Mark as Unoccupied&quot;</span> button to make the case open for legal assistance once more.
+            <span className="font-bold text-blue-600">Update Status:</span> If a problem that was marked as <strong>SOLVED</strong> needs attention again, click the <span className="font-bold">&quot;Mark as Unsolved&quot;</span> button to make the problem open for assistance once more.
           </p>
         </div>
 
         <div className="bg-white p-4 rounded-lg shadow-sm" style={{marginTop:"40px"}} >
           <h2 className="text-xl font-semibold mb-2">Color Codes</h2>
           <p className="text-gray-700">
-            <span className="font-bold text-green-600">Green:</span> Indicates that the case is <span className="font-bold">OCCUPIED</span>. This means that a lawyer has been found and the issue has been resolved.
+            <span className="font-bold text-green-600">Green:</span> Indicates that the problem is <span className="font-bold">SOLVED</span>. This means that a solution has been found and the issue has been resolved.
           </p>
           <br/>
           <p className="text-gray-700">
-            <span className="font-bold text-yellow-600">Yellow:</span> Indicates that the case is <span className="font-bold">OPEN</span>. This means that the case is still available for legal assistance.
+            <span className="font-bold text-yellow-600">Yellow:</span> Indicates that the problem is <span className="font-bold">UNSOLVED</span>. This means that the problem is still open and needs assistance.
           </p>
           <br/>
           <p className="text-gray-700">
-            <span className="font-bold text-red-600">Red Glow:</span> Indicates that the case is <span className="font-bold">URGENT</span>. This means that the case needs IMMEDIATE attention.
+            <span className="font-bold text-red-600">Red Glow:</span> Indicates that the problem is <span className="font-bold">URGENT</span>. This means that the problem needs IMMEDIATE attention.
+          </p>
+        </div>
+
+        <div className="bg-white p-4 rounded-lg shadow-sm">
+          <h2 className="text-xl font-semibold mb-2">Helping Others</h2>
+          <p className="text-gray-700 mb-2">
+            If you see a problem you can help with, click the <span className="font-bold">&quot;Contact to Help&quot;</span> button. This will open your email client to contact the person who posted the problem.
           </p>
         </div>
 
