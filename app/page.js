@@ -164,121 +164,83 @@ const Home = () => {
   };
 
   return (
-    <div className="p-3 max-w-8xl mx-auto">
-      <h1
-        className="text-3xl font-bold mb-4 text-center"
-        style={{ margin: "40px" }}
-      >
-        Problem Solver 🆘
-      </h1>
-      {user && (
-        <button
-          onClick={handleLogout}
-          className="bg-red-500 text-white py-2 px-4 rounded shadow hover:bg-red-600 transition mb-4"
-        >
-          Logout
-        </button>
-      )}
-      <div className="text-center mb-4">
-        <Link
-          href={"/how"}
-          className="bg-gray-500 text-white py-2 px-4 rounded shadow hover:bg-gray-600 transition"
-          color="green"
-          style={{ marginBottom: "40px" }}
-        >
-          How to (Guide)
-        </Link>
-        <br />
-        <br />
-        <label
-          htmlFor="category-filter"
-          className="block text-sm font-medium text-gray-700"
-        >
-          Filter by Category
-        </label>
-        <select
-          id="category-filter"
-          value={selectedCategory}
-          onChange={(e) => setSelectedCategory(e.target.value)}
-          className="mt-4 block w-full border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
-          style={{
-            height: "40px",
-            margin: "20px",
-            width: "20rem",
-            boxShadow: "inherit",
-          }}
-        >
-          <option value="">All Categories</option>
-          {problemCategories.map((cat) => (
-            <option key={cat} value={cat}>
-              {cat}
-            </option>
-          ))}
-        </select>
-
-        <input
-          id="search-input"
-          type="text"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          placeholder="Search by title..."
-          className="mt-2 block w-full border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
-          style={{
-            height: "40px",
-            margin: "30px",
-            width: "80vw",
-            boxShadow: "inherit",
-            padding: "10px",
-          }}
-        />
-      </div>
-      <div className="text-center mb-4">
-        {!user ? (
-          <div>
-            <h2 className="text-xl mb-4">Login to Add Your Problems 👇</h2>
+    <div className="p-6 max-w-7xl mx-auto">
+      <header className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold">Problem Solver 🆘</h1>
+        <nav className="flex items-center space-x-4">
+          <Link
+            href={"/how"}
+            className="bg-gray-700 text-white py-2 px-4 rounded shadow hover:bg-gray-800 transition"
+          >
+            How to (Guide)
+          </Link>
+          {user ? (
+            <div className="flex items-center space-x-4">
+              <span className="text-lg font-semibold">{user.displayName}</span>
+              <img
+                src={user.photoURL || "/default-avatar.png"}
+                alt="User Profile"
+                className="w-10 h-10 rounded-full object-cover"
+              />
+              <Link
+                href={"/profile"}
+                className="bg-gray-700 text-white py-2 px-4 rounded hover:bg-gray-800 transition"
+              >
+                Profile
+              </Link>
+              <button
+                onClick={handleLogout}
+                className="bg-red-600 text-white py-2 px-4 rounded hover:bg-red-700 transition"
+              >
+                Logout
+              </button>
+            </div>
+          ) : (
             <button
               onClick={handleSignInWithGoogle}
-              className="bg-blue-500 text-white py-2 px-4 rounded shadow hover:bg-blue-600 transition"
+              className="bg-blue-500 text-white py-3 px-6 rounded hover:bg-blue-600 transition"
             >
-              Sign in with Google
+              Sign In with Google
             </button>
-          </div>
-        ) : (
-          <div>
-            <img
-              src={user?.photoURL || "/default-avatar.png"}
-              alt="User Profile"
-              className="w-32 h-32 rounded-full mx-auto mb-4 object-cover"
-            />
-            <h1 className="text-2xl font-semibold mb-4">
-              Welcome back {user?.displayName} 👋
-            </h1>
-            <div className="mb-4">
-              <Link
-                href={"/add"}
-                className="bg-green-500 text-white py-2 px-4 rounded shadow hover:bg-green-600 transition"
-              >
-                Add Problem
-              </Link>
-            </div>
-            <button
-              onClick={() => setShowPopup(true)}
-              className="bg-gray-500 text-white py-2 px-4 rounded shadow hover:bg-gray-600 transition"
-            >
-              Manage Your Problems
-            </button>
-          </div>
-        )}
+          )}
+        </nav>
+      </header>
+      
+      <div className="text-center mb-4">
+        <div className="mt-6 flex justify-center space-x-4">
+          <select
+            id="category-filter"
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+            className="block w-64 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
+          >
+            <option value="">All Categories</option>
+            {problemCategories.map((cat) => (
+              <option key={cat} value={cat}>
+                {cat}
+              </option>
+            ))}
+          </select>
+
+          <input
+            id="search-input"
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Search by title..."
+            className="block w-96 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
+          />
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mx-18" >
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {loading ? (
           <h1>Loading...</h1>
         ) : filteredProblems.length > 0 ? (
           filteredProblems.map((problem) => (
             <div
               key={problem.id}
-              className={`border border-gray-200 rounded-lg p-6 h-400 shadow-lg ${
+              className={`border border-gray-200 rounded-lg p-6 shadow-lg ${
                 problem.found ? "bg-green-100" : "bg-yellow-100"
               }`}
               style={problem.urgent ? {
@@ -289,7 +251,7 @@ const Home = () => {
               } : {}}
             >
               <h4 className="text-xl font-semibold">{problem.title}</h4>
-              <p style={{ margin: "20px 0" }}>
+              <p className="mt-4 mb-2">
                 <strong>Description:</strong><br />
                 {problem.problem}
               </p>
@@ -297,94 +259,52 @@ const Home = () => {
               <p><strong>Location:</strong> {problem.location}</p>
               <p><strong>Status:</strong> {problem.found ? "Solved" : "Unsolved"}</p>
               {user && user.uid === problem.userId && (
-                <div className="mt-4">
+                <div className="mt-4 flex justify-between">
                   <button
                     onClick={() => handleToggleSolved(problem.id)}
-                    className={`py-2 px-4 rounded shadow transition mr-2 ${
+                    className={`py-2 px-4 rounded transition ${
                       problem.found
-                        ? "bg-yellow-500 hover:bg-yellow-600 text-white"
-                        : "bg-blue-500 hover:bg-blue-600 text-white"
+                        ? "bg-red-600 text-white hover:bg-red-700"
+                        : "bg-green-500 text-white hover:bg-green-600"
                     }`}
                   >
                     {problem.found ? "Mark as Unsolved" : "Mark as Solved"}
                   </button>
                   <button
                     onClick={() => handleDeleteProblem(problem.id)}
-                    className="bg-red-500 text-white py-2 px-4 rounded shadow hover:bg-red-600 transition"
+                    className="bg-red-600 text-white py-2 px-4 rounded hover:bg-red-700 transition"
                   >
                     Delete
                   </button>
                 </div>
               )}
-              {!user || user.uid !== problem.userId && (
-                <div className="mt-4">
+              {user && user.uid !== problem.userId && (
+                <div className="mt-4 flex justify-between">
                   <button
-                    onClick={() => window.location.href = `mailto:${problem.email}`}
-                    className="bg-green-500 text-white py-2 px-4 rounded shadow hover:bg-green-600 transition"
+                    onClick={() => alert(`Contact ${problem.email}`)}
+                    className="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 transition"
                   >
-                    Contact to Help
+                    Contact User
                   </button>
                 </div>
               )}
             </div>
           ))
         ) : (
-          <h1 style={{margin:"40px"}}><strong>No problems found</strong></h1>
+          <h1>No problems found.</h1>
         )}
       </div>
-      {showPopup && (
-  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-    <div className="bg-white p-6 rounded-lg max-w-2xl w-full max-h-[80vh] overflow-y-auto">
-      <h2 className="text-2xl font-bold mb-4">Your Problems</h2>
-      {userProblems.length > 0 ? (
-        userProblems.map((problem) => (
-          <div 
-            key={problem.id} 
-            style={{marginTop:"40px"}}
-            className={`mb-4 p-4 border rounded ${
-              problem.found ? 'bg-green-100' : 'bg-yellow-100'
-            }`}
+
+      {!user && (
+        <div className="flex justify-center mt-12">
+          <button
+            onClick={handleSignInWithGoogle}
+            className="bg-blue-500 text-white py-3 px-6 rounded hover:bg-blue-600 transition"
           >
-            <h3 className="text-xl font-semibold">{problem.title}</h3>
-            <p>{problem.problem}</p>
-            <p>
-              <strong>Category:</strong> {problem.category}
-            </p>
-            <p>
-              <strong>Status: {problem.found ? "Solved" : "Unsolved"}</strong>{" "}
-            </p>
-            <div className="mt-2">
-              <button
-                onClick={() => handleToggleSolved(problem.id)}
-                className={`py-1 px-2 rounded mr-2 ${
-                  problem.found
-                    ? "bg-yellow-500 text-white"
-                    : "bg-blue-500 text-white"
-                }`}
-              >
-                {problem.found ? "Mark as Unsolved" : "Mark as Solved"}
-              </button>
-              <button
-                onClick={() => handleDeleteProblem(problem.id)}
-                className="bg-red-500 text-white py-1 px-2 rounded"
-              >
-                Delete
-              </button>
-            </div>
-          </div>
-        ))
-      ) : (
-        <p>You have no problems added yet.</p>
+            Sign In with Google
+          </button>
+        </div>
       )}
-      <button
-        onClick={() => setShowPopup(false)}
-        className="mt-4 bg-gray-500 text-white py-2 px-4 rounded"
-      >
-        Close
-      </button>
-    </div>
-  </div>
-)}
     </div>
   );
 };
