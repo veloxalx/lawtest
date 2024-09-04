@@ -185,10 +185,22 @@ const Home = () => {
           </div>
         </div>
       </nav>
-
+     
       <div className="container mx-auto p-6">
         <h1 className="text-4xl font-bold text-center mb-6">Problem Solver 🆘</h1>
-
+        <div className=" flex-col items-center justify-center bg-gray-100">
+      <h1 className="text-3xl font-bold text-gray-800 mb-8">Law Assistant</h1>
+      <div className="space-y-4">
+        <Link href="/addLawyer">
+        <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+          Register as Lawyer
+        </button>
+        </Link>
+        <button className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+          Get Lawyer Assistance
+        </button>
+      </div>
+    </div>
         <div className="text-center mb-6">
           <label htmlFor="category-filter" className="block text-sm font-medium text-gray-700">Filter by Category</label>
           <select
@@ -310,7 +322,9 @@ const Home = () => {
             )}
           </>
         )}
+    
       </div>
+ 
     </div>
   );
 };
