@@ -47,7 +47,7 @@ export default function AddLawyer({ onClose }) {
   };
 
   return (
-    <div className=" inset-0 flex items-center justify-center bg-black bg-opacity-50">
+    <div className="mt-4 inset-0 flex items-center justify-center bg-black bg-opacity-50">
       <div className="relative bg-white p-8 rounded shadow-md w-full max-w-lg">
         <button
           onClick={onClose}
