@@ -1,8 +1,8 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
+import { getStorage } from "firebase/storage"; 
 
-// Replace these with your Firebase project config
 const firebaseConfig = {
   apiKey: "AIzaSyCfj-o4h1Jp49iqREEHSdZZOE4DQRLCNjU",
   authDomain: "problems-33746.firebaseapp.com",
@@ -13,10 +13,10 @@ const firebaseConfig = {
   measurementId: "G-LCBEGTE3B2"
 };
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const firestore = getFirestore(app);
+const storage = getStorage(app); 
 const googleProvider = new GoogleAuthProvider();
 
 const signInWithGoogle = async () => {
@@ -58,4 +58,4 @@ const logOut = async () => {
   }
 };
 
-export { auth, firestore, googleProvider, signInWithGoogle, signUp, signIn, logOut };
+export { auth, firestore, googleProvider, signInWithGoogle, signUp, signIn, logOut,storage };

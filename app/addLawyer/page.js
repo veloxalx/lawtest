@@ -1,49 +1,72 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState } from "react";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { firestore, storage } from "../lib/firebase";
+import { useRouter } from "next/navigation";
+import { collection, addDoc } from "firebase/firestore";
+
 
 export default function AddLawyer({ onClose }) {
-  const [lawyerName, setLawyerName] = useState('');
-  const [age, setAge] = useState('');
-  const [nic, setNic] = useState('');
-  const [university, setUniversity] = useState('Colombo');
-  const [experienceYears, setExperienceYears] = useState('');
+  const router = useRouter();
+  const [lawyerName, setLawyerName] = useState("");
+  const [age, setAge] = useState("");
+  const [nic, setNic] = useState("");
+  const [university, setUniversity] = useState("Colombo");
+  const [experienceYears, setExperienceYears] = useState("");
   const [certificate, setCertificate] = useState(null);
   const [prevExperiences, setPrevExperiences] = useState([]);
-  const [experience, setExperience] = useState('');
+  const [experience, setExperience] = useState("");
   const [profilePic, setProfilePic] = useState(null);
-  const [contactNo, setContactNo] = useState('');
+  const [contactNo, setContactNo] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const addExperience = () => {
     if (experience) {
       setPrevExperiences([...prevExperiences, experience]);
-      setExperience('');
+      setExperience("");
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const formData = new FormData();
-    formData.append('lawyerName', lawyerName);
-    formData.append('age', age);
-    formData.append('nic', nic);
-    formData.append('university', university);
-    formData.append('experienceYears', experienceYears);
-    formData.append('certificate', certificate);
-    formData.append('prevExperiences', prevExperiences.join(', '));
-    formData.append('profilePic', profilePic);
-    formData.append('contactNo', contactNo);
+    setLoading(true);
 
-    fetch('Api-url', {
-      method: 'POST',
-      body: formData,
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log('Success:', data);
-      })
-      .catch((error) => {
-        console.error('Error:', error);
+    try {
+      let certificateUrl = "";
+      let profilePicUrl = "";
+
+      if (certificate) {
+        const certificateRef = ref(storage, `certificates/${certificate.name}`);
+        await uploadBytes(certificateRef, certificate);
+        certificateUrl = await getDownloadURL(certificateRef);
+      }
+
+      if (profilePic) {
+        const profilePicRef = ref(storage, `profilePics/${profilePic.name}`);
+        await uploadBytes(profilePicRef, profilePic);
+        profilePicUrl = await getDownloadURL(profilePicRef);
+      }
+
+      const docRef = await addDoc(collection(firestore, "lawyers"), {
+        lawyerName,
+        age,
+        nic,
+        university,
+        experienceYears,
+        certificate: certificateUrl,
+        prevExperiences,
+        experience,
+        profilePic: profilePicUrl,
+        contactNo,
       });
+
+      alert("New Lawyer added!");
+      router.push(`/viewLawyer/${docRef.id}`);
+    } catch (error) {
+      console.error("Error adding document: ", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -55,10 +78,15 @@ export default function AddLawyer({ onClose }) {
         >
           &times;
         </button>
-        <h1 className="text-3xl font-bold text-gray-800 mb-8">New Lawyer Registration</h1>
+        <h1 className="text-3xl font-bold text-gray-800 mb-8">
+          New Lawyer Registration
+        </h1>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label className="block text-gray-700 font-bold mb-2" htmlFor="lawyerName">
+            <label
+              className="block text-gray-700 font-bold mb-2"
+              htmlFor="lawyerName"
+            >
               Full Name
             </label>
             <input
@@ -100,7 +128,10 @@ export default function AddLawyer({ onClose }) {
           </div>
 
           <div className="mb-4">
-            <label className="block text-gray-700 font-bold mb-2" htmlFor="university">
+            <label
+              className="block text-gray-700 font-bold mb-2"
+              htmlFor="university"
+            >
               Graduate University
             </label>
             <select
@@ -119,7 +150,10 @@ export default function AddLawyer({ onClose }) {
           </div>
 
           <div className="mb-4">
-            <label className="block text-gray-700 font-bold mb-2" htmlFor="experienceYears">
+            <label
+              className="block text-gray-700 font-bold mb-2"
+              htmlFor="experienceYears"
+            >
               Experience in Years
             </label>
             <input
@@ -133,7 +167,10 @@ export default function AddLawyer({ onClose }) {
           </div>
 
           <div className="mb-4">
-            <label className="block text-gray-700 font-bold mb-2" htmlFor="certificate">
+            <label
+              className="block text-gray-700 font-bold mb-2"
+              htmlFor="certificate"
+            >
               Upload Certificate
             </label>
             <input
@@ -145,7 +182,10 @@ export default function AddLawyer({ onClose }) {
           </div>
 
           <div className="mb-4">
-            <label className="block text-gray-700 font-bold mb-2" htmlFor="prevExperience">
+            <label
+              className="block text-gray-700 font-bold mb-2"
+              htmlFor="prevExperience"
+            >
               Add Previous Working Experience
             </label>
             <input
@@ -173,7 +213,10 @@ export default function AddLawyer({ onClose }) {
           </div>
 
           <div className="mb-4">
-            <label className="block text-gray-700 font-bold mb-2" htmlFor="profilePic">
+            <label
+              className="block text-gray-700 font-bold mb-2"
+              htmlFor="profilePic"
+            >
               Upload Profile Picture
             </label>
             <input
@@ -185,7 +228,10 @@ export default function AddLawyer({ onClose }) {
           </div>
 
           <div className="mb-4">
-            <label className="block text-gray-700 font-bold mb-2" htmlFor="contactNo">
+            <label
+              className="block text-gray-700 font-bold mb-2"
+              htmlFor="contactNo"
+            >
               Contact No
             </label>
             <input
@@ -204,6 +250,7 @@ export default function AddLawyer({ onClose }) {
           >
             Register
           </button>
+          {loading && <p>Loading...</p>}
         </form>
       </div>
     </div>
