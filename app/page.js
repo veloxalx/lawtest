@@ -22,7 +22,7 @@ const problemCategories = [
   "Legal",
   "Career",
   "Relationship",
-  "Other"
+  "Other",
 ];
 
 const Home = () => {
@@ -129,14 +129,18 @@ const Home = () => {
   const handleToggleSolved = async (problemId) => {
     try {
       const problemDoc = doc(firestore, "problems", problemId);
-      const problemToUpdate = problems.find((problem) => problem.id === problemId);
+      const problemToUpdate = problems.find(
+        (problem) => problem.id === problemId
+      );
       const newFoundStatus = !problemToUpdate.found;
-      
+
       await updateDoc(problemDoc, { found: newFoundStatus });
-      
+
       const updateProblem = (list) =>
         list.map((problem) =>
-          problem.id === problemId ? { ...problem, found: newFoundStatus } : problem
+          problem.id === problemId
+            ? { ...problem, found: newFoundStatus }
+            : problem
         );
 
       setProblems(updateProblem(problems));
@@ -170,45 +174,82 @@ const Home = () => {
         <div className="container mx-auto px-6 py-3 flex items-center justify-between">
           <div className="text-2xl font-bold text-blue-600">Problem Solver</div>
           <div className="flex items-center space-x-4">
-            <Link href="/" className="text-gray-700 hover:text-blue-600">Home</Link>
-            <Link href="/how" className="text-gray-700 hover:text-blue-600">How to (Guide)</Link>
+            <Link href="/" className="text-gray-700 hover:text-blue-600">
+              Home
+            </Link>
+            <Link href="/how" className="text-gray-700 hover:text-blue-600">
+              How to (Guide)
+            </Link>
             {user ? (
               <div className="flex items-center space-x-4">
-                <img src={user.photoURL} alt={user.displayName} className="w-10 h-10 rounded-full" />
-                <span className="font-medium text-gray-700">{user.displayName}</span>
-                <button onClick={handleLogout} className="text-red-500 hover:text-red-700">Logout</button>
-                <Link href="/add" className="bg-green-500 text-white py-2 px-4 rounded shadow hover:bg-green-600 transition">Add Problem</Link>
+                <img
+                  src={user.photoURL}
+                  alt={user.displayName}
+                  className="w-10 h-10 rounded-full"
+                />
+                <span className="font-medium text-gray-700">
+                  {user.displayName}
+                </span>
+                <button
+                  onClick={handleLogout}
+                  className="text-red-500 hover:text-red-700"
+                >
+                  Logout
+                </button>
+                <Link
+                  href="/add"
+                  className="bg-green-500 text-white py-2 px-4 rounded shadow hover:bg-green-600 transition"
+                >
+                  Add Problem
+                </Link>
               </div>
             ) : (
-              <button onClick={handleSignInWithGoogle} className="bg-blue-500 text-white py-2 px-4 rounded shadow hover:bg-blue-600 transition">Sign in with Google</button>
+              <button
+                onClick={handleSignInWithGoogle}
+                className="bg-blue-500 text-white py-2 px-4 rounded shadow hover:bg-blue-600 transition"
+              >
+                Sign in with Google
+              </button>
             )}
           </div>
         </div>
       </nav>
-     
+
       <div className="container mx-auto p-6">
-        <h1 className="text-4xl font-bold text-center mb-6">Problem Solver 🆘</h1>
+        <h1 className="text-4xl font-bold text-center mb-6">
+          Problem Solver 🆘
+        </h1>
         <div className=" flex-col items-center justify-center bg-gray-100">
-      <h1 className="text-3xl font-bold text-gray-800 mb-8">Law Assistant</h1>
-      <div className="space-y-4">
-        <Link href="/addLawyer">
-        <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-          Register as Lawyer
-        </button>
-        </Link>
-        <button className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
-          Get Lawyer Assistance
-        </button>
-      </div>
-    </div>
+          <h1 className="text-3xl font-bold text-gray-800 mb-8">
+            Law Assistant
+          </h1>
+          <div className="space-y-4">
+            <Link href="/addLawyer">
+              <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                Register as Lawyer
+              </button>
+            </Link>
+            <Link href="/community">
+            <button className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+              Get Lawyer Assistance
+            </button>
+            </Link>
+          </div>
+              
+        </div>
         <div className="text-center mb-6">
-          <label htmlFor="category-filter" className="block text-sm font-medium text-gray-700">Filter by Category</label>
+          <label
+            htmlFor="category-filter"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Filter by Category
+          </label>
           <select
             id="category-filter"
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
             className="mt-2 block w-full max-w-md mx-auto h-8 border border-gray-300 rounded-md shadow-sm focus:border-gray-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
-            >
+          >
             <option value="">All Categories</option>
             {problemCategories.map((cat) => (
               <option key={cat} value={cat}>
@@ -235,19 +276,32 @@ const Home = () => {
               <div
                 key={problem.id}
                 className={`border rounded-lg p-6 shadow-lg ${
-                  problem.found ? "bg-green-50 border-green-300" : "bg-yellow-50 border-yellow-300"
+                  problem.found
+                    ? "bg-green-50 border-green-300"
+                    : "bg-yellow-50 border-yellow-300"
                 } ${problem.urgent ? "border-red-500 bg-red-50" : ""}`}
               >
                 <h4 className="text-xl font-semibold mb-2">{problem.title}</h4>
-                <p className="mb-2"><strong>Description:</strong> {problem.problem}</p>
-                <p className="mb-2"><strong>Category:</strong> {problem.category}</p>
-                <p className="mb-2"><strong>Location:</strong> {problem.location}</p>
-                <p className="mb-2"><strong>Status:</strong> {problem.found ? "Solved" : "Unsolved"}</p>
+                <p className="mb-2">
+                  <strong>Description:</strong> {problem.problem}
+                </p>
+                <p className="mb-2">
+                  <strong>Category:</strong> {problem.category}
+                </p>
+                <p className="mb-2">
+                  <strong>Location:</strong> {problem.location}
+                </p>
+                <p className="mb-2">
+                  <strong>Status:</strong>{" "}
+                  {problem.found ? "Solved" : "Unsolved"}
+                </p>
                 <div className="mt-4 flex space-x-2">
                   <button
                     onClick={() => handleToggleSolved(problem.id)}
                     className={`py-2 px-4 rounded shadow transition ${
-                      problem.found ? "bg-yellow-500 hover:bg-yellow-600" : "bg-blue-500 hover:bg-blue-600"
+                      problem.found
+                        ? "bg-yellow-500 hover:bg-yellow-600"
+                        : "bg-blue-500 hover:bg-blue-600"
                     } text-white`}
                   >
                     {problem.found ? "Mark as Unsolved" : "Mark as Solved"}
@@ -284,20 +338,38 @@ const Home = () => {
                     <div className="text-center text-xl">Loading...</div>
                   ) : userProblems.length > 0 ? (
                     userProblems.map((problem) => (
-                      <div key={problem.id} className="border rounded-lg p-4 shadow-sm">
-                        <h4 className="text-lg font-semibold mb-2">{problem.title}</h4>
-                        <p className="mb-2"><strong>Description:</strong> {problem.problem}</p>
-                        <p className="mb-2"><strong>Category:</strong> {problem.category}</p>
-                        <p className="mb-2"><strong>Location:</strong> {problem.location}</p>
-                        <p className="mb-2"><strong>Status:</strong> {problem.found ? "Solved" : "Unsolved"}</p>
+                      <div
+                        key={problem.id}
+                        className="border rounded-lg p-4 shadow-sm"
+                      >
+                        <h4 className="text-lg font-semibold mb-2">
+                          {problem.title}
+                        </h4>
+                        <p className="mb-2">
+                          <strong>Description:</strong> {problem.problem}
+                        </p>
+                        <p className="mb-2">
+                          <strong>Category:</strong> {problem.category}
+                        </p>
+                        <p className="mb-2">
+                          <strong>Location:</strong> {problem.location}
+                        </p>
+                        <p className="mb-2">
+                          <strong>Status:</strong>{" "}
+                          {problem.found ? "Solved" : "Unsolved"}
+                        </p>
                         <div className="mt-4 flex space-x-2">
                           <button
                             onClick={() => handleToggleSolved(problem.id)}
                             className={`py-2 px-4 rounded shadow transition ${
-                              problem.found ? "bg-yellow-500 hover:bg-yellow-600" : "bg-blue-500 hover:bg-blue-600"
+                              problem.found
+                                ? "bg-yellow-500 hover:bg-yellow-600"
+                                : "bg-blue-500 hover:bg-blue-600"
                             } text-white`}
                           >
-                            {problem.found ? "Mark as Unsolved" : "Mark as Solved"}
+                            {problem.found
+                              ? "Mark as Unsolved"
+                              : "Mark as Solved"}
                           </button>
                           <button
                             onClick={() => handleDeleteProblem(problem.id)}
@@ -309,7 +381,9 @@ const Home = () => {
                       </div>
                     ))
                   ) : (
-                    <div className="text-center text-xl">No problems found.</div>
+                    <div className="text-center text-xl">
+                      No problems found.
+                    </div>
                   )}
                 </div>
                 <button
@@ -322,9 +396,7 @@ const Home = () => {
             )}
           </>
         )}
-    
       </div>
- 
     </div>
   );
 };

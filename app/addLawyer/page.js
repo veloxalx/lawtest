@@ -61,7 +61,7 @@ export default function AddLawyer({ onClose }) {
       });
 
       alert("New Lawyer added!");
-      router.push(`/viewLawyer/${docRef.id}`);
+      router.push(`/community/${docRef.id}`);
     } catch (error) {
       console.error("Error adding document: ", error);
     } finally {
