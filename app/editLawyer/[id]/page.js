@@ -62,7 +62,18 @@ const EditLawyer = () => {
   };
 
   if (loading) return <div>Loading...</div>;
-
+  const problemCategories = [
+    "Medical",
+    "Technical",
+    "Financial",
+    "Educational",
+    "Home & Repair",
+    "Legal",
+    "Career",
+    "Relationship",
+    "Other",
+  ];
+  
   return (
     <div className="mt-4 p-8 bg-white rounded shadow-md">
       <h1 className="text-3xl font-bold text-gray-800 mb-4">Edit Lawyer Profile</h1>
