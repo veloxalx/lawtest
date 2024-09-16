@@ -56,3 +56,16 @@ export const PATCH=async(request,{params})=>{
 
     }
 }
+
+export const DELETE=async(request,{params})=>{
+try{
+    await connectionDB();
+    await Lawyer.findByIdAndRemove(params.id);
+
+     return  new Response("Profile Delete successful", {status:200})
+    }
+    catch(error){
+        return new Response("Error !", {status:500})
+
+    }
+}
