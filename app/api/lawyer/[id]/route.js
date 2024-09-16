@@ -9,7 +9,7 @@ export const GET=async(request,{params})=>{
         if(!lawyer){
             return new Response("No such lawyer found", {status:404})
         }
-        return  new Response(JSON.lawyer.stringify, {status:200})
+        return  new Response(JSON.lawyer.stringify(lawyer), {status:200})
     }
     catch(error){
         return new Response("Error !", {status:500})

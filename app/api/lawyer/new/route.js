@@ -32,7 +32,7 @@ export const POST = async (request) => {
     });
 
     await newLawyer.save();
-    return new Response(JSON.newLawyer(stringify), { status: 201 });
+    return new Response(JSON.newLawyer.stringify(newLawyer), { status: 201 });
   } catch (error) {
     return new Response("Failed to create a new lawyer profile", {
       status: 500,
