@@ -1,6 +1,5 @@
 import Lawyer from "@models/lawyer";
 import { connectionDB } from "@utils/db";
-import { stringify } from "postcss";
 
 export const GET=async(request,{params})=>{
     try{
