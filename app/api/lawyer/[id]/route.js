@@ -17,3 +17,42 @@ export const GET=async(request,{params})=>{
     }
 }
 
+export const PATCH=async(request,{params})=>{
+    const {
+        lawyerName,
+        age,
+        nic,
+        university,
+        experienceYears,
+        certificate,
+        prevExperiences,
+        experience,
+        profilePic,
+        contactNo,
+      } = await request.json();
+
+    try{
+        await connectionDB();
+        const existlawyer=await Lawyer.findById(params.id);
+        if(!lawyer){
+            return new Response("No such lawyer found", {status:404})
+        }
+        existlawyer.lawyerName=lawyerName,
+        existlawyer.age= age,
+        existlawyer.nic= nic,
+        existlawyer.university= university,
+        existlawyer.experienceYears=experienceYears,
+        existlawyer.certificate= certificate,
+        existlawyer.prevExperiences= prevExperiences,
+        existlawyer.experience=experience,
+        existlawyer.profilePic=profilePic,
+        existlawyer.contactNo=contactNo,
+
+        existlawyer.save();
+        return  new Response("Profile update successful", {status:200})
+    }
+    catch(error){
+        return new Response("Error !", {status:500})
+
+    }
+}
