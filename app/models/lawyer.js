@@ -1,7 +1,10 @@
-const mongoose = require('mongoose');
-const { Schema } = mongoose;
+import { Schema, model, models } from 'mongoose';
 
 const LawyerSchema = new Schema({
+    creator: {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+      },
     lawyerName: {
         type: String,
         required: true
