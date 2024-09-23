@@ -1,5 +1,5 @@
-import Lawyer from "@models/lawyer";
-import { connectionDB } from "@utils/db";
+import Lawyer from '../../../models/lawyer'
+import { connectionDB } from '../../../utils/db';
 export const POST = async (request) => {
   const {
     userId,
@@ -18,7 +18,7 @@ export const POST = async (request) => {
   try {
     await connectionDB();
     const newLawyer = new Lawyer({
-      creator: lawyerName,
+      lawyerName,
       age,
       nic,
       university,
@@ -31,8 +31,10 @@ export const POST = async (request) => {
     });
 
     await newLawyer.save();
-    return new Response(JSON.newLawyer.stringify(newLawyer), { status: 201 });
+    return new Response(JSON.stringify(newLawyer), { status: 201 }); 
   } catch (error) {
+    console.error("Error creating new lawyer:", error); 
+
     return new Response("Failed to create a new lawyer profile", {
       status: 500,
     });

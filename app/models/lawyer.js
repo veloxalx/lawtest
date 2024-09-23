@@ -47,6 +47,5 @@ const LawyerSchema = new Schema({
     }
 });
 
-const Lawyer = mongoose.model('Lawyer', LawyerSchema);
-
+const Lawyer = models.Lawyer || model('Lawyer', LawyerSchema);
 module.exports = Lawyer;
