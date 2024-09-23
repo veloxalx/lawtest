@@ -1,5 +1,5 @@
-import Lawyer from "@models/lawyer";
-import { connectionDB } from "@utils/db";
+import Lawyer from '../../../models/lawyer'
+import { connectionDB } from '../../../utils/db';
 
 export const GET=async(request,{params})=>{
     try{
