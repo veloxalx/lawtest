@@ -20,7 +20,8 @@ export default function AddLawyer({ onClose }) {
   const [contactNo, setContactNo] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const addExperience = () => {
+  const addExperience = async (e) => {
+        e.preventDefault();
     if (experience) {
       setPrevExperiences([...prevExperiences, experience]);
       setExperience("");
