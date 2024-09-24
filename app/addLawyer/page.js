@@ -21,7 +21,6 @@ export default function AddLawyer({ onClose }) {
   const [loading, setLoading] = useState(false);
 
   const addExperience = async (e) => {
-        e.preventDefault();
     if (experience) {
       setPrevExperiences([...prevExperiences, experience]);
       setExperience("");
@@ -31,24 +30,24 @@ export default function AddLawyer({ onClose }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-
+  
     try {
       let certificateUrl = "";
       let profilePicUrl = "";
-
+  
       if (certificate) {
         const certificateRef = ref(storage, `certificates/${certificate.name}`);
         await uploadBytes(certificateRef, certificate);
         certificateUrl = await getDownloadURL(certificateRef);
       }
-
+  
       if (profilePic) {
         const profilePicRef = ref(storage, `profilePics/${profilePic.name}`);
         await uploadBytes(profilePicRef, profilePic);
         profilePicUrl = await getDownloadURL(profilePicRef);
       }
-
-      const docRef = await addDoc(collection(firestore, "lawyers"), {
+  
+      const lawyerData = {
         lawyerName,
         age,
         nic,
@@ -59,16 +58,31 @@ export default function AddLawyer({ onClose }) {
         experience,
         profilePic: profilePicUrl,
         contactNo,
+      };
+  
+      const response = await fetch("/api/lawyer/new", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(lawyerData),
       });
-
-      alert("New Lawyer added!");
-      router.push(`/community/${docRef.id}`);
+  
+      if (response.ok) {
+        const newLawyer = await response.json();
+        alert("New Lawyer added!");
+        router.push(`/community/${newLawyer._id}`);
+      } else {
+        throw new Error("Failed to add lawyer");
+      }
     } catch (error) {
-      console.error("Error adding document: ", error);
+      console.error("Error adding lawyer:", error);
+      alert("Error adding lawyer, please try again.");
     } finally {
       setLoading(false);
     }
   };
+  
 
   return (
     <div className="mt-4 inset-0 flex items-center justify-center bg-black bg-opacity-50">
