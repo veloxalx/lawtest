@@ -32,20 +32,20 @@ export default function AddLawyer({ onClose }) {
     setLoading(true);
   
     try {
-      let certificateUrl = "";
-      let profilePicUrl = "";
+      // let certificateUrl = "";
+      // let profilePicUrl = "";
   
-      if (certificate) {
-        const certificateRef = ref(storage, `certificates/${certificate.name}`);
-        await uploadBytes(certificateRef, certificate);
-        certificateUrl = await getDownloadURL(certificateRef);
-      }
+      // if (certificate) {
+      //   const certificateRef = ref(storage, `certificates/${certificate.name}`);
+      //   await uploadBytes(certificateRef, certificate);
+      //   certificateUrl = await getDownloadURL(certificateRef);
+      // }
   
-      if (profilePic) {
-        const profilePicRef = ref(storage, `profilePics/${profilePic.name}`);
-        await uploadBytes(profilePicRef, profilePic);
-        profilePicUrl = await getDownloadURL(profilePicRef);
-      }
+      // if (profilePic) {
+      //   const profilePicRef = ref(storage, `profilePics/${profilePic.name}`);
+      //   await uploadBytes(profilePicRef, profilePic);
+      //   profilePicUrl = await getDownloadURL(profilePicRef);
+      // }
   
       const lawyerData = {
         lawyerName,
@@ -53,10 +53,10 @@ export default function AddLawyer({ onClose }) {
         nic,
         university,
         experienceYears,
-        certificate: certificateUrl,
+        // certificate: certificateUrl,
         prevExperiences,
         experience,
-        profilePic: profilePicUrl,
+        // profilePic: profilePicUrl,
         contactNo,
       };
   
