@@ -1,10 +1,97 @@
+// "use client";
+// import React, { useState } from "react";
+// import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+// import { firestore, storage } from "../lib/firebase";
+// import { useRouter } from "next/navigation";
+// import { collection, addDoc } from "firebase/firestore";
+
+// export default function AddLawyer({ onClose }) {
+//   const router = useRouter();
+//   const [lawyerName, setLawyerName] = useState("");
+//   const [age, setAge] = useState("");
+//   const [nic, setNic] = useState("");
+//   const [university, setUniversity] = useState("Colombo");
+//   const [experienceYears, setExperienceYears] = useState("");
+//   const [certificate, setCertificate] = useState(null);
+//   const [prevExperiences, setPrevExperiences] = useState([]);
+//   const [experience, setExperience] = useState("");
+//   const [profilePic, setProfilePic] = useState(null);
+//   const [contactNo, setContactNo] = useState("");
+//   const [loading, setLoading] = useState(false);
+
+//   // const addExperience = async (e) => {
+//   //   if (experience) {
+//   //     setPrevExperiences([...prevExperiences, experience]);
+//   //     setExperience("");
+//   //   }
+//   // };
+
+//   const handleSubmit = async (e) => {
+//     e.preventDefault();
+//     setLoading(true);
+  
+//     try {
+//       if (!lawyerName || !age || !nic || !university || !experienceYears || !contactNo) {
+//         alert("Please fill in all required fields.");
+//         setLoading(false);
+//         return;
+//       }
+  
+//       // let certificateUrl = "";
+//       // let profilePicUrl = "";
+  
+//       // if (certificate) {
+//       //   const certificateRef = ref(storage, `certificates/${certificate.name}`);
+//       //   await uploadBytes(certificateRef, certificate);
+//       //   certificateUrl = await getDownloadURL(certificateRef);
+//       // }
+  
+//       // if (profilePic) {
+//       //   const profilePicRef = ref(storage, `profilePics/${profilePic.name}`);
+//       //   await uploadBytes(profilePicRef, profilePic);
+//       //   profilePicUrl = await getDownloadURL(profilePicRef);
+//       // }
+  
+//       const lawyerData = {
+//         lawyerName,
+//         age,
+//         nic,
+//         university,
+//         experienceYears,
+//         // certificate: certificateUrl,
+//         // prevExperiences,
+//         // experience: Number(experience) || 0,
+//         // profilePic: profilePicUrl,
+//         contactNo,
+//       };
+  
+//       const response = await fetch("/api/lawyer/new", {
+//         method: "POST",
+//         headers: {
+//           "Content-Type": "application/json",
+//         },
+//         body: JSON.stringify(lawyerData),
+//       });
+  
+//       if (response.ok) {
+//         const newLawyer = await response.json();
+//         alert("New Lawyer added!");
+//         router.push(`/community/${newLawyer._id}`);
+//       } else {
+//         const errorText = await response.text();
+//         throw new Error(`HTTP error! status: ${response.status}, ${errorText}`);
+//       }
+//     } catch (error) {
+//       console.error("Error adding lawyer:", error);
+//       alert("Error adding lawyer, please try again.");
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+  
 "use client";
 import React, { useState } from "react";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { firestore, storage } from "../lib/firebase";
 import { useRouter } from "next/navigation";
-import { collection, addDoc } from "firebase/firestore";
-
 
 export default function AddLawyer({ onClose }) {
   const router = useRouter();
@@ -13,53 +100,30 @@ export default function AddLawyer({ onClose }) {
   const [nic, setNic] = useState("");
   const [university, setUniversity] = useState("Colombo");
   const [experienceYears, setExperienceYears] = useState("");
-  const [certificate, setCertificate] = useState(null);
-  const [prevExperiences, setPrevExperiences] = useState([]);
-  const [experience, setExperience] = useState("");
   const [profilePic, setProfilePic] = useState(null);
   const [contactNo, setContactNo] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const addExperience = async (e) => {
-    if (experience) {
-      setPrevExperiences([...prevExperiences, experience]);
-      setExperience("");
-    }
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-  
+
     try {
-      // let certificateUrl = "";
-      // let profilePicUrl = "";
-  
-      // if (certificate) {
-      //   const certificateRef = ref(storage, `certificates/${certificate.name}`);
-      //   await uploadBytes(certificateRef, certificate);
-      //   certificateUrl = await getDownloadURL(certificateRef);
-      // }
-  
-      // if (profilePic) {
-      //   const profilePicRef = ref(storage, `profilePics/${profilePic.name}`);
-      //   await uploadBytes(profilePicRef, profilePic);
-      //   profilePicUrl = await getDownloadURL(profilePicRef);
-      // }
-  
+      if (!lawyerName || !age || !nic || !university || !experienceYears || !contactNo) {
+        alert("Please fill in all required fields.");
+        setLoading(false);
+        return;
+      }
+
       const lawyerData = {
         lawyerName,
         age,
         nic,
         university,
         experienceYears,
-        // certificate: certificateUrl,
-        prevExperiences,
-        experience,
-        // profilePic: profilePicUrl,
         contactNo,
       };
-  
+
       const response = await fetch("/api/lawyer/new", {
         method: "POST",
         headers: {
@@ -67,13 +131,14 @@ export default function AddLawyer({ onClose }) {
         },
         body: JSON.stringify(lawyerData),
       });
-  
+
       if (response.ok) {
         const newLawyer = await response.json();
         alert("New Lawyer added!");
         router.push(`/community/${newLawyer._id}`);
       } else {
-        throw new Error("Failed to add lawyer");
+        const errorText = await response.text();
+        throw new Error(`HTTP error! status: ${response.status}, ${errorText}`);
       }
     } catch (error) {
       console.error("Error adding lawyer:", error);
@@ -82,8 +147,6 @@ export default function AddLawyer({ onClose }) {
       setLoading(false);
     }
   };
-  
-
   return (
     <div className="mt-4 inset-0 flex items-center justify-center bg-black bg-opacity-50">
       <div className="relative bg-white p-8 rounded shadow-md w-full max-w-lg">
@@ -181,66 +244,7 @@ export default function AddLawyer({ onClose }) {
             />
           </div>
 
-          <div className="mb-4">
-            <label
-              className="block text-gray-700 font-bold mb-2"
-              htmlFor="certificate"
-            >
-              Upload Certificate
-            </label>
-            <input
-              type="file"
-              id="certificate"
-              onChange={(e) => setCertificate(e.target.files[0])}
-              className="w-full px-3 py-2 border rounded"
-            />
-          </div>
-
-          <div className="mb-4">
-            <label
-              className="block text-gray-700 font-bold mb-2"
-              htmlFor="prevExperience"
-            >
-              Add Previous Working Experience
-            </label>
-            <input
-              type="text"
-              id="prevExperience"
-              value={experience}
-              onChange={(e) => setExperience(e.target.value)}
-              className="w-full px-3 py-2 border rounded"
-              placeholder="Enter previous work experience"
-            />
-            <button
-              type="button"
-              onClick={addExperience}
-              className="mt-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-            >
-              Add Experience
-            </button>
-            <ul className="mt-4">
-              {prevExperiences.map((exp, index) => (
-                <li key={index} className="text-gray-700">
-                  {exp}
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="mb-4">
-            <label
-              className="block text-gray-700 font-bold mb-2"
-              htmlFor="profilePic"
-            >
-              Upload Profile Picture
-            </label>
-            <input
-              type="file"
-              id="profilePic"
-              onChange={(e) => setProfilePic(e.target.files[0])}
-              className="w-full px-3 py-2 border rounded"
-            />
-          </div>
+          
 
           <div className="mb-4">
             <label
