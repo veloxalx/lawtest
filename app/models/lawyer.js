@@ -4,7 +4,7 @@ const LawyerSchema = new Schema({
     creator: {
         type: Schema.Types.ObjectId,
         ref: 'User',
-      },
+    },
     lawyerName: {
         type: String,
         required: true
@@ -25,15 +25,22 @@ const LawyerSchema = new Schema({
         type: Number,
         required: true
     },
-    certificate: { type: File, required: true }, 
-    experience: { type: Number, required: true },
+    certificate: {
+        data: Buffer,
+        contentType: String,
+        required: true
+    },
+    experience: {
+        type: Number,
+        required: true
+    },
     prevExperiences: {
-        type: [String], 
+        type: [String],
         required: false
     },
- 
     profilePic: {
-        type: File, 
+        data: Buffer,
+        contentType: String,
         required: false
     },
     contactNo: {
@@ -43,7 +50,9 @@ const LawyerSchema = new Schema({
 });
 
 const Lawyer = models.Lawyer || model('Lawyer', LawyerSchema);
-module.exports = Lawyer;
+export default Lawyer;
+
+
 
 // import { Schema, model, models } from 'mongoose';
 

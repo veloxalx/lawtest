@@ -29,75 +29,67 @@ export default function AddLawyer({ onClose }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-  
+
     try {
-      if (!lawyerName || !age || !nic || !university || !experienceYears || !contactNo) {
-        alert("Please fill in all required fields.");
-        setLoading(false);
-        return;
-      }
-  
-      let certificateUrl = "";
-      let profilePicUrl = "";
-  
-      if (certificate) {
-        try {
-          const certificateRef = ref(storage, `certificates/${certificate.name}`);
-          await uploadBytes(certificateRef, certificate);
-          certificateUrl = await getDownloadURL(certificateRef);
-        } catch (error) {
-          console.error("Error uploading certificate:", error);
-          alert("Failed to upload certificate.");
+        if (!lawyerName || !age || !nic || !university || !experienceYears || !contactNo) {
+            alert("Please fill in all required fields.");
+            setLoading(false);
+            return;
         }
-      }
-      if (profilePic) {
-        try {
-          const profilePicRef = ref(storage, `profilePics/${profilePic.name}`);
-          await uploadBytes(profilePicRef, profilePic);
-          profilePicUrl = await getDownloadURL(profilePicRef);
-        } catch (error) {
-          console.error("Error uploading profilePic:", error);
-          alert("Failed to upload profilePic.");
+
+        const lawyerData = {
+            lawyerName,
+            age,
+            nic,
+            university,
+            experienceYears,
+            certificate: certificate ? {
+                data: await getFileBuffer(certificate),
+                contentType: certificate.type
+            } : null,
+            prevExperiences,
+            experience: Number(experience) || 0,
+            profilePic: profilePic ? {
+                data: await getFileBuffer(profilePic),
+                contentType: profilePic.type
+            } : null,
+            contactNo,
+        };
+
+        const response = await fetch("/api/lawyer/new", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(lawyerData),
+        });
+
+        if (response.ok) {
+            const newLawyer = await response.json();
+            alert("New Lawyer added!");
+            router.push(`/community/${newLawyer._id}`);
+        } else {
+            const errorText = await response.text();
+            throw new Error(`HTTP error! status: ${response.status}, ${errorText}`);
         }
-      }
- 
-  
-      const lawyerData = {
-        lawyerName,
-        age,
-        nic,
-        university,
-        experienceYears,
-        certificate: certificateUrl,
-        prevExperiences,
-        experience: Number(experience) || 0,
-        profilePic: profilePicUrl,
-        contactNo,
-      };
-  
-      const response = await fetch("/api/lawyer/new", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(lawyerData),
-      });
-  
-      if (response.ok) {
-        const newLawyer = await response.json();
-        alert("New Lawyer added!");
-        router.push(`/community/${newLawyer._id}`);
-      } else {
-        const errorText = await response.text();
-        throw new Error(`HTTP error! status: ${response.status}, ${errorText}`);
-      }
     } catch (error) {
-      console.error("Error adding lawyer:", error);
-      alert("Error adding lawyer, please try again.");
+        console.error("Error adding lawyer:", error);
+        alert("Error adding lawyer, please try again.");
     } finally {
-      setLoading(false);
+        setLoading(false);
     }
-  };
+};
+
+const getFileBuffer = (file) => {
+    return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            resolve(reader.result);
+        };
+        reader.readAsArrayBuffer(file);
+    });
+};
+
   
 // "use client";
 // import React, { useState } from "react";
