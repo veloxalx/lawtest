@@ -1,49 +1,46 @@
+import { NextResponse } from 'next/server';
 import Lawyer from '../../../models/lawyer';
 import { connectionDB } from '../../../utils/db';
+import { writeFile } from 'fs/promises';
+import path from 'path';
 
-export const POST = async (request) => {
-    const {
-        userId,
-        lawyerName,
-        age,
-        nic,
-        university,
-        experienceYears,
-        certificate,
-        // prevExperiences,
-        // experience,
-        profilePic,
-        contactNo,
-    } = await request.json();
+export async function POST(request) {
+  try {
+    await connectionDB();
 
-    try {
-        await connectionDB();
+    const formData = await request.formData();
+    const lawyerName = formData.get('lawyerName');
+    const age = Number(formData.get('age'));
+    const nic = formData.get('nic');
+    const university = formData.get('university');
+    const experienceYears = Number(formData.get('experienceYears'));
+    const contactNo = formData.get('contactNo');
+    const certificate = formData.get('certificate');
 
-        const newLawyer = new Lawyer({
-            lawyerName,
-            age,
-            nic,
-            university,
-            experienceYears,
-            certificate: {
-                data: Buffer.from(certificate.data), 
-                contentType: certificate.contentType,
-            },
-            // prevExperiences,
-            // experience,
-            profilePic: {
-                data: Buffer.from(profilePic.data),
-                contentType: profilePic.contentType,
-            },
-            contactNo,
-        });
-
-        await newLawyer.save();
-        return new Response(JSON.stringify(newLawyer), { status: 201 });
-    } catch (error) {
-        console.error("Error creating new lawyer:", error);
-        return new Response("Failed to create a new lawyer profile", {
-            status: 500,
-        });
+    if (!lawyerName || !age || !nic || !university || !experienceYears || !contactNo || !certificate) {
+      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
-};
+
+    const bytes = await certificate.arrayBuffer();
+    const buffer = Buffer.from(bytes);
+    const fileName = `${Date.now()}_${certificate.name}`;
+    const filePath = path.join(process.cwd(), 'public', 'uploads', fileName);
+    await writeFile(filePath, buffer);
+
+    const newLawyer = new Lawyer({
+      lawyerName,
+      age,
+      nic,
+      university,
+      experienceYears,
+      certificatePath: `/uploads/${fileName}`,
+      contactNo,
+    });
+
+    await newLawyer.save();
+    return NextResponse.json(newLawyer, { status: 201 });
+  } catch (error) {
+    console.error("Error creating new lawyer:", error);
+    return NextResponse.json({ error: "Failed to create a new lawyer profile" }, { status: 500 });
+  }
+}
