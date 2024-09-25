@@ -30,14 +30,14 @@ const LawyerSchema = new Schema({
         contentType: String,
         required: true
     },
-    experience: {
-        type: Number,
-        required: true
-    },
-    prevExperiences: {
-        type: [String],
-        required: false
-    },
+    // experience: {
+    //     type: Number,
+    //     required: true
+    // },
+    // prevExperiences: {
+    //     type: [String],
+    //     required: false
+    // },
     profilePic: {
         data: Buffer,
         contentType: String,
