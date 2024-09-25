@@ -13,8 +13,8 @@ export default function AddLawyer({ onClose }) {
   const [university, setUniversity] = useState("Colombo");
   const [experienceYears, setExperienceYears] = useState("");
   const [certificate, setCertificate] = useState(null);
-  const [prevExperiences, setPrevExperiences] = useState([]);
-  const [experience, setExperience] = useState("");
+  // const [prevExperiences, setPrevExperiences] = useState([]);
+  // const [experience, setExperience] = useState("");
   const [profilePic, setProfilePic] = useState(null);
   const [contactNo, setContactNo] = useState("");
   const [loading, setLoading] = useState(false);
@@ -47,8 +47,7 @@ export default function AddLawyer({ onClose }) {
                 data: await getFileBuffer(certificate),
                 contentType: certificate.type
             } : null,
-            prevExperiences,
-            experience: Number(experience) || 0,
+           
             profilePic: profilePic ? {
                 data: await getFileBuffer(profilePic),
                 contentType: profilePic.type
@@ -90,65 +89,7 @@ const getFileBuffer = (file) => {
     });
 };
 
-  
-// "use client";
-// import React, { useState } from "react";
-// import { useRouter } from "next/navigation";
 
-// export default function AddLawyer({ onClose }) {
-//   const router = useRouter();
-//   const [lawyerName, setLawyerName] = useState("");
-//   const [age, setAge] = useState("");
-//   const [nic, setNic] = useState("");
-//   const [university, setUniversity] = useState("Colombo");
-//   const [experienceYears, setExperienceYears] = useState("");
-//   const [profilePic, setProfilePic] = useState(null);
-//   const [contactNo, setContactNo] = useState("");
-//   const [loading, setLoading] = useState(false);
-
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
-//     setLoading(true);
-
-//     try {
-//       if (!lawyerName || !age || !nic || !university || !experienceYears || !contactNo) {
-//         alert("Please fill in all required fields.");
-//         setLoading(false);
-//         return;
-//       }
-
-//       const lawyerData = {
-//         lawyerName,
-//         age,
-//         nic,
-//         university,
-//         experienceYears,
-//         contactNo,
-//       };
-
-//       const response = await fetch("/api/lawyer/new", {
-//         method: "POST",
-//         headers: {
-//           "Content-Type": "application/json",
-//         },
-//         body: JSON.stringify(lawyerData),
-//       });
-
-//       if (response.ok) {
-//         const newLawyer = await response.json();
-//         alert("New Lawyer added!");
-//         router.push(`/community/${newLawyer._id}`);
-//       } else {
-//         const errorText = await response.text();
-//         throw new Error(`HTTP error! status: ${response.status}, ${errorText}`);
-//       }
-//     } catch (error) {
-//       console.error("Error adding lawyer:", error);
-//       alert("Error adding lawyer, please try again.");
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
   return (
     <div className="mt-4 inset-0 flex items-center justify-center bg-black bg-opacity-50">
       <div className="relative bg-white p-8 rounded shadow-md w-full max-w-lg">
@@ -261,36 +202,7 @@ const getFileBuffer = (file) => {
             />
           </div>
 
-          <div className="mb-4">
-            <label
-              className="block text-gray-700 font-bold mb-2"
-              htmlFor="prevExperience"
-            >
-              Add Previous Working Experience
-            </label>
-            <input
-              type="text"
-              id="prevExperience"
-              value={experience}
-              onChange={(e) => setExperience(e.target.value)}
-              className="w-full px-3 py-2 border rounded"
-              placeholder="Enter previous work experience"
-            />
-            <button
-              type="button"
-              onClick={addExperience}
-              className="mt-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-            >
-              Add Experience
-            </button>
-            <ul className="mt-4">
-              {prevExperiences.map((exp, index) => (
-                <li key={index} className="text-gray-700">
-                  {exp}
-                </li>
-              ))}
-            </ul>
-          </div>
+        
 
           <div className="mb-4">
             <label
@@ -337,3 +249,34 @@ const getFileBuffer = (file) => {
     </div>
   );
 }
+
+{/* <div className="mb-4">
+<label
+  className="block text-gray-700 font-bold mb-2"
+  htmlFor="prevExperience"
+>
+  Add Previous Working Experience
+</label>
+<input
+  type="text"
+  id="prevExperience"
+  value={experience}
+  onChange={(e) => setExperience(e.target.value)}
+  className="w-full px-3 py-2 border rounded"
+  placeholder="Enter previous work experience"
+/>
+<button
+  type="button"
+  onClick={addExperience}
+  className="mt-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+>
+  Add Experience
+</button>
+<ul className="mt-4">
+  {prevExperiences.map((exp, index) => (
+    <li key={index} className="text-gray-700">
+      {exp}
+    </li>
+  ))}
+</ul>
+</div> */}
