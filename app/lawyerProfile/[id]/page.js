@@ -1,7 +1,7 @@
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import { db } from '../../firebase';
-import { firestore } from "../lib/firebase";
+import { db } from '../../lib/firebase'; //this is not there in firebase.js
+import { firestore } from "../lib/firebase"; //this is not there in firebase.js
 import { FaEdit, FaTrash } from 'react-icons/fa'; 
 
 const LawyerProfile = () => {
