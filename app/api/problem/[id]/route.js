@@ -1,5 +1,5 @@
-import Problem from "@models/problem";
-import { connectionDB } from "@utils/db";
+import AddProblem from "@/app/add/page";
+import { connectionDB } from "@/app/utils/db";
 
 export const GET=async(request,{params})=>{
     try{

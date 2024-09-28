@@ -1,10 +1,10 @@
-import Problem from "@models/problem";
-import { connectionDB } from "@utils/db";
+import AddProblem from "@/app/add/page";
+import { connectionDB } from "@/app/utils/db";
 
 export const GET=async(request)=>{
     try{
         await connectionDB();
-        const problem=Problem.find({}).populate('creator')
+        const problem=AddProblem.find({}).populate('creator')
         return new Response(JSON.stringify(problem), {status:200})
     }
     catch(error){
