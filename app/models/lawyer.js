@@ -17,6 +17,10 @@ const LawyerSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  myCategory: {
+    type: String,
+    required: true
+  },
   experienceYears: {
     type: Number,
     required: true
