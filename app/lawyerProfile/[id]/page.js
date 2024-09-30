@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import { db } from '../../firebase';
+import { db } from '../../lib/firebase'; 
 import { firestore } from "../lib/firebase";
 import { FaEdit, FaTrash } from 'react-icons/fa'; 
 

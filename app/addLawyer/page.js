@@ -8,7 +8,8 @@ export default function AddLawyer({ onClose }) {
   const [lawyerName, setLawyerName] = useState("")
   const [age, setAge] = useState("")
   const [nic, setNic] = useState("")
-  const [university, setUniversity] = useState("Colombo")
+  const [university, setUniversity] = useState("Select an University")
+  const [myCategory, setMyCategory] = useState("Select Categories")
   const [experienceYears, setExperienceYears] = useState("")
   const [certificate, setCertificate] = useState(null)
   const [contactNo, setContactNo] = useState("")
@@ -19,7 +20,7 @@ export default function AddLawyer({ onClose }) {
     setLoading(true)
 
     try {
-      if (!lawyerName || !age || !nic || !university || !experienceYears || !contactNo || !certificate) {
+      if (!lawyerName || !age || !nic || !university || !experienceYears || !contactNo || !certificate || !myCategory) {
         alert("Please fill in all required fields and upload the certificate.")
         setLoading(false)
         return
@@ -33,6 +34,7 @@ export default function AddLawyer({ onClose }) {
       formData.append("experienceYears", experienceYears)
       formData.append("contactNo", contactNo)
       formData.append("certificate", certificate)
+      formData.append("myCategory", myCategory)
 
       const response = await fetch("/api/lawyer/new", {
         method: "POST",
@@ -42,6 +44,7 @@ export default function AddLawyer({ onClose }) {
       if (response.ok) {
         const newLawyer = await response.json()
         alert("New Lawyer added!")
+        router.push("/community")
         // router.push(`/community/${newLawyer._id}`)
       } else {
         const errorText = await response.text()
@@ -56,14 +59,14 @@ export default function AddLawyer({ onClose }) {
   }
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+    <div className="flex items-center justify-center bg-black bg-opacity-50">
       <div className="relative bg-white p-8 rounded shadow-md w-full max-w-lg">
-        <button
+        {/* <button
           onClick={onClose}
           className="absolute top-0 right-0 mt-2 mr-2 text-gray-600 hover:text-gray-900"
         >
           &times;
-        </button>
+        </button> */}
         <h1 className="text-3xl font-bold text-gray-800 mb-8">
           New Lawyer Registration
         </h1>
@@ -129,6 +132,29 @@ export default function AddLawyer({ onClose }) {
               <option value="Jaffna">University of Jaffna</option>
               <option value="Open">Open University of SL</option>
               <option value="LawCollege">SL Law College</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          <div className="mb-4">
+            <label className="block text-gray-700 font-bold mb-2" htmlFor="university">
+              Category
+            </label>
+            <select
+              id="myCategory"
+              value={myCategory}
+              onChange={(e) => setMyCategory(e.target.value)}
+              className="w-full px-3 py-2 border rounded"
+              required
+            >
+              <option value="medical">Medical</option>
+              <option value="technical">Technical</option>
+              <option value="financial">Financial</option>
+              <option value="educational">Educational</option>
+              <option value="home">Home & Repair</option>
+              <option value="legal">Legal</option>
+              <option value="career">Career</option>
+              <option value="relationship">Relationship</option>
               <option value="Other">Other</option>
             </select>
           </div>

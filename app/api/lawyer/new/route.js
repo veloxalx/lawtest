@@ -16,8 +16,9 @@ export async function POST(request) {
     const experienceYears = Number(formData.get('experienceYears'));
     const contactNo = formData.get('contactNo');
     const certificate = formData.get('certificate');
+    const myCategory = formData.get('myCategory');
 
-    if (!lawyerName || !age || !nic || !university || !experienceYears || !contactNo || !certificate) {
+    if (!lawyerName || !age || !nic || !university || !experienceYears || !contactNo || !certificate || !myCategory) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
@@ -32,6 +33,7 @@ export async function POST(request) {
       age,
       nic,
       university,
+      myCategory,
       experienceYears,
       certificatePath: `/uploads/${fileName}`,
       contactNo,
