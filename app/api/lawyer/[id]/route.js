@@ -4,7 +4,7 @@ import { connectionDB } from '@/app/utils/db';
 export const GET=async(request,{params})=>{
     try{
         await connectionDB();
-        const lawyer=await Lawyer.findById(params.id).populate('creator')
+        const lawyer=await Lawyer.findById(params.id);
         if(!lawyer){
             return new Response("No such lawyer found", {status:404})
         }
