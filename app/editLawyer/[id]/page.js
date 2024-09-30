@@ -1,6 +1,10 @@
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
+<<<<<<< HEAD
 import { db } from '../../lib/firebase';
+=======
+import { db } from '../../lib/firebase'; //this is not there in firebase.js
+>>>>>>> a404b0409fce8ea0122ff6135315fa97f163eb38
 
 const EditLawyer = () => {
   const router = useRouter();

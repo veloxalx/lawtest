@@ -1,5 +1,5 @@
-import Problem from "@models/problem";
-import { connectionDB } from "@utils/db";
+import AddProblem from "@/app/add/page";
+import { connectionDB } from "@/app/utils/db";
 export const POST = async (request) => {
   const {
     title,
@@ -15,7 +15,7 @@ export const POST = async (request) => {
 
   try {
     await connectionDB();
-    const newProblem = new Problem({
+    const newProblem = new AddProblem({
       creator: title,
       location,
       problem,

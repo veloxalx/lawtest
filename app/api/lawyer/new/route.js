@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import Lawyer from '../../../models/lawyer';
-import { connectionDB } from '../../../utils/db';
+import Lawyer from '@/app/models/lawyer';
+import { connectionDB } from '@/app/utils/db';
 import { writeFile } from 'fs/promises';
 import path from 'path';
 
