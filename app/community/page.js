@@ -53,7 +53,6 @@ const CommunityHome = () => {
           >
             <div className="p-6">
               <div className="flex flex-col items-center">
-                <Link href={{ pathname: `/community/${lawyer.id}` }}>
                   {" "}
                   <div className="w-24 h-24 rounded-full bg-gray-200 mb-4 overflow-hidden">
                     <img
@@ -62,6 +61,7 @@ const CommunityHome = () => {
                       className="w-full h-full object-cover"
                     />
                   </div>
+                  <Link href={{ pathname: `/community/${lawyer._id}` }}>
 
                 <h2 className="text-xl font-semibold text-center mb-2">
                   {lawyer.lawyerName}

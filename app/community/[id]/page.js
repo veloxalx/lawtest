@@ -4,22 +4,28 @@ import { useRouter } from 'next/navigation';
 
 const Community = () => {
   const router = useRouter();
-  const { id } = router.query || {};
+  // const { id } = router.query;
     const [lawyer, setLawyer] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (id) {
+    const timeoutId = setTimeout(() => {
+      setLoading(false);
+      setError('Loading timeout, please try again.');
+    }, 10000);
+    if (!router.isReady) return;
+
+    const { id } = router.query;
 
     const fetchLawyer = async () => {
       try {
-        const response = await fetch(`/api/lawyer/${id}`);
-        if (!response.ok) {
+        const response = await fetch(`/api/lawyer/${id}`, { signal });        if (!response.ok) {
           throw new Error('Failed to fetch lawyer details');
         }
         const data = await response.json();
-        setLawyer(data); 
+        setLawyer(data);
+        clearTimeout(timeoutId);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -27,8 +33,11 @@ const Community = () => {
       }
     };
 
-    fetchLawyer();
- } }, [id]); 
+    if (id) {
+      fetchLawyer();
+    }
+    return () => clearTimeout(timeoutId); 
+  }, [router.isReady, router.query]);
 
   if (loading) {
     return <div className="flex justify-center items-center min-h-screen">Loading...</div>;
