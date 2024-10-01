@@ -56,13 +56,12 @@ const CommunityHome = () => {
                   {" "}
                   <div className="w-24 h-24 rounded-full bg-gray-200 mb-4 overflow-hidden">
                     <img
-                      src={`/placeholder.svg?height=96&width=96`}
-                      alt={lawyer.lawyerName}
-                      className="w-full h-full object-cover"
+                      // src={`/placeholder.svg?height=96&width=96`}
+                      // alt={lawyer.lawyerName}
+                      // className="w-full h-full object-cover"
                     />
                   </div>
-                  <Link href={{ pathname: `/community/${lawyer._id}` }}>
-
+                  <Link href={`/community/${lawyer._id}`}>
                 <h2 className="text-xl font-semibold text-center mb-2">
                   {lawyer.lawyerName}
                 </h2>                </Link>
