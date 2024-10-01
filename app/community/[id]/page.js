@@ -176,7 +176,7 @@ const Community = () => {
           <span className="text-xs">Cases</span>
         </div>
         <div className="text-center">
-          <span className="block font-bold text-lg">120</span>
+          <span className="block font-bold text-md">120</span>
           <span className="text-xs">Ratings</span>
         </div>
         <div className="text-center">
