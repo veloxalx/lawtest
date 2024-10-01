@@ -69,26 +69,26 @@ const CommunityHome = () => {
                 <p className="text-sm text-gray-600 text-center mb-2">
                   Age: {lawyer.age}
                 </p>
-                <p className="text-sm text-gray-600 text-center mb-2">
+                {/* <p className="text-sm text-gray-600 text-center mb-2">
                   NIC: {lawyer.nic}
-                </p>
-                <p className="text-sm text-gray-600 text-center mb-2">
+                </p> */}
+                {/* <p className="text-sm text-gray-600 text-center mb-2">
                   University: {lawyer.university}
-                </p>
+                </p> */}
                 <p className="text-sm text-gray-600 text-center mb-2">
                   Experience: {lawyer.experienceYears} years
                 </p>
                 <p className="text-sm text-gray-600 text-center mb-2">
                   Contact: {lawyer.contactNo}
                 </p>
-                <a
+                {/* <a
                   href={lawyer.certificatePath}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-sm text-blue-500 hover:underline"
                 >
                   View Certificate
-                </a>
+                </a> */}
               </div>
             </div>
           </div>
