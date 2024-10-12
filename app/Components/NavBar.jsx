@@ -131,7 +131,7 @@ const NavBar = () => {
     <div className="container mx-auto px-6 py-3 flex items-center justify-between">
     <Link href="/" className="text-gray-700 hover:text-blue-600">
 
-      <div className="text-2xl font-bold text-blue-600">Problem Solver</div>
+      <div className="text-2xl font-bold text-blue-600">LawTest</div>
       </Link>
 
       <div className="flex items-center space-x-4">
