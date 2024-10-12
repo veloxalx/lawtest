@@ -57,7 +57,8 @@ const Community = () => {
   }
 
   return (
-    <div className="bg-white p-8 flex-1 rounded-lg shadow-md mt-5 max-w-md w-full">
+    <div className="bg-white p-8 justify-center items-center flex rounded-lg shadow-md mt-5 max-w-xl w-full flex-col mx-auto">
+      {" "}
       <div className="relative">
         {/* <img
             src="https://placekitten.com/500/150"
@@ -101,7 +102,7 @@ const Community = () => {
           </svg>
         </button>
       </div>
-      <div className="flex flex-col md:flex-row justify-between text-gray-700 mt-2">
+      <div className="flex flex-col md:flex-row justify-between text-gray-700 mt-2 mr-10">
         <div className="flex items-center">
           {" "}
           <span>
@@ -122,7 +123,7 @@ const Community = () => {
         </div>
         <br></br>
 
-        <div className="flex items-center">
+        <div className="ml-5 flex items-center">
           {" "}
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -144,8 +145,8 @@ const Community = () => {
           <h3 className="ml-2">{lawyer.university}</h3>
         </div>
       </div>
-      <div className="flex items-center mt-4 space-x-4">
-        <div className="flex items-center">
+      <div className="flex items-center mt-4 ml-10 space-x-4">
+        <div className="ml-5 flex items-center">
           {" "}
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -170,46 +171,45 @@ const Community = () => {
         </div>
       </div>
       <hr className="my-4 border-t border-gray-300" />
-      <div className="flex justify-between text-gray-600 mx-2">
+      <div className="flex justify-between gap-10 flex-col-3 text-gray-600 mx-2">
         <div className="text-center">
           <span className="block font-bold text-lg">1.5k</span>
           <span className="text-xs">Cases</span>
         </div>
-        <div className="text-center">
-          <span className="block font-bold text-md">120</span>
-          <span className="text-xs">Ratings</span>
-        </div>
+     
         <div className="text-center">
           <span className="block font-bold text-lg">
             {lawyer.experienceYears}
           </span>
           <span className="text-xs">Years Experience</span>
         </div>
+        <div className="text-center">
+          <span className="block font-bold text-lg">120</span>
+          <span className="text-xs">Ratings</span>
+        </div>
       </div>
       <hr className="my-4 border-t border-gray-300" />
       <div className="flex justify-between text-gray-600 mx-2">
-      <Link href={`/chatroom/${lawyer._id}`}>
-
-  <div className="ml-10 mt-4 text-xl  text-white bg-indigo-600 py-3 px-8 rounded-xl shadow-lg flex items-center">
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="30"
-      height="30"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="#FFFFFF"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className="mr-3"
-    >
-      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-    </svg>
-    <p>Chat {lawyer.lawyerName}</p>
-  </div>
-  </Link>
-</div>
-
+        <Link href={`/chatroom/${lawyer._id}`}>
+          <div className="ml-10 mt-4 text-xl  text-white bg-indigo-600 py-3 px-8 rounded-xl shadow-lg flex items-center">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="30"
+              height="30"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#FFFFFF"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="mr-3"
+            >
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+            <p>Chat {lawyer.lawyerName}</p>
+          </div>
+        </Link>
+      </div>
     </div>
   );
 };
