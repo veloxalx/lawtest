@@ -35,8 +35,6 @@ const Home = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [userProblems, setUserProblems] = useState([]);
 
-
-
   const handleToggleSolved = async (problemId) => {
     try {
       const problemDoc = doc(firestore, "problems", problemId);
@@ -80,31 +78,28 @@ const Home = () => {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      {/* Navbar */}
-
-
-      <div className="container mx-auto p-6">
-        <h1 className="text-4xl font-bold text-center mb-6">
-          Problem Solver 🆘
-        </h1>
-        <div className=" flex-col items-center bg-gray-100">
-          <h1 className="text-3xl font-bold text-gray-800 mb-8">
-            Law Assistant
+      <div className="bg-gradient-to-r from-blue-500 to-purple-600 py-20">
+        <div className="container mx-auto text-center text-white">
+          <h1 className="text-5xl font-bold mb-4">
+            Welcome to LawTest Problem Solver 🆘
           </h1>
-          <div className="space-y-4">
-            <Link href="/addLawyer">
-              <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-3">
-                Register as Lawyer
-              </button>
-            </Link>
-            <Link href="/community">
-            <button className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+          <p className="text-xl mb-6">
+            Your one-stop solution for legal assistance and problem-solving.
+          </p>
+          <Link href="/addLawyer">
+            <button className="bg-white text-blue-500 font-bold py-3 px-6 rounded-full shadow-lg hover:bg-gray-200 transition duration-300">
+              Register as Lawyer
+            </button>
+          </Link>
+          <Link href="/community">
+            <button className="bg-green-500 text-white-500 font-bold py-3 ml-5 px-6 rounded-full shadow-lg hover:bg-blue-600 transition duration-300">
               Get Lawyer Assistance
             </button>
-            </Link>
-          </div>
-              
+          </Link>
         </div>
+      </div>
+
+      <div className="container mx-auto p-6">
         <div className="text-center mb-6">
           <label
             htmlFor="category-filter"
@@ -116,7 +111,7 @@ const Home = () => {
             id="category-filter"
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
-            className="mt-2 block w-full max-w-md mx-auto h-8 border border-gray-300 rounded-md shadow-sm focus:border-gray-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
+            className="mt-2 block w-full max-w-md mx-auto h-9 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
           >
             <option value="">All Categories</option>
             {problemCategories.map((cat) => (
@@ -166,7 +161,7 @@ const Home = () => {
                 <div className="mt-4 flex space-x-2">
                   <button
                     onClick={() => handleToggleSolved(problem.id)}
-                    className={`py-2 px-4 rounded shadow transition ${
+                    className={`py-2 px-4 rounded-lg shadow transition ${
                       problem.found
                         ? "bg-yellow-500 hover:bg-yellow-600"
                         : "bg-blue-500 hover:bg-blue-600"
@@ -176,7 +171,7 @@ const Home = () => {
                   </button>
                   <button
                     onClick={() => handleDeleteProblem(problem.id)}
-                    className="py-2 px-4 rounded shadow bg-red-500 hover:bg-red-600 text-white"
+                    className="py-2 px-4 rounded-lg shadow bg-red-500 hover:bg-red-600 text-white"
                   >
                     Delete
                   </button>
@@ -193,7 +188,7 @@ const Home = () => {
             <div className="fixed bottom-6 right-6">
               <button
                 onClick={() => setShowPopup(!showPopup)}
-                className="bg-blue-500 text-white py-2 px-4 rounded shadow-lg hover:bg-blue-600 transition"
+                className="bg-blue-500 text-white py-2 px-4 rounded-full shadow-lg hover:bg-blue-600 transition"
               >
                 {showPopup ? "Close My Problems" : "View My Problems"}
               </button>
@@ -229,7 +224,7 @@ const Home = () => {
                         <div className="mt-4 flex space-x-2">
                           <button
                             onClick={() => handleToggleSolved(problem.id)}
-                            className={`py-2 px-4 rounded shadow transition ${
+                            className={`py-2 px-4 rounded-lg shadow transition ${
                               problem.found
                                 ? "bg-yellow-500 hover:bg-yellow-600"
                                 : "bg-blue-500 hover:bg-blue-600"
@@ -241,7 +236,7 @@ const Home = () => {
                           </button>
                           <button
                             onClick={() => handleDeleteProblem(problem.id)}
-                            className="py-2 px-4 rounded shadow bg-red-500 hover:bg-red-600 text-white"
+                            className="py-2 px-4 rounded-lg shadow bg-red-500 hover:bg-red-600 text-white"
                           >
                             Delete
                           </button>
@@ -256,7 +251,7 @@ const Home = () => {
                 </div>
                 <button
                   onClick={() => setShowPopup(false)}
-                  className="mt-4 py-2 px-4 rounded shadow bg-gray-500 hover:bg-gray-600 text-white"
+                  className="mt-4 py-2 px-4 rounded-lg shadow bg-gray-500 hover:bg-gray-600 text-white"
                 >
                   Close
                 </button>
