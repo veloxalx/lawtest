@@ -77,7 +77,7 @@ const Home = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gradient-to-r">
       <div className="bg-gradient-to-r from-blue-500 to-purple-600 py-20">
         <div className="container mx-auto text-center text-white">
           <h1 className="text-5xl font-bold mb-4">
@@ -99,11 +99,11 @@ const Home = () => {
         </div>
       </div>
 
-      <div className="container mx-auto p-6">
-        <div className="text-center mb-6">
+      <div className="text-center mt-10 mb-6">
+        <div className="bg-white rounded-lg shadow-lg p-6 mx-auto max-w-md">
           <label
             htmlFor="category-filter"
-            className="block text-sm font-medium text-gray-700"
+            className="block text-md font-medium text-gray-700 mb-2"
           >
             Filter by Category
           </label>
@@ -111,7 +111,7 @@ const Home = () => {
             id="category-filter"
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
-            className="mt-2 block w-full max-w-md mx-auto h-9 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
+            className="block w-full h-10 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition duration-200 ease-in-out mb-4"
           >
             <option value="">All Categories</option>
             {problemCategories.map((cat) => (
@@ -127,7 +127,7 @@ const Home = () => {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Search by title..."
-            className="mt-4 block w-full max-w-md h-9 mx-auto border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
+            className="block w-full h-10 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition duration-200 ease-in-out"
           />
         </div>
 
@@ -179,7 +179,8 @@ const Home = () => {
               </div>
             ))
           ) : (
-            <div className="text-center text-xl">No problems found.</div>
+            <div className="justify-center ml-20 text-center text-xl">
+            </div>
           )}
         </div>
 
