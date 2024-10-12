@@ -18,7 +18,7 @@ const problemCategories = [
   "Technical",
   "Financial",
   "Educational",
-  "Home & Repair",
+  "Home",
   "Legal",
   "Career",
   "Relationship",
@@ -99,38 +99,67 @@ const Home = () => {
         </div>
       </div>
 
-      <div className="text-center mt-10 mb-6">
-        <div className="bg-white rounded-lg shadow-lg p-6 mx-auto max-w-md">
-          <label
-            htmlFor="category-filter"
-            className="block text-md font-medium text-gray-700 mb-2"
-          >
-            Filter by Category
-          </label>
-          <select
-            id="category-filter"
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-            className="block w-full h-10 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition duration-200 ease-in-out mb-4"
-          >
-            <option value="">All Categories</option>
-            {problemCategories.map((cat) => (
-              <option key={cat} value={cat}>
-                {cat}
-              </option>
+      <div
+        className="text-flex center py-20 "
+        style={{
+          backgroundImage:
+            "url('https://images.unsplash.com/photo-1589205005253-25ef965ef7ed')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          padding: "20px",
+          borderRadius: "10px",
+        }}
+      >
+        {" "}
+        <div className="px-20   container mx-auto p-6">
+          <h2 className="text-3xl font-bold text-center mb-8">
+            Explore Categories
+          </h2>
+          <div className="flex justify-center space-x-4">
+            {problemCategories.map((category, index) => (
+              <div
+                key={index}
+                className="bg-white text-blue-500 font-bold py-3 px-6 rounded-full shadow-lg hover:bg-gray-400 transition duration-300"              >
+                <div className="mb-2"></div>
+                <h3 className="text-xl text-gray-800 font-semibold text-center">
+                  {category}
+                </h3>
+
+                <Link href="/community"></Link>
+              </div>
             ))}
-          </select>
+          </div>
+          <div className="mt-10 bg-white rounded-lg flex-1 shadow-lg p-6 mx-auto max-w-xl max-h-xl">
+            <label
+              htmlFor="category-filter"
+              className="block text-md font-medium text-gray-700 mb-2"
+            >
+              Filter by Category
+            </label>
+            <select
+              id="category-filter"
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="block w-full h-10 border border-gray-300 bg-white rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition duration-200 ease-in-out mb-4"
+            >
+              <option value="">All Categories</option>
+              {problemCategories.map((cat) => (
+                <option key={cat} value={cat}>
+                  {cat}
+                </option>
+              ))}
+            </select>
 
-          <input
-            id="search-input"
-            type="text"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search by title..."
-            className="block w-full h-10 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition duration-200 ease-in-out"
-          />
+            <input
+              id="search-input"
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Search by title..."
+              className="block w-full h-10 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition duration-200 ease-in-out"
+            />
+          </div>
         </div>
-
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {loading ? (
             <div className="text-center text-xl">Loading...</div>
@@ -179,11 +208,9 @@ const Home = () => {
               </div>
             ))
           ) : (
-            <div className="justify-center ml-20 text-center text-xl">
-            </div>
+            <div className="justify-center ml-20 text-center text-xl"></div>
           )}
         </div>
-
         {user && (
           <>
             <div className="fixed bottom-6 right-6">
