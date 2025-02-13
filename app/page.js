@@ -172,7 +172,13 @@ const Home = () => {
       {/* Header */}
       <header className="bg-blue-600 text-white py-4 px-6 shadow-md">
         <div className="container mx-auto flex justify-between items-center">
-          <h1 className="text-2xl font-bold">I Have A Problem 🔔🆘</h1>
+          <h1 className="text-2xl font-bold">Problem Solver 🆘</h1>
+          <Link href={"/how"}>
+            {" "}
+            <button className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-md shadow-md transition">
+              How To Use The App
+            </button>
+          </Link>
           {user && (
             <button
               onClick={handleLogout}
@@ -187,12 +193,8 @@ const Home = () => {
       {/* Main Content */}
       <main className="container mx-auto p-6">
         {/* Filters */}
-        <div className="mb-6 border-yellow-400">
+        <div className="mb-6">
           <h2 className="text-xl font-semibold mb-4">Filter by Category</h2>
-          <br />
-          <Link href={"/how"}>
-            <button>How To Use The App</button>
-          </Link>
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
