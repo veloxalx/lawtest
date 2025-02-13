@@ -4,7 +4,7 @@ import React from 'react';
 
 const HowToSection = () => {
   const handleEmailClick = () => {
-    window.location.href = "mailto:imveloxal@gmail.com";
+    window.location.href = "mailto:dulransamarasinghe3@gmail.com";
   };
 
   return (

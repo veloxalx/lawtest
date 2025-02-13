@@ -22,7 +22,7 @@ const problemCategories = [
   "Legal",
   "Career",
   "Relationship",
-  "Other"
+  "Other",
 ];
 
 const Home = () => {
@@ -129,14 +129,18 @@ const Home = () => {
   const handleToggleSolved = async (problemId) => {
     try {
       const problemDoc = doc(firestore, "problems", problemId);
-      const problemToUpdate = problems.find((problem) => problem.id === problemId);
+      const problemToUpdate = problems.find(
+        (problem) => problem.id === problemId
+      );
       const newFoundStatus = !problemToUpdate.found;
-      
+
       await updateDoc(problemDoc, { found: newFoundStatus });
-      
+
       const updateProblem = (list) =>
         list.map((problem) =>
-          problem.id === problemId ? { ...problem, found: newFoundStatus } : problem
+          problem.id === problemId
+            ? { ...problem, found: newFoundStatus }
+            : problem
         );
 
       setProblems(updateProblem(problems));
@@ -164,227 +168,222 @@ const Home = () => {
   };
 
   return (
-    <div className="p-3 max-w-8xl mx-auto">
-      <h1
-        className="text-3xl font-bold mb-4 text-center"
-        style={{ margin: "40px" }}
-      >
-        Problem Solver 🆘
-      </h1>
-      {user && (
-        <button
-          onClick={handleLogout}
-          className="bg-red-500 text-white py-2 px-4 rounded shadow hover:bg-red-600 transition mb-4"
-        >
-          Logout
-        </button>
-      )}
-      <div className="text-center mb-4">
-        <Link
-          href={"/how"}
-          className="bg-gray-500 text-white py-2 px-4 rounded shadow hover:bg-gray-600 transition"
-          color="green"
-          style={{ marginBottom: "40px" }}
-        >
-          How to (Guide)
-        </Link>
-        <br />
-        <br />
-        <label
-          htmlFor="category-filter"
-          className="block text-sm font-medium text-gray-700"
-        >
-          Filter by Category
-        </label>
-        <select
-          id="category-filter"
-          value={selectedCategory}
-          onChange={(e) => setSelectedCategory(e.target.value)}
-          className="mt-4 block w-full border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
-          style={{
-            height: "40px",
-            margin: "20px",
-            width: "20rem",
-            boxShadow: "inherit",
-          }}
-        >
-          <option value="">All Categories</option>
-          {problemCategories.map((cat) => (
-            <option key={cat} value={cat}>
-              {cat}
-            </option>
-          ))}
-        </select>
-
-        <input
-          id="search-input"
-          type="text"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          placeholder="Search by title..."
-          className="mt-2 block w-full border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
-          style={{
-            height: "40px",
-            margin: "30px",
-            width: "80vw",
-            boxShadow: "inherit",
-            padding: "10px",
-          }}
-        />
-      </div>
-      <div className="text-center mb-4">
-        {!user ? (
-          <div>
-            <h2 className="text-xl mb-4">Login to Add Your Problems 👇</h2>
+    <div className="min-h-screen bg-gray-100 font-sans">
+      {/* Header */}
+      <header className="bg-blue-600 text-white py-4 px-6 shadow-md">
+        <div className="container mx-auto flex justify-between items-center">
+          <h1 className="text-2xl font-bold">I Have A Problem 🔔🆘</h1>
+          {user && (
             <button
-              onClick={handleSignInWithGoogle}
-              className="bg-blue-500 text-white py-2 px-4 rounded shadow hover:bg-blue-600 transition"
+              onClick={handleLogout}
+              className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded transition"
             >
-              Sign in with Google
+              Logout
             </button>
-          </div>
-        ) : (
-          <div>
-            <img
-              src={user?.photoURL || "/default-avatar.png"}
-              alt="User Profile"
-              className="w-32 h-32 rounded-full mx-auto mb-4 object-cover"
-            />
-            <h1 className="text-2xl font-semibold mb-4">
-              Welcome back {user?.displayName} 👋
-            </h1>
-            <div className="mb-4">
-              <Link
-                href={"/add"}
-                className="bg-green-500 text-white py-2 px-4 rounded shadow hover:bg-green-600 transition"
+          )}
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main className="container mx-auto p-6">
+        {/* Filters */}
+        <div className="mb-6 border-yellow-400">
+          <h2 className="text-xl font-semibold mb-4">Filter by Category</h2>
+          <br />
+          <Link href={"/how"}>
+            <button>How To Use The App</button>
+          </Link>
+          <select
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+            className="w-full md:w-1/3 p-3 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          >
+            <option value="">All Categories</option>
+            {problemCategories.map((cat) => (
+              <option key={cat} value={cat}>
+                {cat}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Search Bar */}
+        <div className="mb-6">
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Search by title..."
+            className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+        </div>
+
+        {/* User Actions */}
+        <div className="mb-6">
+          {!user ? (
+            <div className="text-center">
+              <p className="text-lg mb-4">Login to Add Your Problems 👇</p>
+              <button
+                onClick={handleSignInWithGoogle}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-md shadow-md transition"
               >
-                Add Problem
+                Sign in with Google
+              </button>
+            </div>
+          ) : (
+            <div className="text-center">
+              <p className="text-lg mb-4">
+                Welcome back {user?.displayName} 👋
+              </p>
+              <button
+                onClick={() => setShowPopup(true)}
+                className="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-md shadow-md transition mr-4"
+              >
+                Manage Your Problems
+              </button>
+              <Link href="/add-problem">
+                <button className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-md shadow-md transition">
+                  Add Problem
+                </button>
               </Link>
             </div>
+          )}
+        </div>
+
+        {/* Problem List */}
+        {loading ? (
+          <p className="text-center text-gray-600">Loading...</p>
+        ) : filteredProblems.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredProblems.map((problem) => (
+              <div
+                key={problem.id}
+                className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition"
+              >
+                <h3 className="text-xl font-semibold mb-2">{problem.title}</h3>
+                <p className="text-gray-600 mb-4">{problem.problem}</p>
+                <div className="flex justify-between items-center">
+                  <div>
+                    <span className="text-sm text-gray-500">
+                      Category: {problem.category}
+                    </span>
+                    <br />
+                    <span className="text-sm text-gray-500">
+                      Status:{" "}
+                      <span
+                        className={`font-bold ${
+                          problem.found ? "text-green-600" : "text-red-600"
+                        }`}
+                      >
+                        {problem.found ? "Solved" : "Unsolved"}
+                      </span>
+                    </span>
+                  </div>
+                  <div className="flex space-x-2">
+                    {user && user.uid === problem.userId && (
+                      <>
+                        <button
+                          onClick={() => handleToggleSolved(problem.id)}
+                          className={`px-3 py-1 rounded-md text-white transition ${
+                            problem.found
+                              ? "bg-yellow-500 hover:bg-yellow-600"
+                              : "bg-blue-500 hover:bg-blue-600"
+                          }`}
+                        >
+                          {problem.found
+                            ? "Mark as Unsolved"
+                            : "Mark as Solved"}
+                        </button>
+                        <button
+                          onClick={() => handleDeleteProblem(problem.id)}
+                          className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md transition"
+                        >
+                          Delete
+                        </button>
+                      </>
+                    )}
+                    {!user ||
+                      (user.uid !== problem.userId && (
+                        <a
+                          href={`mailto:${problem.email}`}
+                          className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-md transition"
+                        >
+                          Contact to Help
+                        </a>
+                      ))}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-center text-gray-600">No problems found</p>
+        )}
+      </main>
+
+      {/* Popup for User Problems */}
+      {showPopup && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white w-full max-w-2xl p-6 rounded-lg shadow-lg">
+            <h2 className="text-2xl font-bold mb-4">Your Problems</h2>
+            {userProblems.length > 0 ? (
+              <div className="space-y-4">
+                {userProblems.map((problem) => (
+                  <div
+                    key={problem.id}
+                    className="bg-gray-100 p-4 rounded-lg shadow-sm"
+                  >
+                    <h3 className="text-lg font-semibold">{problem.title}</h3>
+                    <p className="text-gray-600">{problem.problem}</p>
+                    <div className="flex justify-between items-center mt-2">
+                      <span className="text-sm text-gray-500">
+                        Status:{" "}
+                        <span
+                          className={`font-bold ${
+                            problem.found ? "text-green-600" : "text-red-600"
+                          }`}
+                        >
+                          {problem.found ? "Solved" : "Unsolved"}
+                        </span>
+                      </span>
+                      <div className="flex space-x-2">
+                        <button
+                          onClick={() => handleToggleSolved(problem.id)}
+                          className={`px-3 py-1 rounded-md text-white transition ${
+                            problem.found
+                              ? "bg-yellow-500 hover:bg-yellow-600"
+                              : "bg-blue-500 hover:bg-blue-600"
+                          }`}
+                        >
+                          {problem.found
+                            ? "Mark as Unsolved"
+                            : "Mark as Solved"}
+                        </button>
+                        <button
+                          onClick={() => handleDeleteProblem(problem.id)}
+                          className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md transition"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-center text-gray-600">
+                You have no problems added yet.
+              </p>
+            )}
             <button
-              onClick={() => setShowPopup(true)}
-              className="bg-gray-500 text-white py-2 px-4 rounded shadow hover:bg-gray-600 transition"
+              onClick={() => setShowPopup(false)}
+              className="mt-6 w-full bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md transition"
             >
-              Manage Your Problems
+              Close
             </button>
           </div>
-        )}
-      </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mx-18" >
-        {loading ? (
-          <h1>Loading...</h1>
-        ) : filteredProblems.length > 0 ? (
-          filteredProblems.map((problem) => (
-            <div
-              key={problem.id}
-              className={`border border-gray-200 rounded-lg p-6 h-400 shadow-lg ${
-                problem.found ? "bg-green-100" : "bg-yellow-100"
-              }`}
-              style={problem.urgent ? {
-                borderColor: "red",
-                borderRadius: "12px",
-                borderWidth: "2px",
-                boxShadow: "0 0 15px red",
-              } : {}}
-            >
-              <h4 className="text-xl font-semibold">{problem.title}</h4>
-              <p style={{ margin: "20px 0" }}>
-                <strong>Description:</strong><br />
-                {problem.problem}
-              </p>
-              <p><strong>Category:</strong> {problem.category}</p>
-              <p><strong>Location:</strong> {problem.location}</p>
-              <p><strong>Status:</strong> {problem.found ? "Solved" : "Unsolved"}</p>
-              {user && user.uid === problem.userId && (
-                <div className="mt-4">
-                  <button
-                    onClick={() => handleToggleSolved(problem.id)}
-                    className={`py-2 px-4 rounded shadow transition mr-2 ${
-                      problem.found
-                        ? "bg-yellow-500 hover:bg-yellow-600 text-white"
-                        : "bg-blue-500 hover:bg-blue-600 text-white"
-                    }`}
-                  >
-                    {problem.found ? "Mark as Unsolved" : "Mark as Solved"}
-                  </button>
-                  <button
-                    onClick={() => handleDeleteProblem(problem.id)}
-                    className="bg-red-500 text-white py-2 px-4 rounded shadow hover:bg-red-600 transition"
-                  >
-                    Delete
-                  </button>
-                </div>
-              )}
-              {!user || user.uid !== problem.userId && (
-                <div className="mt-4">
-                  <button
-                    onClick={() => window.location.href = `mailto:${problem.email}`}
-                    className="bg-green-500 text-white py-2 px-4 rounded shadow hover:bg-green-600 transition"
-                  >
-                    Contact to Help
-                  </button>
-                </div>
-              )}
-            </div>
-          ))
-        ) : (
-          <h1 style={{margin:"40px"}}><strong>No problems found</strong></h1>
-        )}
-      </div>
-      {showPopup && (
-  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-    <div className="bg-white p-6 rounded-lg max-w-2xl w-full max-h-[80vh] overflow-y-auto">
-      <h2 className="text-2xl font-bold mb-4">Your Problems</h2>
-      {userProblems.length > 0 ? (
-        userProblems.map((problem) => (
-          <div 
-            key={problem.id} 
-            style={{marginTop:"40px"}}
-            className={`mb-4 p-4 border rounded ${
-              problem.found ? 'bg-green-100' : 'bg-yellow-100'
-            }`}
-          >
-            <h3 className="text-xl font-semibold">{problem.title}</h3>
-            <p>{problem.problem}</p>
-            <p>
-              <strong>Category:</strong> {problem.category}
-            </p>
-            <p>
-              <strong>Status: {problem.found ? "Solved" : "Unsolved"}</strong>{" "}
-            </p>
-            <div className="mt-2">
-              <button
-                onClick={() => handleToggleSolved(problem.id)}
-                className={`py-1 px-2 rounded mr-2 ${
-                  problem.found
-                    ? "bg-yellow-500 text-white"
-                    : "bg-blue-500 text-white"
-                }`}
-              >
-                {problem.found ? "Mark as Unsolved" : "Mark as Solved"}
-              </button>
-              <button
-                onClick={() => handleDeleteProblem(problem.id)}
-                className="bg-red-500 text-white py-1 px-2 rounded"
-              >
-                Delete
-              </button>
-            </div>
-          </div>
-        ))
-      ) : (
-        <p>You have no problems added yet.</p>
+        </div>
       )}
-      <button
-        onClick={() => setShowPopup(false)}
-        className="mt-4 bg-gray-500 text-white py-2 px-4 rounded"
-      >
-        Close
-      </button>
-    </div>
-  </div>
-)}
     </div>
   );
 };
