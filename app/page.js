@@ -243,7 +243,7 @@ const Home = () => {
               >
                 Manage Your Problems
               </button>
-              <Link href="/add-problem">
+              <Link href="/add">
                 <button className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-md shadow-md transition">
                   Add Problem
                 </button>
