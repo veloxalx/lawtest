@@ -60,11 +60,8 @@ const Home = () => {
     fetchProblems();
 
     // Check if the scam warning has been shown before
-    const hasSeenScamWarning = localStorage.getItem("hasSeenScamWarning");
-    if (!hasSeenScamWarning) {
-      setShowScamWarning(true); // Show the scam warning
-      localStorage.setItem("hasSeenScamWarning", "true"); // Mark as seen
-    }
+
+    setShowScamWarning(true); // Show the scam warning
 
     return () => unsubscribe();
   }, []);
