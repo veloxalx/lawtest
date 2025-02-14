@@ -1,4 +1,4 @@
-"use client";
+"use client"
 import React, { useState, useEffect } from "react";
 import { GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
 import {
@@ -12,6 +12,7 @@ import {
 } from "firebase/firestore";
 import { auth, firestore } from "./lib/firebase";
 import Link from "next/link";
+
 
 const problemCategories = [
   "Medical",
@@ -34,6 +35,7 @@ const Home = () => {
   const [showPopup, setShowPopup] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [userProblems, setUserProblems] = useState([]);
+  const [showScamWarning, setShowScamWarning] = useState(false); // New state for scam warning
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(setUser);
@@ -57,24 +59,29 @@ const Home = () => {
     };
 
     fetchProblems();
+
+    // Check if the scam warning has been shown before
+    const hasSeenScamWarning = localStorage.getItem("hasSeenScamWarning");
+    if (!hasSeenScamWarning) {
+      setShowScamWarning(true); // Show the scam warning
+      localStorage.setItem("hasSeenScamWarning", "true"); // Mark as seen
+    }
+
     return () => unsubscribe();
   }, []);
 
   useEffect(() => {
     let updatedProblems = problems;
-
     if (selectedCategory) {
       updatedProblems = updatedProblems.filter(
         (problem) => problem.category === selectedCategory
       );
     }
-
     if (searchTerm) {
       updatedProblems = updatedProblems.filter((problem) =>
         problem.title.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
-
     setFilteredProblems(updatedProblems);
   }, [selectedCategory, searchTerm, problems]);
 
@@ -133,16 +140,13 @@ const Home = () => {
         (problem) => problem.id === problemId
       );
       const newFoundStatus = !problemToUpdate.found;
-
       await updateDoc(problemDoc, { found: newFoundStatus });
-
       const updateProblem = (list) =>
         list.map((problem) =>
           problem.id === problemId
             ? { ...problem, found: newFoundStatus }
             : problem
         );
-
       setProblems(updateProblem(problems));
       setFilteredProblems(updateProblem(filteredProblems));
       setUserProblems(updateProblem(userProblems));
@@ -168,221 +172,245 @@ const Home = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 font-sans">
+    <div className="min-h-screen bg-gray-50">
+      {/* Scam Warning Alert */}
+      {showScamWarning && (
+        <div className="fixed top-0 left-0 right-0 z-50 bg-yellow-50 border-b border-yellow-200">
+          <div className="container mx-auto px-4 py-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <svg className="h-5 w-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                <span className="ml-2 text-yellow-800">Beware of scams! This application takes no responsibility for who contacts you. Be mindful when using it.</span>
+              </div>
+              <button onClick={() => setShowScamWarning(false)} className="text-yellow-600 hover:text-yellow-800">
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
-      <header className="bg-blue-600 text-white py-4 px-6 shadow-md">
-        <div className="container mx-auto flex justify-between items-center">
-          <h1 className="text-2xl font-bold">Problem Solver 🆘</h1>
-          <Link href={"/how"}>
-            {" "}
-            <button className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-md shadow-md transition">
-              How To Use The App
-            </button>
-          </Link>
-          {user && (
-            <button
-              onClick={handleLogout}
-              className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded transition"
-            >
-              Logout
-            </button>
-          )}
+      <header className="bg-gradient-to-r from-blue-600 to-purple-600">
+        <div className="container mx-auto px-4 py-6">
+          <div className="flex items-center justify-between">
+            <div className="text-white">
+              <h1 className="text-3xl font-bold">Problem Solver 🆘</h1>
+              <p className="mt-2 text-blue-100">Connect, Share, Solve Together</p>
+            </div>
+            {user && (
+              <button
+                onClick={handleLogout}
+                className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors flex items-center"
+              >
+                <svg className="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+                Logout
+              </button>
+            )}
+          </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="container mx-auto p-6">
-        {/* Filters */}
-        <div className="mb-6">
-          <h2 className="text-xl font-semibold mb-4">Filter by Category</h2>
-          <select
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-            className="w-full md:w-1/3 p-3 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          >
-            <option value="">All Categories</option>
-            {problemCategories.map((cat) => (
-              <option key={cat} value={cat}>
-                {cat}
-              </option>
-            ))}
-          </select>
+      <main className="container mx-auto px-4 py-8">
+        {/* Filters Section */}
+        <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
+          <div className="grid gap-6 md:grid-cols-2">
+            <div className="relative">
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Search problems..."
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+              <svg className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+            <select
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="">All Categories</option>
+              {problemCategories.map((cat) => (
+                <option key={cat} value={cat}>
+                  {cat}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
-
-        {/* Search Bar */}
-        <div className="mb-6">
-          <input
-            type="text"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search by title..."
-            className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          />
-        </div>
-
+        <Link  className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors m-4" href={"/how"}> How To Use The App</Link>
         {/* User Actions */}
-        <div className="mb-6">
+        <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
           {!user ? (
             <div className="text-center">
-              <p className="text-lg mb-4">Login to Add Your Problems 👇</p>
+              <h2 className="text-xl font-semibold mb-4">Get Started</h2>
               <button
                 onClick={handleSignInWithGoogle}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-md shadow-md transition"
+                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
               >
                 Sign in with Google
               </button>
             </div>
           ) : (
-            <div className="text-center">
-              <p className="text-lg mb-4">
-                Welcome back {user?.displayName} 👋
-              </p>
-              <button
-                onClick={() => setShowPopup(true)}
-                className="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-md shadow-md transition mr-4"
-              >
-                Manage Your Problems
-              </button>
-              <Link href="/add">
-                <button className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-md shadow-md transition">
-                  Add Problem
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-semibold">Welcome back, {user?.displayName} 👋</h2>
+              <div className="space-x-4">
+                <button
+                  onClick={() => setShowPopup(true)}
+                  className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors m-4"
+                >
+                  Manage Problems
                 </button>
-              </Link>
+                <Link href="/add">
+                  <button className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center">
+                    <svg className="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                    Add Problem
+                  </button>
+                </Link>
+              </div>
             </div>
           )}
         </div>
 
-        {/* Problem List */}
+        {/* Problems Grid */}
         {loading ? (
-          <p className="text-center text-gray-600">Loading...</p>
-        ) : filteredProblems.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="text-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-transparent"></div>
+          </div>
+        ) : (
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {filteredProblems.map((problem) => (
-              <div
-                key={problem.id}
-                className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition"
-              >
-                <h3 className="text-xl font-semibold mb-2">{problem.title}</h3>
-                <p className="text-gray-600 mb-4">{problem.problem}</p>
-                <div className="flex justify-between items-center">
-                  <div>
-                    <span className="text-sm text-gray-500">
-                      Category: {problem.category}
+              <div key={problem.id} className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow">
+                <div className="p-6">
+                  <div className="flex justify-between items-start mb-4">
+                    <h3 className="text-xl font-semibold">{problem.title}</h3>
+                    <span className={`px-3 py-1 rounded-full text-sm ${
+                      problem.found
+                        ? "bg-green-100 text-green-800"
+                        : "bg-gray-100 text-gray-800"
+                    }`}>
+                      {problem.found ? "Solved" : "Unsolved"}
                     </span>
-                    <br />
-                    <span className="text-sm text-gray-500">
-                      Status:{" "}
-                      <span
-                        className={`font-bold ${
-                          problem.found ? "text-green-600" : "text-red-600"
+                  </div>
+                  <p className="text-gray-600 mb-4">{problem.problem}</p>
+                  <div className="flex items-center gap-2 mb-4">
+                    <span className="px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800">
+                      {problem.category}
+                    </span>
+                  </div>
+                  {user && user.uid === problem.userId ? (
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleToggleSolved(problem.id)}
+                        className={`flex-1 px-4 py-2 rounded-lg transition-colors flex items-center justify-center ${
+                          problem.found
+                            ? "bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
+                            : "bg-blue-600 text-white hover:bg-blue-700"
                         }`}
                       >
-                        {problem.found ? "Solved" : "Unsolved"}
-                      </span>
-                    </span>
-                  </div>
-                  <div className="flex space-x-2">
-                    {user && user.uid === problem.userId && (
-                      <>
-                        <button
-                          onClick={() => handleToggleSolved(problem.id)}
-                          className={`px-3 py-1 rounded-md text-white transition ${
-                            problem.found
-                              ? "bg-yellow-500 hover:bg-yellow-600"
-                              : "bg-blue-500 hover:bg-blue-600"
-                          }`}
-                        >
-                          {problem.found
-                            ? "Mark as Unsolved"
-                            : "Mark as Solved"}
-                        </button>
-                        <button
-                          onClick={() => handleDeleteProblem(problem.id)}
-                          className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md transition"
-                        >
-                          Delete
-                        </button>
-                      </>
-                    )}
-                    {!user ||
-                      (user.uid !== problem.userId && (
-                        <a
-                          href={`mailto:${problem.email}`}
-                          className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-md transition"
-                        >
-                          Contact to Help
-                        </a>
-                      ))}
-                  </div>
+                        <svg className="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                        {problem.found ? "Mark Unsolved" : "Mark Solved"}
+                      </button>
+                      <button
+                        onClick={() => handleDeleteProblem(problem.id)}
+                        className="p-2 bg-red-100 text-red-800 rounded-lg hover:bg-red-200 transition-colors"
+                      >
+                        <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
+                  ) : (
+                    <button className="w-full px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                      Contact to Help
+                    </button>
+                  )}
                 </div>
               </div>
             ))}
           </div>
-        ) : (
-          <p className="text-center text-gray-600">No problems found</p>
+        )}
+
+        {filteredProblems.length === 0 && !loading && (
+          <div className="bg-white rounded-lg shadow-sm p-12 text-center">
+            <h3 className="text-xl font-semibold mb-2">No Problems Found</h3>
+            <p className="text-gray-600">Try adjusting your filters or add a new problem.</p>
+          </div>
         )}
       </main>
 
-      {/* Popup for User Problems */}
+      {/* User Problems Modal */}
       {showPopup && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white w-full max-w-2xl p-6 rounded-lg shadow-lg">
-            <h2 className="text-2xl font-bold mb-4">Your Problems</h2>
-            {userProblems.length > 0 ? (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+          <div className="bg-white rounded-lg max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-semibold">Your Problems</h2>
+                <button
+                  onClick={() => setShowPopup(false)}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
               <div className="space-y-4">
-                {userProblems.map((problem) => (
-                  <div
-                    key={problem.id}
-                    className="bg-gray-100 p-4 rounded-lg shadow-sm"
-                  >
-                    <h3 className="text-lg font-semibold">{problem.title}</h3>
-                    <p className="text-gray-600">{problem.problem}</p>
-                    <div className="flex justify-between items-center mt-2">
-                      <span className="text-sm text-gray-500">
-                        Status:{" "}
-                        <span
-                          className={`font-bold ${
-                            problem.found ? "text-green-600" : "text-red-600"
-                          }`}
-                        >
+                {userProblems.length > 0 ? (
+                  userProblems.map((problem) => (
+                    <div key={problem.id} className="border border-gray-200 rounded-lg p-4">
+                      <div className="flex justify-between items-start mb-4">
+                        <h3 className="text-lg font-semibold">{problem.title}</h3>
+                        <span className={`px-3 py-1 rounded-full text-sm ${
+                          problem.found
+                            ? "bg-green-100 text-green-800"
+                            : "bg-gray-100 text-gray-800"
+                        }`}>
                           {problem.found ? "Solved" : "Unsolved"}
                         </span>
-                      </span>
-                      <div className="flex space-x-2">
+                      </div>
+                      <p className="text-gray-600 mb-4">{problem.problem}</p>
+                      <div className="flex gap-2">
                         <button
                           onClick={() => handleToggleSolved(problem.id)}
-                          className={`px-3 py-1 rounded-md text-white transition ${
+                          className={`flex-1 px-4 py-2 rounded-lg transition-colors ${
                             problem.found
-                              ? "bg-yellow-500 hover:bg-yellow-600"
-                              : "bg-blue-500 hover:bg-blue-600"
+                              ? "bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
+                              : "bg-blue-600 text-white hover:bg-blue-700"
                           }`}
                         >
-                          {problem.found
-                            ? "Mark as Unsolved"
-                            : "Mark as Solved"}
+                          {problem.found ? "Mark Unsolved" : "Mark Solved"}
                         </button>
                         <button
                           onClick={() => handleDeleteProblem(problem.id)}
-                          className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md transition"
+                          className="px-4 py-2 bg-red-100 text-red-800 rounded-lg hover:bg-red-200 transition-colors"
                         >
                           Delete
                         </button>
                       </div>
                     </div>
+                  ))
+                ) : (
+                  <div className="text-center py-8">
+                    <p className="text-gray-600">You haven't added any problems yet.</p>
                   </div>
-                ))}
+                )}
               </div>
-            ) : (
-              <p className="text-center text-gray-600">
-                You have no problems added yet.
-              </p>
-            )}
-            <button
-              onClick={() => setShowPopup(false)}
-              className="mt-6 w-full bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md transition"
-            >
-              Close
-            </button>
+            </div>
           </div>
         </div>
       )}
