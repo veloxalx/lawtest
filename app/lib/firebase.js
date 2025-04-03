@@ -3,13 +3,13 @@ import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, createUserWithEm
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDpv_mcvJmehfalXqDTt561y8ZNkex2n6U",
-  authDomain: "fypdulran.firebaseapp.com",
-  projectId: "fypdulran",
-  storageBucket: "fypdulran.firebasestorage.app",
-  messagingSenderId: "386177490250",
-  appId: "1:386177490250:web:e1f7732d3ab9366a55f5b3",
-  measurementId: "G-8XQNVLMS5W",
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
 // Initialize Firebase

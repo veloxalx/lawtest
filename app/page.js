@@ -230,7 +230,7 @@ const Home = () => {
         <div className="container mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
             <div className="text-white">
-              <h1 className="text-3xl font-bold">Lanka Freelance 🇱🇰</h1>
+              <h1 className="text-3xl font-bold">FreeLanka 🇱🇰</h1>
               <p className="mt-2 text-green-100">
                 Connect with local Sri Lankan projects
               </p>
