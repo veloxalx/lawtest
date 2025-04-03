@@ -50,23 +50,29 @@ const HowToSection = () => {
                 <div className="flex items-start">
                   <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-blue-100 text-blue-600">1</div>
                   <p className="ml-4 text-gray-700">
-                    <span className="font-semibold text-blue-600">Sign in with Google:</span> Click on the "Sign in with Google" button on the homepage to create an account or log in.
+                    <span className="font-semibold text-blue-600">Browse Listings Without Logging In:</span> If you're looking for gigs, you don’t need to create an account. You can explore available projects and directly reach out to project owners through the <strong>Contact Section</strong> on each listing.
                   </p>
                 </div>
                 <div className="flex items-start">
                   <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-blue-100 text-blue-600">2</div>
                   <p className="ml-4 text-gray-700">
-                    <span className="font-semibold text-blue-600">Browse Projects:</span> View available projects by category or use the search bar to find specific opportunities.
+                    <span className="font-semibold text-blue-600">Sign in with Google:</span> Click on the "Sign in with Google" button on the homepage to create an account or log in.
                   </p>
                 </div>
                 <div className="flex items-start">
                   <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-blue-100 text-blue-600">3</div>
                   <p className="ml-4 text-gray-700">
-                    <span className="font-semibold text-blue-600">Apply for Projects:</span> Click the "Apply for Project" button on projects you're interested in working on.
+                    <span className="font-semibold text-blue-600">Browse Projects:</span> View available projects by category or use the search bar to find specific opportunities.
                   </p>
                 </div>
                 <div className="flex items-start">
                   <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-blue-100 text-blue-600">4</div>
+                  <p className="ml-4 text-gray-700">
+                    <span className="font-semibold text-blue-600">Apply for Projects:</span> Click the "Apply for Project" button on projects you're interested in working on.
+                  </p>
+                </div>
+                <div className="flex items-start">
+                  <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-blue-100 text-blue-600">5</div>
                   <p className="ml-4 text-gray-700">
                     <span className="font-semibold text-blue-600">Verify Identity:</span> Always verify the identity of clients before accepting any work, as recommended in our platform notice.
                   </p>
@@ -118,45 +124,38 @@ const HowToSection = () => {
               </h2>
               <div className="space-y-4">
                 <div className="flex items-center p-4 bg-green-50 rounded-lg border border-green-100">
-                  <div className="w-4 h-4 bg-green-500 rounded-full mr-3"></div>
-                  <p className="text-gray-700">
-                    <span className="font-semibold text-green-600">Completed:</span> Project has been marked as finished by the owner
-                  </p>
+                  <div className="w-4 h-4 bg-green-600 rounded-full"></div>
+                  <p className="ml-4 text-gray-700">Open: The project is live and available for bids.</p>
                 </div>
-                <div className="flex items-center p-4 bg-orange-50 rounded-lg border border-orange-100">
-                  <div className="w-4 h-4 bg-orange-500 rounded-full mr-3"></div>
-                  <p className="text-gray-700">
-                    <span className="font-semibold text-orange-600">Open:</span> Project is still available for applications
-                  </p>
+                <div className="flex items-center p-4 bg-blue-50 rounded-lg border border-blue-100">
+                  <div className="w-4 h-4 bg-blue-600 rounded-full"></div>
+                  <p className="ml-4 text-gray-700">In Progress: The project is underway and being worked on.</p>
+                </div>
+                <div className="flex items-center p-4 bg-yellow-50 rounded-lg border border-yellow-100">
+                  <div className="w-4 h-4 bg-yellow-600 rounded-full"></div>
+                  <p className="ml-4 text-gray-700">Completed: The project has been finished.</p>
+                </div>
+                <div className="flex items-center p-4 bg-red-50 rounded-lg border border-red-100">
+                  <div className="w-4 h-4 bg-red-600 rounded-full"></div>
+                  <p className="ml-4 text-gray-700">Closed: The project is no longer available.</p>
                 </div>
               </div>
             </div>
+          </div>
 
-            <div className="bg-purple-50 p-6 rounded-xl border border-purple-100">
-              <h2 className="text-xl font-semibold mb-4 flex items-center text-purple-800">
-                <svg className="w-6 h-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                Need Help?
-              </h2>
-              <p className="text-gray-700 mb-4">
-                If you have any questions about using Lanka Freelance or encounter any issues, please contact our support team.
-              </p>
-              <button
-                onClick={handleWhatsAppClick}
-                className="inline-flex items-center px-6 py-3 text-base font-medium rounded-lg text-white bg-green-600 hover:bg-green-700 transition duration-150 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-              >
-                <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                </svg>
-                Contact via WhatsApp
-              </button>
-            </div>
+          <div className="bg-gray-50 py-8 px-6 text-center">
+            <h3 className="text-lg font-medium text-gray-900">Have a question?</h3>
+            <button
+              className="mt-4 inline-flex items-center bg-green-600 text-white py-2 px-6 rounded-lg hover:bg-green-700 transition-colors"
+              onClick={handleWhatsAppClick}
+            >
+              Contact via WhatsApp
+            </button>
           </div>
         </div>
       </div>
     </div>
   );
-}
+};
 
 export default HowToSection;
