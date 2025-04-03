@@ -13,94 +13,92 @@ import {
 import { auth, firestore } from "./lib/firebase";
 import Link from "next/link";
 
-const problemCategories = [
-  "Medical",
-  "Technical",
-  "Financial",
-  "Educational",
-  "Home & Repair",
-  "Legal",
-  "Career",
-  "Relationship",
+const projectCategories = [
+  "Web Development",
+  "Mobile App Development",
+  "Graphic Design",
+  "Content Writing",
+  "Digital Marketing",
+  "Video Production",
+  "Translation",
+  "Data Entry",
+  "Accounting",
   "Other",
 ];
 
 const Home = () => {
   const [user, setUser] = useState(null);
-  const [problems, setProblems] = useState([]);
-  const [filteredProblems, setFilteredProblems] = useState([]);
+  const [projects, setProjects] = useState([]);
+  const [filteredProjects, setFilteredProjects] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [userProblems, setUserProblems] = useState([]);
-  const [showScamWarning, setShowScamWarning] = useState(false); // New state for scam warning
+  const [userProjects, setUserProjects] = useState([]);
+  const [showVerificationWarning, setShowVerificationWarning] = useState(false);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(setUser);
 
-    const fetchProblems = async () => {
+    const fetchProjects = async () => {
       setLoading(true);
       try {
-        const problemsCollection = collection(firestore, "problems");
-        const snapshot = await getDocs(problemsCollection);
-        const problemsList = snapshot.docs.map((doc) => ({
+        const projectsCollection = collection(firestore, "projects");
+        const snapshot = await getDocs(projectsCollection);
+        const projectsList = snapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
         }));
-        setProblems(problemsList);
-        setFilteredProblems(problemsList);
+        setProjects(projectsList);
+        setFilteredProjects(projectsList);
       } catch (error) {
-        console.error("Error fetching problems:", error.message);
+        console.error("Error fetching projects:", error.message);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchProblems();
-
-    // Check if the scam warning has been shown before
-
-    setShowScamWarning(true); // Show the scam warning
+    fetchProjects();
+    setShowVerificationWarning(true);
 
     return () => unsubscribe();
   }, []);
 
   useEffect(() => {
-    let updatedProblems = problems;
+    let updatedProjects = projects;
     if (selectedCategory) {
-      updatedProblems = updatedProblems.filter(
-        (problem) => problem.category === selectedCategory
+      updatedProjects = updatedProjects.filter(
+        (project) => project.category === selectedCategory
       );
     }
     if (searchTerm) {
-      updatedProblems = updatedProblems.filter((problem) =>
-        problem.title.toLowerCase().includes(searchTerm.toLowerCase())
+      updatedProjects = updatedProjects.filter((project) =>
+        project.title.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
-    setFilteredProblems(updatedProblems);
-  }, [selectedCategory, searchTerm, problems]);
+    setFilteredProjects(updatedProjects);
+  }, [selectedCategory, searchTerm, projects]);
 
   useEffect(() => {
     if (user && showPopup) {
-      fetchUserProblems();
+      fetchUserProjects();
     }
   }, [user, showPopup]);
 
-  const fetchUserProblems = async () => {
+  const fetchUserProjects = async () => {
     if (user) {
       setLoading(true);
       try {
-        const problemsCollection = collection(firestore, "problems");
-        const q = query(problemsCollection, where("userId", "==", user.uid));
+        const projectsCollection = collection(firestore, "projects");
+        const q = query(projectsCollection, where("userId", "==", user.uid));
         const snapshot = await getDocs(q);
-        const userProblemsList = snapshot.docs.map((doc) => ({
+        const userProjectsList = snapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
         }));
-        setUserProblems(userProblemsList);
+        setUserProjects(userProjectsList);
       } catch (error) {
-        console.error("Error fetching user problems:", error.message);
+        console.error("Error fetching user projects:", error.message);
       } finally {
         setLoading(false);
       }
@@ -129,56 +127,56 @@ const Home = () => {
     }
   };
 
-  const handleToggleSolved = async (problemId) => {
+  const handleToggleCompleted = async (projectId) => {
     try {
-      const problemDoc = doc(firestore, "problems", problemId);
-      const problemToUpdate = problems.find(
-        (problem) => problem.id === problemId
+      const projectDoc = doc(firestore, "projects", projectId);
+      const projectToUpdate = projects.find(
+        (project) => project.id === projectId
       );
-      const newFoundStatus = !problemToUpdate.found;
-      await updateDoc(problemDoc, { found: newFoundStatus });
-      const updateProblem = (list) =>
-        list.map((problem) =>
-          problem.id === problemId
-            ? { ...problem, found: newFoundStatus }
-            : problem
+      const newCompletedStatus = !projectToUpdate.completed;
+      await updateDoc(projectDoc, { completed: newCompletedStatus });
+      const updateProject = (list) =>
+        list.map((project) =>
+          project.id === projectId
+            ? { ...project, completed: newCompletedStatus }
+            : project
         );
-      setProblems(updateProblem(problems));
-      setFilteredProblems(updateProblem(filteredProblems));
-      setUserProblems(updateProblem(userProblems));
+      setProjects(updateProject(projects));
+      setFilteredProjects(updateProject(filteredProjects));
+      setUserProjects(updateProject(userProjects));
     } catch (error) {
-      console.error("Error toggling problem solved status:", error.message);
+      console.error("Error toggling project completion status:", error.message);
     }
   };
 
-  const handleDeleteProblem = async (problemId) => {
+  const handleDeleteProject = async (projectId) => {
     try {
-      const problemDoc = doc(firestore, "problems", problemId);
-      await deleteDoc(problemDoc);
-      setProblems(problems.filter((problem) => problem.id !== problemId));
-      setFilteredProblems(
-        filteredProblems.filter((problem) => problem.id !== problemId)
+      const projectDoc = doc(firestore, "projects", projectId);
+      await deleteDoc(projectDoc);
+      setProjects(projects.filter((project) => project.id !== projectId));
+      setFilteredProjects(
+        filteredProjects.filter((project) => project.id !== projectId)
       );
-      setUserProblems(
-        userProblems.filter((problem) => problem.id !== problemId)
+      setUserProjects(
+        userProjects.filter((project) => project.id !== projectId)
       );
     } catch (error) {
-      console.error("Error deleting problem:", error.message);
+      console.error("Error deleting project:", error.message);
     }
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Scam Warning Alert */}
-      {showScamWarning && (
+      {/* Verification Warning Alert */}
+      {showVerificationWarning && (
         <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
           <div className="bg-white p-6 rounded-lg shadow-lg w-96 text-center">
             <div className="flex justify-between items-center">
               <h2 className="text-lg font-bold text-yellow-600">
-                ⚠ Beware of Scams!
+                ⚠ Verification Notice
               </h2>
               <button
-                onClick={() => setShowScamWarning(false)}
+                onClick={() => setShowVerificationWarning(false)}
                 className="text-gray-600 hover:text-gray-800"
               >
                 <svg
@@ -197,27 +195,27 @@ const Home = () => {
               </button>
             </div>
             <p className="mt-4 text-gray-700">
-              This application takes no responsibility for who contacts you. Be
-              mindful when using it.
+              This platform connects Sri Lankan freelancers with local projects. 
+              We recommend verifying the identity of clients before accepting any work.
             </p>
             <button
-              onClick={() => setShowScamWarning(false)}
+              onClick={() => setShowVerificationWarning(false)}
               className="mt-4 px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors"
             >
-              Got it
+              Understood
             </button>
           </div>
         </div>
       )}
 
       {/* Header */}
-      <header className="bg-gradient-to-r from-blue-600 to-purple-600">
+      <header className="bg-gradient-to-r from-green-600 to-blue-600">
         <div className="container mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
             <div className="text-white">
-              <h1 className="text-3xl font-bold">Problem Solver 🆘</h1>
-              <p className="mt-2 text-blue-100">
-                Connect, Share, Solve Together
+              <h1 className="text-3xl font-bold">Lanka Freelance 🇱🇰</h1>
+              <p className="mt-2 text-green-100">
+                Connect with local Sri Lankan projects
               </p>
             </div>
             {user && (
@@ -255,8 +253,8 @@ const Home = () => {
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Search problems..."
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Search projects..."
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
               />
               <svg
                 className="absolute left-3 top-2.5 h-5 w-5 text-gray-400"
@@ -275,10 +273,10 @@ const Home = () => {
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
             >
               <option value="">All Categories</option>
-              {problemCategories.map((cat) => (
+              {projectCategories.map((cat) => (
                 <option key={cat} value={cat}>
                   {cat}
                 </option>
@@ -291,7 +289,7 @@ const Home = () => {
           href={"/how"}
         >
           {" "}
-          How To Use The App
+          How To Use The Platform
         </Link>
         {/* User Actions */}
         <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
@@ -300,7 +298,7 @@ const Home = () => {
               <h2 className="text-xl font-semibold mb-4">Get Started</h2>
               <button
                 onClick={handleSignInWithGoogle}
-                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
               >
                 Sign in with Google
               </button>
@@ -315,7 +313,7 @@ const Home = () => {
                   onClick={() => setShowPopup(true)}
                   className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors m-4"
                 >
-                  Manage Problems
+                  Manage Projects
                 </button>
                 <Link href="/add">
                   <button className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center">
@@ -332,7 +330,7 @@ const Home = () => {
                         d="M12 4v16m8-8H4"
                       />
                     </svg>
-                    Add Problem
+                    Post Project
                   </button>
                 </Link>
               </div>
@@ -340,45 +338,55 @@ const Home = () => {
           )}
         </div>
 
-        {/* Problems Grid */}
+        {/* Projects Grid */}
         {loading ? (
           <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-transparent"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-4 border-green-600 border-t-transparent"></div>
           </div>
         ) : (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {filteredProblems.map((problem) => (
+            {filteredProjects.map((project) => (
               <div
-                key={problem.id}
+                key={project.id}
                 className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow"
               >
                 <div className="p-6">
                   <div className="flex justify-between items-start mb-4">
-                    <h3 className="text-xl font-semibold">{problem.title}</h3>
+                    <h3 className="text-xl font-semibold">{project.title}</h3>
                     <span
                       className={`px-3 py-1 rounded-full text-sm ${
-                        problem.found
+                        project.completed
                           ? "bg-green-100 text-green-800"
-                          : "bg-gray-100 text-gray-800"
+                          : "bg-orange-100 text-orange-800"
                       }`}
                     >
-                      {problem.found ? "Solved" : "Unsolved"}
+                      {project.completed ? "Completed" : "Open"}
                     </span>
                   </div>
-                  <p className="text-gray-600 mb-4">{problem.problem}</p>
-                  <div className="flex items-center gap-2 mb-4">
+                  <p className="text-gray-600 mb-4">{project.description}</p>
+                  <div className="flex flex-wrap items-center gap-2 mb-4">
                     <span className="px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800">
-                      {problem.category}
+                      {project.category}
                     </span>
+                    {project.budget && (
+                      <span className="px-3 py-1 rounded-full text-sm bg-purple-100 text-purple-800">
+                        Rs. {project.budget.toLocaleString()}
+                      </span>
+                    )}
+                    {project.location && (
+                      <span className="px-3 py-1 rounded-full text-sm bg-gray-100 text-gray-800">
+                        {project.location}
+                      </span>
+                    )}
                   </div>
-                  {user && user.uid === problem.userId ? (
+                  {user && user.uid === project.userId ? (
                     <div className="flex gap-2">
                       <button
-                        onClick={() => handleToggleSolved(problem.id)}
+                        onClick={() => handleToggleCompleted(project.id)}
                         className={`flex-1 px-4 py-2 rounded-lg transition-colors flex items-center justify-center ${
-                          problem.found
+                          project.completed
                             ? "bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
-                            : "bg-blue-600 text-white hover:bg-blue-700"
+                            : "bg-green-600 text-white hover:bg-green-700"
                         }`}
                       >
                         <svg
@@ -394,10 +402,10 @@ const Home = () => {
                             d="M5 13l4 4L19 7"
                           />
                         </svg>
-                        {problem.found ? "Mark Unsolved" : "Mark Solved"}
+                        {project.completed ? "Reopen Project" : "Mark Completed"}
                       </button>
                       <button
-                        onClick={() => handleDeleteProblem(problem.id)}
+                        onClick={() => handleDeleteProject(project.id)}
                         className="p-2 bg-red-100 text-red-800 rounded-lg hover:bg-red-200 transition-colors"
                       >
                         <svg
@@ -417,7 +425,7 @@ const Home = () => {
                     </div>
                   ) : (
                     <button className="w-full px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-                      Contact to Help
+                      Apply for Project
                     </button>
                   )}
                 </div>
@@ -426,23 +434,23 @@ const Home = () => {
           </div>
         )}
 
-        {filteredProblems.length === 0 && !loading && (
+        {filteredProjects.length === 0 && !loading && (
           <div className="bg-white rounded-lg shadow-sm p-12 text-center">
-            <h3 className="text-xl font-semibold mb-2">No Problems Found</h3>
+            <h3 className="text-xl font-semibold mb-2">No Projects Found</h3>
             <p className="text-gray-600">
-              Try adjusting your filters or add a new problem.
+              Try adjusting your filters or post a new project.
             </p>
           </div>
         )}
       </main>
 
-      {/* User Problems Modal */}
+      {/* User Projects Modal */}
       {showPopup && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
           <div className="bg-white rounded-lg max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-semibold">Your Problems</h2>
+                <h2 className="text-2xl font-semibold">Your Posted Projects</h2>
                 <button
                   onClick={() => setShowPopup(false)}
                   className="text-gray-500 hover:text-gray-700"
@@ -463,40 +471,45 @@ const Home = () => {
                 </button>
               </div>
               <div className="space-y-4">
-                {userProblems.length > 0 ? (
-                  userProblems.map((problem) => (
+                {userProjects.length > 0 ? (
+                  userProjects.map((project) => (
                     <div
-                      key={problem.id}
+                      key={project.id}
                       className="border border-gray-200 rounded-lg p-4"
                     >
                       <div className="flex justify-between items-start mb-4">
                         <h3 className="text-lg font-semibold">
-                          {problem.title}
+                          {project.title}
                         </h3>
                         <span
                           className={`px-3 py-1 rounded-full text-sm ${
-                            problem.found
+                            project.completed
                               ? "bg-green-100 text-green-800"
-                              : "bg-gray-100 text-gray-800"
+                              : "bg-orange-100 text-orange-800"
                           }`}
                         >
-                          {problem.found ? "Solved" : "Unsolved"}
+                          {project.completed ? "Completed" : "Open"}
                         </span>
                       </div>
-                      <p className="text-gray-600 mb-4">{problem.problem}</p>
+                      <p className="text-gray-600 mb-4">{project.description}</p>
+                      {project.budget && (
+                        <p className="text-gray-600 mb-4">
+                          Budget: Rs. {project.budget.toLocaleString()}
+                        </p>
+                      )}
                       <div className="flex gap-2">
                         <button
-                          onClick={() => handleToggleSolved(problem.id)}
+                          onClick={() => handleToggleCompleted(project.id)}
                           className={`flex-1 px-4 py-2 rounded-lg transition-colors ${
-                            problem.found
+                            project.completed
                               ? "bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
-                              : "bg-blue-600 text-white hover:bg-blue-700"
+                              : "bg-green-600 text-white hover:bg-green-700"
                           }`}
                         >
-                          {problem.found ? "Mark Unsolved" : "Mark Solved"}
+                          {project.completed ? "Reopen Project" : "Mark Completed"}
                         </button>
                         <button
-                          onClick={() => handleDeleteProblem(problem.id)}
+                          onClick={() => handleDeleteProject(project.id)}
                           className="px-4 py-2 bg-red-100 text-red-800 rounded-lg hover:bg-red-200 transition-colors"
                         >
                           Delete
@@ -507,7 +520,7 @@ const Home = () => {
                 ) : (
                   <div className="text-center py-8">
                     <p className="text-gray-600">
-                      You haven't added any problems yet.
+                      You haven't posted any projects yet.
                     </p>
                   </div>
                 )}

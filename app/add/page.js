@@ -4,29 +4,27 @@ import { GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
 import { collection, addDoc } from "firebase/firestore";
 import { auth, firestore } from "../lib/firebase";
 import Link from "next/link";
-import Image from "next/image";
 
-const problemCategories = [
-  "Medical",
-  "Technical",
-  "Financial",
-  "Educational",
-  "Home & Repair",
-  "Legal",
-  "Career",
-  "Relationship",
-  "Other"
+const projectCategories = [
+  "Web Development",
+  "Mobile App Development",
+  "Graphic Design",
+  "Content Writing",
+  "Digital Marketing",
+  "Video Production",
+  "Translation",
+  "Data Entry",
+  "Accounting",
+  "Other",
 ];
 
-const AddProblem = () => {
+const AddProject = () => {
   const [user, setUser] = useState(null);
   const [title, setTitle] = useState("");
   const [location, setLocation] = useState("");
-  const [problem, setProblem] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
+  const [description, setDescription] = useState("");
+  const [budget, setBudget] = useState("");
   const [category, setCategory] = useState("");
-  const [urgent, setUrgent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState("");
 
@@ -35,8 +33,9 @@ const AddProblem = () => {
   }, [status]);
 
   useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem("user"));
-    if (storedUser) setUser(storedUser);
+    const unsubscribe = auth.onAuthStateChanged(setUser);
+    
+    return () => unsubscribe();
   }, []);
 
   const handleSignInWithGoogle = async () => {
@@ -61,35 +60,35 @@ const AddProblem = () => {
     }
   };
 
-  const handleAddProblem = async (e) => {
+  const handleAddProject = async (e) => {
     e.preventDefault();
     setLoading(true);
     setStatus("");
 
     try {
-      await addDoc(collection(firestore, "problems"), {
+      // Parse budget to number if it's provided
+      const budgetValue = budget ? parseInt(budget, 10) : null;
+      
+      await addDoc(collection(firestore, "projects"), {
         title,
         location,
-        problem,
-        email,
-        phone,
+        description,
+        budget: budgetValue,
         category,
         userId: user.uid,
-        found: false,
-        urgent,
+        completed: false,
         createdAt: new Date().toISOString(),
       });
+      
       setTitle("");
       setLocation("");
-      setProblem("");
-      setEmail("");
-      setPhone("");
+      setDescription("");
+      setBudget("");
       setCategory("");
-      setUrgent(false);
-      setStatus("Problem added successfully!");
+      setStatus("Project added successfully!");
     } catch (error) {
-      console.error("Error adding problem:", error.message);
-      setStatus("Failed to add problem. Please try again.");
+      console.error("Error adding project:", error.message);
+      setStatus("Failed to add project. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -109,9 +108,9 @@ const AddProblem = () => {
         </Link>
 
         <div className="bg-white rounded-lg shadow-xl overflow-hidden">
-          <div className="bg-gradient-to-r from-blue-600 to-blue-800 px-6 py-8">
+          <div className="bg-gradient-to-r from-green-600 to-blue-600 px-6 py-8">
             <h1 className="text-2xl font-bold text-center text-white">
-              Submit a New Problem
+              Post a New Project
             </h1>
           </div>
 
@@ -119,19 +118,12 @@ const AddProblem = () => {
             {!user ? (
               <div className="text-center py-8">
                 <h2 className="text-xl font-semibold mb-6">
-                  Sign in to Submit a Problem
+                  Sign in to Post a Project
                 </h2>
                 <button
                   onClick={handleSignInWithGoogle}
-                  className="inline-flex items-center px-6 py-3 bg-white border border-gray-300 rounded-md shadow-sm text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+                  className="inline-flex items-center px-6 py-3 bg-white border border-gray-300 rounded-md shadow-sm text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors"
                 >
-                  <Image
-                    src="/google-logo.png"
-                    alt="Google"
-                    width={20}
-                    height={20}
-                    className="mr-2"
-                  />
                   Sign in with Google
                 </button>
               </div>
@@ -139,13 +131,13 @@ const AddProblem = () => {
               <div className="space-y-6">
                 <div className="flex items-center justify-between mb-8 pb-4 border-b border-gray-200">
                   <div className="flex items-center space-x-4">
-                    <Image
-                      src={user?.photoURL || "/default-avatar.png"}
-                      alt="Profile"
-                      width={48}
-                      height={48}
-                      className="rounded-full"
-                    />
+                    {user.photoURL && (
+                      <img
+                        src={user.photoURL}
+                        alt="Profile"
+                        className="h-12 w-12 rounded-full"
+                      />
+                    )}
                     <div>
                       <p className="font-medium text-gray-900">
                         {user.displayName}
@@ -171,7 +163,7 @@ const AddProblem = () => {
                   </div>
                 )}
 
-                <form onSubmit={handleAddProblem} className="space-y-6">
+                <form onSubmit={handleAddProject} className="space-y-6">
                   <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                     <div className="col-span-2">
                       <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -181,10 +173,10 @@ const AddProblem = () => {
                         value={category}
                         onChange={(e) => setCategory(e.target.value)}
                         required
-                        className="block w-full px-3 py-2 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                        className="block w-full px-3 py-2 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 sm:text-sm"
                       >
                         <option value="">Select a Category</option>
-                        {problemCategories.map((cat) => (
+                        {projectCategories.map((cat) => (
                           <option key={cat} value={cat}>
                             {cat}
                           </option>
@@ -194,15 +186,15 @@ const AddProblem = () => {
 
                     <div className="col-span-2">
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Title
+                        Project Title
                       </label>
                       <input
                         type="text"
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
                         required
-                        className="block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                        placeholder="Brief title for your problem"
+                        className="block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                        placeholder="Give your project a clear title"
                       />
                     </div>
 
@@ -214,64 +206,36 @@ const AddProblem = () => {
                         type="text"
                         value={location}
                         onChange={(e) => setLocation(e.target.value)}
-                        className="block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                        placeholder="Where is this problem located?"
+                        className="block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                        placeholder="Where is this project located? (e.g., Colombo, Remote)"
                       />
                     </div>
 
                     <div className="col-span-2">
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Problem Description
+                        Project Description
                       </label>
                       <textarea
                         rows={4}
-                        value={problem}
-                        onChange={(e) => setProblem(e.target.value)}
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
                         required
-                        className="block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                        placeholder="Describe your problem in detail"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Email
-                      </label>
-                      <input
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                        placeholder="Enter Your Email"
-                        className="block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Phone
-                      </label>
-                      <input
-                        type="tel"
-                        value={phone}
-                        placeholder="Enter Your Phone Number"
-                        onChange={(e) => setPhone(e.target.value)}
-                        className="block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                        className="block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                        placeholder="Describe the project requirements in detail (With Contact Details)"
                       />
                     </div>
 
                     <div className="col-span-2">
-                      <div className="flex items-center">
-                        <input
-                          type="checkbox"
-                          checked={urgent}
-                          onChange={(e) => setUrgent(e.target.checked)}
-                          className="h-4 w-4 text-blue-600 focus:ring-2 focus:ring-blue-500 border-gray-300 rounded"
-                        />
-                        <label className="ml-2 block text-sm text-gray-700">
-                          Mark as urgent
-                        </label>
-                      </div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Budget (in Rs.)
+                      </label>
+                      <input
+                        type="number"
+                        value={budget}
+                        onChange={(e) => setBudget(e.target.value)}
+                        placeholder="Enter your budget in Rupees"
+                        className="block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                      />
                     </div>
                   </div>
 
@@ -279,7 +243,7 @@ const AddProblem = () => {
                     <button
                       type="submit"
                       disabled={loading}
-                      className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {loading ? (
                         <>
@@ -287,10 +251,10 @@ const AddProblem = () => {
                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                           </svg>
-                          Adding Problem...
+                          Posting Project...
                         </>
                       ) : (
-                        "Submit Problem"
+                        "Post Project"
                       )}
                     </button>
                   </div>
@@ -304,4 +268,4 @@ const AddProblem = () => {
   );
 };
 
-export default AddProblem;
+export default AddProject;
