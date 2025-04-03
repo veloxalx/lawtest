@@ -47,6 +47,7 @@ const projectCategories = [
 const AddProject = () => {
   const [user, setUser] = useState(null);
   const [title, setTitle] = useState("");
+  const [contact,setContact] = useState(""); 
   const [location, setLocation] = useState(""); // Location will now be selected from a dropdown
   const [description, setDescription] = useState("");
   const [budget, setBudget] = useState("");
@@ -100,6 +101,7 @@ const AddProject = () => {
         category,
         userId: user.uid,
         completed: false,
+        contact,
         createdAt: new Date().toISOString(),
       });
       setTitle("");
@@ -203,6 +205,19 @@ const AddProject = () => {
                     </div>
                     <div className="col-span-2">
                       <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Enter Contact Details
+                      </label>
+                      <input
+                        type="text"
+                        value={contact}
+                        onChange={(e) => setContact(e.target.value)}
+                        required
+                        className="block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                        placeholder="Enter Contact Details"
+                      />
+                    </div>
+                    <div className="col-span-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
                         Project Title
                       </label>
                       <input
@@ -242,7 +257,7 @@ const AddProject = () => {
                         onChange={(e) => setDescription(e.target.value)}
                         required
                         className="block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 sm:text-sm"
-                        placeholder="Describe the project requirements in detail (With Contact Details)"
+                        placeholder="Describe the project requirements in detail"
                       />
                     </div>
                     <div className="col-span-2">

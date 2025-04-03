@@ -438,6 +438,11 @@ const Home = () => {
                         {project.location} , Sri Lanka
                       </span>
                     )}
+                    {project.contact && (
+                      <span className="px-3 py-1 rounded-full text-sm bg-gray-100 text-gray-800">
+                        Contact : {project.contact} 
+                      </span>
+                    )}
                   </div>
                   {user && user.uid === project.userId && (
                     <div className="flex gap-2">
