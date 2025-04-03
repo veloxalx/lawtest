@@ -375,7 +375,7 @@ const Home = () => {
                     )}
                     {project.location && (
                       <span className="px-3 py-1 rounded-full text-sm bg-gray-100 text-gray-800">
-                        {project.location}
+                        {project.location} , Sri Lanka
                       </span>
                     )}
                   </div>
