@@ -31,6 +31,7 @@ const Home = () => {
   const [projects, setProjects] = useState([]);
   const [filteredProjects, setFilteredProjects] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState(""); // Added status filter state
   const [loading, setLoading] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -66,18 +67,34 @@ const Home = () => {
 
   useEffect(() => {
     let updatedProjects = projects;
+    
+    // Filter by category
     if (selectedCategory) {
       updatedProjects = updatedProjects.filter(
         (project) => project.category === selectedCategory
       );
     }
+    
+    // Filter by status (open/completed)
+    if (selectedStatus === "open") {
+      updatedProjects = updatedProjects.filter(
+        (project) => !project.completed
+      );
+    } else if (selectedStatus === "completed") {
+      updatedProjects = updatedProjects.filter(
+        (project) => project.completed
+      );
+    }
+    
+    // Filter by search term
     if (searchTerm) {
       updatedProjects = updatedProjects.filter((project) =>
         project.title.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
+    
     setFilteredProjects(updatedProjects);
-  }, [selectedCategory, searchTerm, projects]);
+  }, [selectedCategory, selectedStatus, searchTerm, projects]);
 
   useEffect(() => {
     if (user && showPopup) {
@@ -247,7 +264,7 @@ const Home = () => {
       <main className="container mx-auto px-4 py-8">
         {/* Filters Section */}
         <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
-          <div className="grid gap-6 md:grid-cols-2">
+          <div className="grid gap-6 md:grid-cols-3">
             <div className="relative">
               <input
                 type="text"
@@ -281,6 +298,15 @@ const Home = () => {
                   {cat}
                 </option>
               ))}
+            </select>
+            <select
+              value={selectedStatus}
+              onChange={(e) => setSelectedStatus(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+            >
+              <option value="">All Projects</option>
+              <option value="open">Open Projects</option>
+              <option value="completed">Completed Projects</option>
             </select>
           </div>
         </div>
@@ -338,6 +364,40 @@ const Home = () => {
           )}
         </div>
 
+        {/* Status Filter Pills - Mobile Friendly Alternative */}
+        <div className="flex gap-2 mb-6">
+          <button
+            onClick={() => setSelectedStatus("")}
+            className={`px-4 py-2 rounded-full text-sm ${
+              selectedStatus === ""
+                ? "bg-blue-600 text-white"
+                : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+            } transition-colors`}
+          >
+            All Projects
+          </button>
+          <button
+            onClick={() => setSelectedStatus("open")}
+            className={`px-4 py-2 rounded-full text-sm ${
+              selectedStatus === "open"
+                ? "bg-orange-500 text-white"
+                : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+            } transition-colors`}
+          >
+            Open Projects
+          </button>
+          <button
+            onClick={() => setSelectedStatus("completed")}
+            className={`px-4 py-2 rounded-full text-sm ${
+              selectedStatus === "completed"
+                ? "bg-green-600 text-white"
+                : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+            } transition-colors`}
+          >
+            Completed Projects
+          </button>
+        </div>
+
         {/* Projects Grid */}
         {loading ? (
           <div className="text-center py-12">
@@ -379,7 +439,7 @@ const Home = () => {
                       </span>
                     )}
                   </div>
-                  {user && user.uid === project.userId ? (
+                  {user && user.uid === project.userId && (
                     <div className="flex gap-2">
                       <button
                         onClick={() => handleToggleCompleted(project.id)}
@@ -423,10 +483,6 @@ const Home = () => {
                         </svg>
                       </button>
                     </div>
-                  ) : (
-                    <button className="w-full px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-                      Apply for Project
-                    </button>
                   )}
                 </div>
               </div>
@@ -470,9 +526,50 @@ const Home = () => {
                   </svg>
                 </button>
               </div>
+              
+              {/* Status filter tabs for the modal */}
+              <div className="flex space-x-2 mb-4">
+                <button
+                  onClick={() => setSelectedStatus("")}
+                  className={`px-3 py-1 rounded-md text-sm ${
+                    selectedStatus === ""
+                      ? "bg-blue-600 text-white"
+                      : "bg-gray-200 text-gray-800"
+                  }`}
+                >
+                  All
+                </button>
+                <button
+                  onClick={() => setSelectedStatus("open")}
+                  className={`px-3 py-1 rounded-md text-sm ${
+                    selectedStatus === "open"
+                      ? "bg-orange-500 text-white"
+                      : "bg-gray-200 text-gray-800"
+                  }`}
+                >
+                  Open
+                </button>
+                <button
+                  onClick={() => setSelectedStatus("completed")}
+                  className={`px-3 py-1 rounded-md text-sm ${
+                    selectedStatus === "completed"
+                      ? "bg-green-600 text-white"
+                      : "bg-gray-200 text-gray-800"
+                  }`}
+                >
+                  Completed
+                </button>
+              </div>
+              
               <div className="space-y-4">
                 {userProjects.length > 0 ? (
-                  userProjects.map((project) => (
+                  userProjects
+                    .filter(project => {
+                      if (selectedStatus === "open") return !project.completed;
+                      if (selectedStatus === "completed") return project.completed;
+                      return true;
+                    })
+                    .map((project) => (
                     <div
                       key={project.id}
                       className="border border-gray-200 rounded-lg p-4"
@@ -521,6 +618,19 @@ const Home = () => {
                   <div className="text-center py-8">
                     <p className="text-gray-600">
                       You haven't posted any projects yet.
+                    </p>
+                  </div>
+                )}
+                
+                {userProjects.length > 0 && 
+                 userProjects.filter(project => {
+                   if (selectedStatus === "open") return !project.completed;
+                   if (selectedStatus === "completed") return project.completed;
+                   return true;
+                 }).length === 0 && (
+                  <div className="text-center py-8">
+                    <p className="text-gray-600">
+                      No {selectedStatus} projects found.
                     </p>
                   </div>
                 )}
