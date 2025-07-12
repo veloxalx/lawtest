@@ -9,6 +9,7 @@ import {
   deleteDoc,
   query,
   where,
+  orderBy,
 } from "firebase/firestore";
 import { auth, firestore } from "./lib/firebase";
 import Link from "next/link";
@@ -26,12 +27,55 @@ const projectCategories = [
   "Other",
 ];
 
+const smeCategories = [
+  "Access to Finance",
+  "Digital Infrastructure",
+  "Export & Trade",
+  "Skills & Training",
+  "Regulatory Compliance",
+  "Technology Adoption",
+  "Market Access",
+  "Supply Chain",
+  "Energy & Utilities",
+  "Workspace & Facilities",
+  "Innovation Support",
+  "Other",
+];
+
+const infrastructureCategories = [
+  "Transportation & Roads",
+  "Public Transport",
+  "Water Supply & Sanitation",
+  "Electricity & Power",
+  "Internet & Telecommunications",
+  "Healthcare Facilities",
+  "Education & Schools",
+  "Waste Management",
+  "Parks & Recreation",
+  "Housing & Urban Planning",
+  "Agriculture & Irrigation",
+  "Environmental Protection",
+  "Digital Government Services",
+  "Emergency Services",
+  "Other",
+];
+
 const Home = () => {
   const [user, setUser] = useState(null);
   const [projects, setProjects] = useState([]);
   const [filteredProjects, setFilteredProjects] = useState([]);
+  const [smeSubmissions, setSmeSubmissions] = useState([]);
+  const [infrastructureSubmissions, setInfrastructureSubmissions] = useState(
+    []
+  );
+  const [filteredSmeSubmissions, setFilteredSmeSubmissions] = useState([]);
+  const [
+    filteredInfrastructureSubmissions,
+    setFilteredInfrastructureSubmissions,
+  ] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
-  const [selectedStatus, setSelectedStatus] = useState(""); // Added status filter state
+  const [selectedStatus, setSelectedStatus] = useState("");
+  const [selectedView, setSelectedView] = useState("projects"); // projects, sme, infrastructure
   const [loading, setLoading] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -41,60 +85,114 @@ const Home = () => {
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(setUser);
 
-    const fetchProjects = async () => {
+    const fetchAllData = async () => {
       setLoading(true);
       try {
+        // Fetch projects
         const projectsCollection = collection(firestore, "projects");
-        const snapshot = await getDocs(projectsCollection);
-        const projectsList = snapshot.docs.map((doc) => ({
+        const projectsSnapshot = await getDocs(projectsCollection);
+        const projectsList = projectsSnapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
         }));
         setProjects(projectsList);
         setFilteredProjects(projectsList);
+
+        // Fetch SME submissions
+        const smeCollection = collection(firestore, "sme_challenges");
+        const smeQuery = query(smeCollection, orderBy("createdAt", "desc"));
+        const smeSnapshot = await getDocs(smeQuery);
+        const smeList = smeSnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setSmeSubmissions(smeList);
+        setFilteredSmeSubmissions(smeList);
+
+        // Fetch Infrastructure submissions
+        const infrastructureCollection = collection(
+          firestore,
+          "infrastructure_suggestions"
+        );
+        const infrastructureQuery = query(
+          infrastructureCollection,
+          orderBy("createdAt", "desc")
+        );
+        const infrastructureSnapshot = await getDocs(infrastructureQuery);
+        const infrastructureList = infrastructureSnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setInfrastructureSubmissions(infrastructureList);
+        setFilteredInfrastructureSubmissions(infrastructureList);
       } catch (error) {
-        console.error("Error fetching projects:", error.message);
+        console.error("Error fetching data:", error.message);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchProjects();
+    fetchAllData();
     setShowVerificationWarning(true);
 
     return () => unsubscribe();
   }, []);
 
   useEffect(() => {
+    // Filter projects
     let updatedProjects = projects;
-    
-    // Filter by category
     if (selectedCategory) {
       updatedProjects = updatedProjects.filter(
         (project) => project.category === selectedCategory
       );
     }
-    
-    // Filter by status (open/completed)
     if (selectedStatus === "open") {
-      updatedProjects = updatedProjects.filter(
-        (project) => !project.completed
-      );
+      updatedProjects = updatedProjects.filter((project) => !project.completed);
     } else if (selectedStatus === "completed") {
-      updatedProjects = updatedProjects.filter(
-        (project) => project.completed
-      );
+      updatedProjects = updatedProjects.filter((project) => project.completed);
     }
-    
-    // Filter by search term
     if (searchTerm) {
       updatedProjects = updatedProjects.filter((project) =>
         project.title.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
-    
     setFilteredProjects(updatedProjects);
-  }, [selectedCategory, selectedStatus, searchTerm, projects]);
+
+    // Filter SME submissions
+    let updatedSme = smeSubmissions;
+    if (selectedCategory) {
+      updatedSme = updatedSme.filter(
+        (submission) => submission.category === selectedCategory
+      );
+    }
+    if (searchTerm) {
+      updatedSme = updatedSme.filter((submission) =>
+        submission.title.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+    setFilteredSmeSubmissions(updatedSme);
+
+    // Filter Infrastructure submissions
+    let updatedInfrastructure = infrastructureSubmissions;
+    if (selectedCategory) {
+      updatedInfrastructure = updatedInfrastructure.filter(
+        (submission) => submission.category === selectedCategory
+      );
+    }
+    if (searchTerm) {
+      updatedInfrastructure = updatedInfrastructure.filter((submission) =>
+        submission.title.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+    setFilteredInfrastructureSubmissions(updatedInfrastructure);
+  }, [
+    selectedCategory,
+    selectedStatus,
+    searchTerm,
+    projects,
+    smeSubmissions,
+    infrastructureSubmissions,
+  ]);
 
   useEffect(() => {
     if (user && showPopup) {
@@ -128,7 +226,6 @@ const Home = () => {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
       setUser(user);
-      localStorage.setItem("user", JSON.stringify(user));
     } catch (error) {
       console.error("Error signing in with Google:", error.message);
     }
@@ -138,7 +235,6 @@ const Home = () => {
     try {
       await signOut(auth);
       setUser(null);
-      localStorage.removeItem("user");
     } catch (error) {
       console.error("Error signing out:", error.message);
     }
@@ -182,6 +278,212 @@ const Home = () => {
     }
   };
 
+  const formatDate = (dateString) => {
+    if (!dateString) return "Date not available";
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
+  const getUrgencyColor = (urgency) => {
+    switch (urgency) {
+      case "critical":
+        return "bg-red-100 text-red-800";
+      case "high":
+        return "bg-orange-100 text-orange-800";
+      case "medium":
+        return "bg-yellow-100 text-yellow-800";
+      case "low":
+        return "bg-green-100 text-green-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
+  };
+
+  const getCurrentCategories = () => {
+    if (selectedView === "projects") return projectCategories;
+    if (selectedView === "sme") return smeCategories;
+    if (selectedView === "infrastructure") return infrastructureCategories;
+    return [];
+  };
+
+  const getCurrentData = () => {
+    if (selectedView === "projects") return filteredProjects;
+    if (selectedView === "sme") return filteredSmeSubmissions;
+    if (selectedView === "infrastructure")
+      return filteredInfrastructureSubmissions;
+    return [];
+  };
+
+  const renderProjectCard = (project) => (
+    <div
+      key={project.id}
+      className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow"
+    >
+      <div className="p-6">
+        <div className="flex justify-between items-start mb-4">
+          <h3 className="text-xl font-semibold">{project.title}</h3>
+          <span
+            className={`px-3 py-1 rounded-full text-sm ${
+              project.completed
+                ? "bg-green-100 text-green-800"
+                : "bg-orange-100 text-orange-800"
+            }`}
+          >
+            {project.completed ? "Completed" : "Open"}
+          </span>
+        </div>
+        <p className="text-gray-600 mb-4">{project.description}</p>
+        <div className="flex flex-wrap items-center gap-2 mb-4">
+          <span className="px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800">
+            {project.category}
+          </span>
+          {project.budget && (
+            <span className="px-3 py-1 rounded-full text-sm bg-purple-100 text-purple-800">
+              Rs. {project.budget.toLocaleString()}
+            </span>
+          )}
+          {project.location && (
+            <span className="px-3 py-1 rounded-full text-sm bg-gray-100 text-gray-800">
+              {project.location}, Sri Lanka
+            </span>
+          )}
+          {project.contact && (
+            <span className="px-3 py-1 rounded-full text-sm bg-gray-100 text-gray-800">
+              Contact: {project.contact}
+            </span>
+          )}
+        </div>
+        {user && user.uid === project.userId && (
+          <div className="flex gap-2">
+            <button
+              onClick={() => handleToggleCompleted(project.id)}
+              className={`flex-1 px-4 py-2 rounded-lg transition-colors flex items-center justify-center ${
+                project.completed
+                  ? "bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
+                  : "bg-green-600 text-white hover:bg-green-700"
+              }`}
+            >
+              <svg
+                className="h-5 w-5 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M5 13l4 4L19 7"
+                />
+              </svg>
+              {project.completed ? "Reopen Project" : "Mark Completed"}
+            </button>
+            <button
+              onClick={() => handleDeleteProject(project.id)}
+              className="p-2 bg-red-100 text-red-800 rounded-lg hover:bg-red-200 transition-colors"
+            >
+              <svg
+                className="h-5 w-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
+  const renderSubmissionCard = (submission) => (
+    <div
+      key={submission.id}
+      className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow"
+    >
+      <div className="p-6">
+        <div className="flex justify-between items-start mb-4">
+          <h3 className="text-xl font-semibold">{submission.title}</h3>
+          <div className="flex flex-col gap-2">
+            <span
+              className={`px-3 py-1 rounded-full text-sm ${getUrgencyColor(
+                submission.urgency
+              )}`}
+            >
+              {submission.urgency?.charAt(0).toUpperCase() +
+                submission.urgency?.slice(1)}{" "}
+              Priority
+            </span>
+            <span className="px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800">
+              {submission.status?.replace("_", " ").toUpperCase()}
+            </span>
+          </div>
+        </div>
+
+        <p className="text-gray-600 mb-4">{submission.description}</p>
+
+        <div className="mb-4 p-3 bg-gray-50 rounded-lg">
+          <h4 className="font-medium text-gray-900 mb-2">Proposed Solution:</h4>
+          <p className="text-gray-700 text-sm">{submission.proposedSolution}</p>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2 mb-4">
+          <span className="px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800">
+            {submission.category}
+          </span>
+          {submission.location && (
+            <span className="px-3 py-1 rounded-full text-sm bg-gray-100 text-gray-800">
+              📍 {submission.location}
+            </span>
+          )}
+          {submission.affectedPeople && (
+            <span className="px-3 py-1 rounded-full text-sm bg-purple-100 text-purple-800">
+              👥 {submission.affectedPeople.toLocaleString()} people affected
+            </span>
+          )}
+          {submission.contact && (
+            <span className="px-3 py-1 rounded-full text-sm bg-gray-100 text-gray-800">
+              📞 {submission.contact}
+            </span>
+          )}
+        </div>
+
+        <div className="flex justify-between items-center text-sm text-gray-500 pt-4 border-t border-gray-200">
+          <span>
+            Submitted by:{" "}
+            <span className="font-medium">{submission.userName}</span>
+          </span>
+          <span>📅 {formatDate(submission.createdAt)}</span>
+        </div>
+
+        {submission.votes !== undefined && (
+          <div className="mt-3 flex items-center gap-4">
+            <span className="text-sm text-gray-600">
+              👍 {submission.votes} votes
+            </span>
+            {submission.comments && (
+              <span className="text-sm text-gray-600">
+                💬 {submission.comments.length} comments
+              </span>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Verification Warning Alert */}
@@ -212,8 +514,9 @@ const Home = () => {
               </button>
             </div>
             <p className="mt-4 text-gray-700">
-              This platform connects Sri Lankan freelancers with local projects. 
-              We recommend verifying the identity of clients before accepting any work.
+              This platform connects Sri Lankan freelancers with local projects
+              and enables civic engagement. We recommend verifying the identity
+              of clients before accepting any work.
             </p>
             <button
               onClick={() => setShowVerificationWarning(false)}
@@ -232,7 +535,8 @@ const Home = () => {
             <div className="text-white">
               <h1 className="text-3xl font-bold">FreeLanka 🇱🇰</h1>
               <p className="mt-2 text-green-100">
-                Connect with local Sri Lankan projects
+                Connect with local Sri Lankan projects & contribute to national
+                development
               </p>
             </div>
             {user && (
@@ -262,6 +566,42 @@ const Home = () => {
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
+        {/* View Navigation */}
+        <div className="bg-white rounded-lg shadow-sm p-4 mb-8">
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={() => setSelectedView("projects")}
+              className={`px-4 py-2 rounded-lg transition-colors ${
+                selectedView === "projects"
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+              }`}
+            >
+              💼 Freelance Projects ({projects.length})
+            </button>
+            <button
+              onClick={() => setSelectedView("sme")}
+              className={`px-4 py-2 rounded-lg transition-colors ${
+                selectedView === "sme"
+                  ? "bg-green-600 text-white"
+                  : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+              }`}
+            >
+              🏢 SME Challenges ({smeSubmissions.length})
+            </button>
+            <button
+              onClick={() => setSelectedView("infrastructure")}
+              className={`px-4 py-2 rounded-lg transition-colors ${
+                selectedView === "infrastructure"
+                  ? "bg-purple-600 text-white"
+                  : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+              }`}
+            >
+              🏗️ Infrastructure Issues ({infrastructureSubmissions.length})
+            </button>
+          </div>
+        </div>
+
         {/* Filters Section */}
         <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
           <div className="grid gap-6 md:grid-cols-3">
@@ -270,7 +610,7 @@ const Home = () => {
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Search projects..."
+                placeholder={`Search ${selectedView}...`}
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
               />
               <svg
@@ -293,30 +633,41 @@ const Home = () => {
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
             >
               <option value="">All Categories</option>
-              {projectCategories.map((cat) => (
+              {getCurrentCategories().map((cat) => (
                 <option key={cat} value={cat}>
                   {cat}
                 </option>
               ))}
             </select>
-            <select
-              value={selectedStatus}
-              onChange={(e) => setSelectedStatus(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-            >
-              <option value="">All Projects</option>
-              <option value="open">Open Projects</option>
-              <option value="completed">Completed Projects</option>
-            </select>
+            {selectedView === "projects" && (
+              <select
+                value={selectedStatus}
+                onChange={(e) => setSelectedStatus(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              >
+                <option value="">All Projects</option>
+                <option value="open">Open Projects</option>
+                <option value="completed">Completed Projects</option>
+              </select>
+            )}
           </div>
         </div>
-        <Link
-          className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors m-4"
-          href={"/how"}
-        >
-          {" "}
-          How To Use The Platform
-        </Link>
+
+        <div className="flex flex-wrap gap-4 mb-8">
+          <Link
+            className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            href="/how"
+          >
+            How To Use The Platform
+          </Link>
+          <Link
+            className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+            href="/civic-platform"
+          >
+            🏛️ Civic Platform - Report Issues
+          </Link>
+        </div>
+
         {/* User Actions */}
         <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
           {!user ? (
@@ -337,7 +688,7 @@ const Home = () => {
               <div className="space-x-4">
                 <button
                   onClick={() => setShowPopup(true)}
-                  className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors m-4"
+                  className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
                 >
                   Manage Projects
                 </button>
@@ -364,142 +715,69 @@ const Home = () => {
           )}
         </div>
 
-        {/* Status Filter Pills - Mobile Friendly Alternative */}
-        <div className="flex gap-2 mb-6">
-          <button
-            onClick={() => setSelectedStatus("")}
-            className={`px-4 py-2 rounded-full text-sm ${
-              selectedStatus === ""
-                ? "bg-blue-600 text-white"
-                : "bg-gray-200 text-gray-800 hover:bg-gray-300"
-            } transition-colors`}
-          >
-            All Projects
-          </button>
-          <button
-            onClick={() => setSelectedStatus("open")}
-            className={`px-4 py-2 rounded-full text-sm ${
-              selectedStatus === "open"
-                ? "bg-orange-500 text-white"
-                : "bg-gray-200 text-gray-800 hover:bg-gray-300"
-            } transition-colors`}
-          >
-            Open Projects
-          </button>
-          <button
-            onClick={() => setSelectedStatus("completed")}
-            className={`px-4 py-2 rounded-full text-sm ${
-              selectedStatus === "completed"
-                ? "bg-green-600 text-white"
-                : "bg-gray-200 text-gray-800 hover:bg-gray-300"
-            } transition-colors`}
-          >
-            Completed Projects
-          </button>
-        </div>
-
-        {/* Projects Grid */}
-        {loading ? (
-          <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-4 border-green-600 border-t-transparent"></div>
-          </div>
-        ) : (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {filteredProjects.map((project) => (
-              <div
-                key={project.id}
-                className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow"
-              >
-                <div className="p-6">
-                  <div className="flex justify-between items-start mb-4">
-                    <h3 className="text-xl font-semibold">{project.title}</h3>
-                    <span
-                      className={`px-3 py-1 rounded-full text-sm ${
-                        project.completed
-                          ? "bg-green-100 text-green-800"
-                          : "bg-orange-100 text-orange-800"
-                      }`}
-                    >
-                      {project.completed ? "Completed" : "Open"}
-                    </span>
-                  </div>
-                  <p className="text-gray-600 mb-4">{project.description}</p>
-                  <div className="flex flex-wrap items-center gap-2 mb-4">
-                    <span className="px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800">
-                      {project.category}
-                    </span>
-                    {project.budget && (
-                      <span className="px-3 py-1 rounded-full text-sm bg-purple-100 text-purple-800">
-                        Rs. {project.budget.toLocaleString()}
-                      </span>
-                    )}
-                    {project.location && (
-                      <span className="px-3 py-1 rounded-full text-sm bg-gray-100 text-gray-800">
-                        {project.location} , Sri Lanka
-                      </span>
-                    )}
-                    {project.contact && (
-                      <span className="px-3 py-1 rounded-full text-sm bg-gray-100 text-gray-800">
-                        Contact : {project.contact} 
-                      </span>
-                    )}
-                  </div>
-                  {user && user.uid === project.userId && (
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => handleToggleCompleted(project.id)}
-                        className={`flex-1 px-4 py-2 rounded-lg transition-colors flex items-center justify-center ${
-                          project.completed
-                            ? "bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
-                            : "bg-green-600 text-white hover:bg-green-700"
-                        }`}
-                      >
-                        <svg
-                          className="h-5 w-5 mr-2"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M5 13l4 4L19 7"
-                          />
-                        </svg>
-                        {project.completed ? "Reopen Project" : "Mark Completed"}
-                      </button>
-                      <button
-                        onClick={() => handleDeleteProject(project.id)}
-                        className="p-2 bg-red-100 text-red-800 rounded-lg hover:bg-red-200 transition-colors"
-                      >
-                        <svg
-                          className="h-5 w-5"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M6 18L18 6M6 6l12 12"
-                          />
-                        </svg>
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))}
+        {/* Status Filter Pills - Only for projects */}
+        {selectedView === "projects" && (
+          <div className="flex gap-2 mb-6">
+            <button
+              onClick={() => setSelectedStatus("")}
+              className={`px-4 py-2 rounded-full text-sm ${
+                selectedStatus === ""
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+              } transition-colors`}
+            >
+              All Projects
+            </button>
+            <button
+              onClick={() => setSelectedStatus("open")}
+              className={`px-4 py-2 rounded-full text-sm ${
+                selectedStatus === "open"
+                  ? "bg-orange-500 text-white"
+                  : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+              } transition-colors`}
+            >
+              Open Projects
+            </button>
+            <button
+              onClick={() => setSelectedStatus("completed")}
+              className={`px-4 py-2 rounded-full text-sm ${
+                selectedStatus === "completed"
+                  ? "bg-green-600 text-white"
+                  : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+              } transition-colors`}
+            >
+              Completed Projects
+            </button>
           </div>
         )}
 
-        {filteredProjects.length === 0 && !loading && (
+        {/* Content Grid */}
+        {loading ? (
+          <div className="text-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-4 border-green-600 border-t-transparent mx-auto"></div>
+            <p className="mt-4 text-gray-600">Loading...</p>
+          </div>
+        ) : (
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {getCurrentData().map((item) => {
+              if (selectedView === "projects") {
+                return renderProjectCard(item);
+              } else {
+                return renderSubmissionCard(item);
+              }
+            })}
+          </div>
+        )}
+
+        {getCurrentData().length === 0 && !loading && (
           <div className="bg-white rounded-lg shadow-sm p-12 text-center">
-            <h3 className="text-xl font-semibold mb-2">No Projects Found</h3>
+            <h3 className="text-xl font-semibold mb-2">
+              No {selectedView} Found
+            </h3>
             <p className="text-gray-600">
-              Try adjusting your filters or post a new project.
+              {selectedView === "projects"
+                ? "Try adjusting your filters or post a new project."
+                : "No submissions found for the selected criteria."}
             </p>
           </div>
         )}
@@ -531,111 +809,86 @@ const Home = () => {
                   </svg>
                 </button>
               </div>
-              
-              {/* Status filter tabs for the modal */}
-              <div className="flex space-x-2 mb-4">
-                <button
-                  onClick={() => setSelectedStatus("")}
-                  className={`px-3 py-1 rounded-md text-sm ${
-                    selectedStatus === ""
-                      ? "bg-blue-600 text-white"
-                      : "bg-gray-200 text-gray-800"
-                  }`}
-                >
-                  All
-                </button>
-                <button
-                  onClick={() => setSelectedStatus("open")}
-                  className={`px-3 py-1 rounded-md text-sm ${
-                    selectedStatus === "open"
-                      ? "bg-orange-500 text-white"
-                      : "bg-gray-200 text-gray-800"
-                  }`}
-                >
-                  Open
-                </button>
-                <button
-                  onClick={() => setSelectedStatus("completed")}
-                  className={`px-3 py-1 rounded-md text-sm ${
-                    selectedStatus === "completed"
-                      ? "bg-green-600 text-white"
-                      : "bg-gray-200 text-gray-800"
-                  }`}
-                >
-                  Completed
-                </button>
-              </div>
-              
+
               <div className="space-y-4">
                 {userProjects.length > 0 ? (
-                  userProjects
-                    .filter(project => {
+                  <>
+                    {userProjects
+                      .filter((project) => {
+                        if (selectedStatus === "open")
+                          return !project.completed;
+                        if (selectedStatus === "completed")
+                          return project.completed;
+                        return true;
+                      })
+                      .map((project) => (
+                        <div
+                          key={project.id}
+                          className="border border-gray-200 rounded-lg p-4"
+                        >
+                          <div className="flex justify-between items-start mb-4">
+                            <h3 className="text-lg font-semibold">
+                              {project.title}
+                            </h3>
+                            <span
+                              className={`px-3 py-1 rounded-full text-sm ${
+                                project.completed
+                                  ? "bg-green-100 text-green-800"
+                                  : "bg-orange-100 text-orange-800"
+                              }`}
+                            >
+                              {project.completed ? "Completed" : "Open"}
+                            </span>
+                          </div>
+                          <p className="text-gray-600 mb-4">
+                            {project.description}
+                          </p>
+                          {project.budget && (
+                            <p className="text-gray-600 mb-4">
+                              Budget: Rs. {project.budget.toLocaleString()}
+                            </p>
+                          )}
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => handleToggleCompleted(project.id)}
+                              className={`flex-1 px-4 py-2 rounded-lg transition-colors ${
+                                project.completed
+                                  ? "bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
+                                  : "bg-green-600 text-white hover:bg-green-700"
+                              }`}
+                            >
+                              {project.completed
+                                ? "Reopen Project"
+                                : "Mark Completed"}
+                            </button>
+                            <button
+                              onClick={() => handleDeleteProject(project.id)}
+                              className="px-4 py-2 bg-red-100 text-red-800 rounded-lg hover:bg-red-200 transition-colors"
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+
+                    {/* Show message when filtered results are empty */}
+                    {userProjects.filter((project) => {
                       if (selectedStatus === "open") return !project.completed;
-                      if (selectedStatus === "completed") return project.completed;
+                      if (selectedStatus === "completed")
+                        return project.completed;
                       return true;
-                    })
-                    .map((project) => (
-                    <div
-                      key={project.id}
-                      className="border border-gray-200 rounded-lg p-4"
-                    >
-                      <div className="flex justify-between items-start mb-4">
-                        <h3 className="text-lg font-semibold">
-                          {project.title}
-                        </h3>
-                        <span
-                          className={`px-3 py-1 rounded-full text-sm ${
-                            project.completed
-                              ? "bg-green-100 text-green-800"
-                              : "bg-orange-100 text-orange-800"
-                          }`}
-                        >
-                          {project.completed ? "Completed" : "Open"}
-                        </span>
-                      </div>
-                      <p className="text-gray-600 mb-4">{project.description}</p>
-                      {project.budget && (
-                        <p className="text-gray-600 mb-4">
-                          Budget: Rs. {project.budget.toLocaleString()}
+                    }).length === 0 && (
+                      <div className="text-center py-8">
+                        <p className="text-gray-600">
+                          No {selectedStatus} projects found.
                         </p>
-                      )}
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => handleToggleCompleted(project.id)}
-                          className={`flex-1 px-4 py-2 rounded-lg transition-colors ${
-                            project.completed
-                              ? "bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
-                              : "bg-green-600 text-white hover:bg-green-700"
-                          }`}
-                        >
-                          {project.completed ? "Reopen Project" : "Mark Completed"}
-                        </button>
-                        <button
-                          onClick={() => handleDeleteProject(project.id)}
-                          className="px-4 py-2 bg-red-100 text-red-800 rounded-lg hover:bg-red-200 transition-colors"
-                        >
-                          Delete
-                        </button>
                       </div>
-                    </div>
-                  ))
+                    )}
+                  </>
                 ) : (
                   <div className="text-center py-8">
                     <p className="text-gray-600">
                       You haven't posted any projects yet.
-                    </p>
-                  </div>
-                )}
-                
-                {userProjects.length > 0 && 
-                 userProjects.filter(project => {
-                   if (selectedStatus === "open") return !project.completed;
-                   if (selectedStatus === "completed") return project.completed;
-                   return true;
-                 }).length === 0 && (
-                  <div className="text-center py-8">
-                    <p className="text-gray-600">
-                      No {selectedStatus} projects found.
                     </p>
                   </div>
                 )}
